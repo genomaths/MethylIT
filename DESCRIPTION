@@ -26,6 +26,7 @@ Imports:
   betareg,
   caret,
   data.table,
+  DESeq2,
   e1071,
   genefilter,
   GenomeInfoDb,

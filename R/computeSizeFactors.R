@@ -27,7 +27,7 @@
 #' @references http://seqanswers.com/forums/showpost.php?p=16468&postcount=13
 #'
 #' @examples
-#'     dds <- makeExampleDESeqDataSet(n = 1000, m = 4)
+#'     dds <- DESeq2::makeExampleDESeqDataSet(n = 1000, m = 4)
 #'     MethylIT:::.computeSizeFactors(dds)
 #' @keywords internal
 .computeSizeFactors <- function(dss) {
