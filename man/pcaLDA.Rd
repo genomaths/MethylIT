@@ -62,7 +62,7 @@ Predict using a PCA-LDA model built with function 'pcaLDA'
 \details{
 The principal components (PCs) are obtained using the function
     'prcomp' from R pacakage 'stats', while the LDA is performed using the
-    'lda' function from R package 'MASS'. The current application only uses 
+    'lda' function from R package 'MASS'. The current application only uses
      basic functionalities of mentioned functions. As shown in the example,
      pcaLDA' function can be used in general classification problems.
 }

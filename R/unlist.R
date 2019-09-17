@@ -4,6 +4,9 @@
 #'     format, unlist simplifies it to produce a new R object which contains all
 #'     the initial components which in 'x' object.
 #' @param x Any list R object.
+#' @param recursive Logical. Should unlisting be applied to list components of
+#'     x?
+#' @param use.names Logical. Should names be preserved?
 #' @details This is a method to extend unlist generic function to handle
 #'     any list of objects from the same class.
 #' @export
@@ -23,9 +26,10 @@
 #' unlist(grl)
 
 setGeneric("unlist", signature = "x")
-unlist <- function(x, ...) UseMethod("unlist", x)
+unlist <- function(x, recursive = TRUE, use.names = TRUE) UseMethod("unlist")
 
-#' @export
+#' @exportMethod unlist.default
+#' @keywords internal
 unlist.default <- function(x, recursive = TRUE, use.names = TRUE) {
    n <- length(x)
    x <- base::unlist(x, recursive = recursive, use.names = use.names)

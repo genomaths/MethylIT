@@ -6,9 +6,7 @@
 #'     \emph{"RangedGlmDataSet"}.
 #' @param digits Number of significant digits to be used.
 #' @keywords internal
-#' @export
-
-print.qdaDMP <- function(x, ...) UseMethod("print", x)
+#' @exportMethod print.qdaDMP
 print.qdaDMP <- function(x, digits = getOption("digits")) {
    if (!is.null(cl <- x$call)) {
        names(cl)[2L] <- ""

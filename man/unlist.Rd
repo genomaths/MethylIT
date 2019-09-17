@@ -8,6 +8,11 @@ unlist(x, recursive = TRUE, use.names = TRUE)
 }
 \arguments{
 \item{x}{Any list R object.}
+
+\item{recursive}{Logical. Should unlisting be applied to list components of
+x?}
+
+\item{use.names}{Logical. Should names be preserved?}
 }
 \description{
 Given a list 'x' of R objects from the same class and same

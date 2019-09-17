@@ -19,7 +19,7 @@ qggamma(p, alpha = 1, scale = 1, mu = 0, psi = 1,
 rggamma(n, alpha = 1, scale = 1, mu = 0, psi = 1)
 }
 \arguments{
-\item{q}{numeric vector}
+\item{q}{numeric vector.}
 
 \item{alpha}{numerical parameter, strictly positive (default 1). The
 generalized gamma becomes the gamma distribution for alpha = 1.}
@@ -36,7 +36,9 @@ log(p).}
 \item{lower.tail}{logical; if TRUE (default), probabilities are P[X<=x],
 otherwise, P[X > x]}
 
-\item{n}{number of observations}
+\item{p}{vector of probabilities.}
+
+\item{n}{number of observations.}
 }
 \value{
 GG PDF values (3-parameters or 4-parameters) for dggamma,

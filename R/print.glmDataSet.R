@@ -1,7 +1,4 @@
 #' @rdname print.glmDataSet
-#' @aliases print.glmDataSet
-#' @aliases print.RangedGlmDataSet
-#' @aliases print
 #' @title Printing object from \emph{glmDataSet} and \emph{"RangedGlmDataSet"}
 #'     classes by simple print methods.
 #' @param x Object from class \emph{glmDataSet} or from class
@@ -10,10 +7,8 @@
 
 
 #' @rdname print.glmDataSet
-#' @name print.glmDataSet
-#' @export
+#' @exportMethod print.glmDataSet
 #' @keywords internal
-print.glmDataSet <- function(x, ...) UseMethod("print", x)
 print.glmDataSet <- function(x, digits = getOption("digits")) {
    cm <- dim(counts)
    lvs <- levels(x$colData$condition)
@@ -26,10 +21,8 @@ print.glmDataSet <- function(x, digits = getOption("digits")) {
 }
 
 #' @rdname print.glmDataSet
-#' @name print.RangedGlmDataSet
-#' @export
+#' @exportMethod print.RangedGlmDataSet
 #' @keywords internal
-print.RangedGlmDataSet <- function(x, ...) UseMethod("print", x)
 print.RangedGlmDataSet <- function(x, digits = getOption("digits")) {
     r <- length(x$GR)
     lvs <- levels(x$colData$condition)

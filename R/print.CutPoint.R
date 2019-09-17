@@ -1,12 +1,9 @@
 #' @rdname print.CutPoint
-#' @aliases print
 #' @title Printing object from 'CutPoint' class by simple print methods
 #' @param x Object of class \code{"CutPoint"}
 #' @param digits Number of significant digits to be used.
 #' @keywords internal
-#' @export
-
-print.CutPoint <- function(x, ...) UseMethod("print", x)
+#' @exportMethod print.CutPoint
 print.CutPoint <- function(x, digits = getOption("digits")) {
 
    postProbCut <- format(signif(x$postProbCut, max(1L, digits - 2L)))

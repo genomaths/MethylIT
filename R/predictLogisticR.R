@@ -33,8 +33,7 @@
 #'     posterior classification probabilities are returned.
 #' @importFrom GenomeInfoDb seqnames
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
-#' @export
-predict.LogisticR <- function(object, ...) UseMethod("predict")
+#' @exportMethod predict.LogisticR
 predict.LogisticR <- function(object, newdata = NULL,
                               type=c("all", "class", "posterior"),
                               num.cores = 1L, tasks = 0L, ...) {

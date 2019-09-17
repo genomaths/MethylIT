@@ -22,6 +22,8 @@ getDIMPatGenes(GR, ...)
 \item{GR}{An obects object from the any of the classes: 'pDMP', 'InfDiv',
 GRangesList, GRanges or a list of GRanges.}
 
+\item{...}{Not in use.}
+
 \item{GENES}{A GRanges object with gene coordinates and gene IDs. A
 meta-column named 'gene_id' carying the gene ids should be included. If
 the meta-column named 'gene_id' is not provided, then gene (region) ids

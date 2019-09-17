@@ -7,9 +7,9 @@
 \alias{validateClass.InfDiv}
 \title{Function to validate S3 classes in MethylIT}
 \usage{
-validateClass(LR, ...)
+validateClass(LR)
 
-\method{validateClass}{default}(LR, ...)
+\method{validateClass}{default}(LR)
 
 \method{validateClass}{pDMP}(LR)
 

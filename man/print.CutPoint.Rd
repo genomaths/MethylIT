@@ -2,7 +2,6 @@
 % Please edit documentation in R/print.CutPoint.R
 \name{print.CutPoint}
 \alias{print.CutPoint}
-\alias{print}
 \title{Printing object from 'CutPoint' class by simple print methods}
 \usage{
 \method{print}{CutPoint}(x, digits = getOption("digits"))

@@ -1,5 +1,4 @@
 #' @rdname predict.ldaDMP
-#' @name predict.ldaDMP
 #' @aliases predict.pcaLDA
 #' @title Predict function for 'ldaDMP' method
 #' @description Predict using a LDA model built with function
@@ -15,8 +14,7 @@
 #' @param ... arguments passed to or from other methods.
 #' @seealso \code{link[MethylIT]{estimateCutPoint}}, \code{link[MASS]{lda}}
 #' @keywords internal
-#' @export
-predict.ldaDMP <- function(object, ...) UseMethod("predict")
+#' @exportMethod predict.ldaDMP
 predict.ldaDMP <- function(object, newdata,
                            type = c("class", "posterior", "scores"), ...) {
    if (!inherits(object, "ldaDMP")) {

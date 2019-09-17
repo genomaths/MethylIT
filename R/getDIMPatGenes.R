@@ -13,6 +13,7 @@
 #'     will be created using the gene (region) coordinates.
 #' @param ignore.strand When set to TRUE, the strand information is ignored in
 #'     the calculations. Default value: TRUE
+#' @param ... Not in use.
 #' @return A GRanges object
 #'
 #' @examples
@@ -91,12 +92,10 @@
 #' @importFrom rtracklayer import
 #'
 #' @export
+getDIMPatGenes <- function(GR, ...) UseMethod("getDIMPatGenes")
 
-getDIMPatGenes <- function(GR, ...) UseMethod("getDIMPatGenes", GR)
-
-#' @name getDIMPatGenes.default
 #' @rdname getDIMPatGenes
-#' @export
+#' @exportMethod getDIMPatGenes.default
 getDIMPatGenes.default <- function(GR, GENES, ignore.strand=TRUE) {
    gene_id <- GENES$gene_id
    if(any(is.na(gene_id))) {
@@ -125,26 +124,20 @@ getDIMPatGenes.default <- function(GR, GENES, ignore.strand=TRUE) {
    return(unique(GENES))
 }
 
-#' @name getDIMPatGenes.pDMP
 #' @rdname getDIMPatGenes
-#' @export
-#'
+#' @exportMethod getDIMPatGenes.pDMP
 getDIMPatGenes.pDMP <- function(GR, GENES, ignore.strand=TRUE) {
    return(lapply(GR, getDIMPatGenes.default, GENES = GENES, keep.attr = TRUE))
 }
 
-#' @name getDIMPatGenes.pDMP
 #' @rdname getDIMPatGenes
-#' @export
-#'
+#' @exportMethod getDIMPatGenes.InfDiv
 getDIMPatGenes.InfDiv <- function(GR, GENES, ignore.strand=TRUE) {
    return(lapply(GR, getDIMPatGenes.default, GENES = GENES, keep.attr = TRUE))
 }
 
-#' @name getDIMPatGenes.list
 #' @rdname getDIMPatGenes
-#' @export
-#'
+#' @exportMethod getDIMPatGenes.list
 getDIMPatGenes.list <- function(GR, GENES, ignore.strand=TRUE) {
    return(lapply(GR, getDIMPatGenes.default, GENES = GENES ))
 }
