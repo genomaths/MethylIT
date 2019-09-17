@@ -13,3 +13,4 @@
 *.knit.md
 .Rproj.user
 .directory
+.Rbuildignore

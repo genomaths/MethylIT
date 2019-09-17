@@ -9,14 +9,13 @@
 \arguments{
 \item{x}{Matrix of counts.}
 
-\item{groups}{Groups information derived from 'DESeqDataSet' object created
-using DESeq2 package}
+\item{groups}{Groups information derived from a
+\code{\link[MethylIT]{glmDataSet}} object.}
 
-\item{baseMV}{parameter passed from 'getBaseMeansAndVariances' function from
-Bioconductor R package DESeq2. If baseMean >= baseVar*MVrate, then the
-nonlinear fit to "Poisson" and "QuasiPoisson" models are performed,
-otherwise only the nonlinear fit to "Neg.Binomial" and "Neg.Binomial
-with weights" models are performed}
+\item{baseMV}{Mean and variance of group counts. If
+baseMean >= baseVar*MVrate, then the nonlinear fit to "Poisson" and
+"QuasiPoisson" models are performed, otherwise only the nonlinear fit to
+"Neg.Binomial" and "Neg.Binomial with weights" models are performed}
 
 \item{w}{group weights used in glm procedure}
 

@@ -10,13 +10,12 @@
 #'     "Neg.Binomial"
 #'
 #' @param x Matrix of counts.
-#' @param groups Groups information derived from 'DESeqDataSet' object created
-#'     using DESeq2 package
-#' @param baseMV parameter passed from 'getBaseMeansAndVariances' function from
-#'     Bioconductor R package DESeq2. If baseMean >= baseVar*MVrate, then the
-#'     nonlinear fit to "Poisson" and "QuasiPoisson" models are performed,
-#'     otherwise only the nonlinear fit to "Neg.Binomial" and "Neg.Binomial
-#'     with weights" models are performed
+#' @param groups Groups information derived from a
+#'     \code{\link[MethylIT]{glmDataSet}} object.
+#' @param baseMV Mean and variance of group counts. If
+#'     baseMean >= baseVar*MVrate, then the nonlinear fit to "Poisson" and
+#'     "QuasiPoisson" models are performed, otherwise only the nonlinear fit to
+#'     "Neg.Binomial" and "Neg.Binomial with weights" models are performed
 #' @param w group weights used in glm procedure
 #' @param MVrate Minimum Mean/Variance rate.
 #' @param test A character string matching one of "Wald" or "LRT". If test =

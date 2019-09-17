@@ -39,7 +39,7 @@ Install R dependencies:
     
     install.packages(c("ArgumentCheck", "caret", "Epi", "e1071", "minpack.lm", "nls2", "caTools", "rmarkdown",   "RCurl"),dependencies=TRUE)
     
-    BiocManager::install(c('BiocParallel', 'biovizBase', 'DESeq2', 'genefilter', 'GenomeInfoDb', 'GenomicRanges'))
+    BiocManager::install(c('BiocParallel', 'biovizBase', 'genefilter', 'GenomeInfoDb', 'GenomicRanges'))
 
 
 You can install MethylIT from GitHub or PSU's GitLab:

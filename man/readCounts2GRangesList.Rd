@@ -7,9 +7,8 @@
 readCounts2GRangesList(filenames = NULL, sample.id = NULL,
   pattern = NULL, remove = FALSE, columns = c(seqnames = NULL, start
   = NULL, end = NULL, strand = NULL, fraction = NULL, percent = NULL, mC =
-  NULL, uC = NULL, coverage = NULL, context = NULL, seq = NULL),
-  chromosome.names = NULL, chromosomes = NULL, contexts = NULL,
-  seqs = NULL, verbose = TRUE, ...)
+  NULL, uC = NULL, coverage = NULL, context = NULL),
+  chromosome.names = NULL, chromosomes = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{filenames}{Character vector with the file names}
@@ -44,14 +43,6 @@ functionality of the function "seqlevels" defined from package
 
 \item{chromosomes}{If provided, it must be a character vector with the names
 of the chromosomes that you want to include in the final GRanges objects.}
-
-\item{contexts}{If provided, it must be a character vector with the names
-of the contexts that you want to include in the final GRanges objects, 
-for example, "CG", "CHG"}
-
-\item{seqs}{If provided, it must be a character vector with the names
-of the trinucleotide sequences that you want to include in the final 
-GRanges objects, for example, "CGA", "CAA"}
 
 \item{verbose}{If TRUE, prints the function log to stdout}
 
@@ -123,44 +114,5 @@ LR <- readCounts2GRangesList(filenames = filenames, remove = TRUE,
                                         mC = 4, uC = 3),
                             pattern = "^Chr1", verbose = TRUE)
 file.remove(filenames) # Remove the downloaded file
-
-#' filename <- "./file.cov"
-gr1 <- data.frame(chr = c("chr1", "chr1"), post = c(1,2),
-                strand = c("+", "-"), ratio = c(0.9, 0.5),
-                context = c("CG", "CG"), CT = c(20, 30))
-filename <- "./file.cov"
-write.table(as.data.frame(gr1), file = filename,
-            col.names = TRUE, row.names = FALSE, quote = FALSE)
-
-## Read the file. It does not work. Typing mistake: "fractions"
-LR <- try(readCounts2GRangesList(filenames = filename, remove = FALSE,
-                            sample.id = "test",
-                            columns = c(seqnames = 1, start = 2,
-                                    strand = 3, fractions = 4,
-                                    context = 5, coverage = 6)),
-                                    silent = TRUE)
-file.remove(filename) # Remove the file
-
-c("seqnames", "start", "strand", "mC", "uC", "context", "seq")
-filename <- "./file.cov"
-gr1 <- data.frame(seqnames = rep(1:20,each=5), start = seq(10, 1000, by=10),
-                strand = rep(c("+", "-"),times=25,each=2), 
-                mC=sample(0:10,size=100,replace=T),
-                uC=sample(0:10,size=100,replace=T),
-                context = rep(c("CG","CHG","CHH"),length.out=100),
-                seq = rep(c("CGC", "CAG", "CTT"),length.out=100))
-filename <- "./file.cov"
-write.table(as.data.frame(gr1), file = filename,
-            col.names = TRUE, row.names = FALSE, quote = FALSE)
-
-## Read the file. It does not work. Typing mistake: "fractions"
-LR <- try(readCounts2GRangesList(filenames = filename, remove = FALSE,
-                            sample.id = "test",
-                            columns = c(seqnames = 1, start = 2,
-                                    strand = 3, mC = 4, uC = 5,
-                                    context = 6, seq = 7)),
-                                    silent = TRUE)
-file.remove(filename) # Remove the file
-
 
 }
