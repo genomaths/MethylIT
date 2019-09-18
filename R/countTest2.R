@@ -7,7 +7,7 @@
 #'     estimation of the prior weights used in Negative Binomial generalized
 #'     linear model.
 #' @details A pairwise group comparison, control versus treatment, is performed.
-#'     The experimental desing settings must be introduced using function
+#'     The experimental design settings must be introduced using function
 #'     \code{link{glmDataSet}} to provide dataset (DS) object.
 #' @param DS A 'glmDataSet' object, which is created with function
 #'     \code{link{glmDataSet}}.

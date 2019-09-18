@@ -7,7 +7,7 @@
 #'     probability vector p_j = c(p_ij, 1 - p_ij). Then, the information
 #'     divergence between methylation levels p1 and p2 is the divergence
 #'     between the vectors p1 = c(p_i1, 1 - p_i1) and p2 = c(p_i2, 1 - p_i2).
-#'     If the vector of covareges is supplied, then the information divergence
+#'     If the vector of coverage is supplied, then the information divergence
 #'     is estimated according to the formula:
 #'
 #'     hdiv = 2*(n[1] + 1)*(n[2] + 1)*((sqrt(p[1]) - sqrt(p[2]))^2 + (sqrt(1 -

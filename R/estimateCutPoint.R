@@ -14,7 +14,7 @@
 #'     Index. More complexes approach based in several machine learning model
 #'     are provided as well.
 #'
-#'     Results of the classification perfomance resulting from the estimated
+#'     Results of the classification performance resulting from the estimated
 #'     cutpoint are normally given, with the exception of those extreme
 #'     situations where the statistics to evaluate performance cannot be
 #'     estimated. More than one classifier model can be applied. For example,
@@ -24,8 +24,8 @@
 #'     cutpoint in range of values from, say, 0.5 to 0.8. Next, a different
 #'     classifier can be used to evaluate the classification performance.
 #'     Different classifier models would yield different performances. Models
-#'     are returned and can be used in futher prediction with new datasets from
-#'     the same batch experiment. This is a machine learnig approach to
+#'     are returned and can be used in further prediction with new datasets from
+#'     the same batch experiment. This is a machine learning approach to
 #'     discriminate the biological regulatory signal naturally generated in the
 #'     control from that one induced by the treatment.
 #'

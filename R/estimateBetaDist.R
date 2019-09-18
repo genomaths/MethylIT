@@ -5,8 +5,9 @@
 #'     parameters of beta distribution
 #' @details In order to obtain the estimates for shape parameters of beta
 #'     distribution, the squared of the difference between the empirical
-#'     cummulative density function (ecdf) & the theoretical cdf is minimized
-#'     using the Non-Linear Minimization function of 'stats' package.
+#'     cumulative distribution function (ecdf) & the theoretical cdf is 
+#'     minimized using the Non-Linear Minimization function of 'stats' 
+#'     package.
 #'
 #' @param q prior probabilities
 #' @param init.pars  initial parameter values. Defaults to alpha = 1 &

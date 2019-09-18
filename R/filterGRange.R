@@ -5,7 +5,7 @@
 #'     coverage values less than 'min.coverage' read counts or values greater
 #'     than the specified 'percentile'.
 #' @details The input must be a GRanges object with a coverage column in the
-#'     meta-olumn table or the columns with methylated (mC) and unmethylated
+#'     metacolumn table or the columns with methylated (mC) and unmethylated
 #'     counts (uC).
 #'
 #' @param x GRanges object
