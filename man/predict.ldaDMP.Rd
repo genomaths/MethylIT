@@ -2,7 +2,6 @@
 % Please edit documentation in R/predict.ldaDMP.R
 \name{predict.ldaDMP}
 \alias{predict.ldaDMP}
-\alias{predict.pcaLDA}
 \title{Predict function for 'ldaDMP' method}
 \usage{
 \method{predict}{ldaDMP}(object, newdata, type = c("class", "posterior",

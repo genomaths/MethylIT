@@ -57,25 +57,16 @@
 #'     is used (\strong{when nlms is given}), since it makes not sense.
 #' @return A list of GRanges objects, each GRanges object carrying the selected
 #'     cytosine sites and and the Weibull probability P[DIV_k > DIV(alpha)].
-#'
-#' @examples
-#' num.points <- 1000
-#' num.samples <- 250
-#' x <- data.frame(chr = "chr1", start = 1:num.samples,
-#'                 end = 1:num.samples,strand = '*',
-#'                 mC = rnbinom(size = num.samples, mu = 4, n = 500),
-#'                 uC = rnbinom(size = num.samples, mu = 4, n = 500))
-#' y <- data.frame(chr = "chr1", start = 1:num.samples,
-#'                 end = 1:num.samples, strand = '*',
-#'                 mC = rnbinom(size = num.samples, mu = 4, n = 500),
-#'                 uC = rnbinom(size = num.samples, mu = 4, n = 500))
-#' x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
-#' y <- makeGRangesFromDataFrame(y, keep.extra.columns = TRUE)
-#' HD <- estimateDivergence(ref = x, indiv = list(y))
-#' nlms <- nonlinearFitDist(HD, column = 1, verbose = FALSE)
-#' getPotentialDIMP(LR = HD, nlms = nlms, div.col = 1, alpha = 0.05)
+#' @importFrom stats p.adjust.methods p.adjust plnorm pweibull pgamma
+#' @importFrom S4Vectors mcols mcols<-
 #'
 #' @export
+#'
+#' @examples
+#' ## Get a dataset of Hellinger divergency of methylation levels and their
+#' ## corresponding best nonlinear fit distribution models from the package
+#' data(HD, nlms)
+#' PS <- getPotentialDIMP(LR = HD, nlms = nlms, div.col = 9L, alpha = 0.05)
 #'
 getPotentialDIMP <- function(LR, nlms=NULL, div.col, dist.name = "Weibull2P",
                            absolute=FALSE, alpha=0.05, pval.col = NULL,

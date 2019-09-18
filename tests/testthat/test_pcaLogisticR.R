@@ -18,5 +18,5 @@ test_that("pcaLogisticR dummy test", {
 
 
   # The accuracy should be > 0.5
-  expect_true(all(table(newdata.prediction$class) == c(10,30)))
+  expect_true(all(table(newdata.prediction$class) == c(12,28)))
 })

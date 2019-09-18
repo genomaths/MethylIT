@@ -45,15 +45,6 @@
 #' table(x)
 #' @importFrom MASS lda
 #' @importFrom stats prcomp terms
-#'
-#' @rdname pcaLDA
-#' @aliases pcaLDA
-#' @title Linear Discriminant Analysis (LDA) using Principal Component Analysis
-#' @description NULL
-#' @details NULL
-#' @usage pcaLDA(formula = NULL, data = NULL, grouping = NULL, n.pc = 1,
-#'               scale = FALSE, center = FALSE, tol = 1.0e-4, method = "moment",
-#'                max.pc = NULL)
 #' @export
 pcaLDA <- function(formula=NULL, data=NULL, grouping=NULL, n.pc=1, scale=FALSE,
                    center=FALSE, tol=1.0e-4, method="moment", max.pc=NULL) {
@@ -130,7 +121,6 @@ pcaLDA <- function(formula=NULL, data=NULL, grouping=NULL, n.pc=1, scale=FALSE,
 
 #' @rdname pcaLDA
 #' @name predict.pcaLDA
-#' @aliases predict.pcaLDA
 #' @title Predict function for 'pcaLDA' method
 #' @description Predict using a PCA-LDA model built with function 'pcaLDA'
 #' @details NULL
@@ -144,7 +134,7 @@ pcaLDA <- function(formula=NULL, data=NULL, grouping=NULL, n.pc=1, scale=FALSE,
 #'     package: 'class', 'posterior', and 'scores' (see ?predict.lda).
 #' @param ... Not in use.
 #' @importFrom S4Vectors mcols
-#' @exportMethod predict.pcaLDA
+#' @export
 predict.pcaLDA <- function(object, newdata,
                            type = c("lda.pred", "class", "posterior",
                                     "scores", "pca.ind.coord"), ...) {

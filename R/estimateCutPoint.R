@@ -124,10 +124,11 @@
 #'               cutpoint when \emph{simple} =  FALSE
 #'         \item optStatVal: Value of the performance statistic at the cutpoint.
 #'     }
-#'
 #' @examples
+#' ## Get a dataset of potential signals and the estimated cutpoint from the
+#' ## package and performs cutpoint estimation
 #' data(PS, package = "MethylIT")
-#' cutpoint = estimateCutPoint(LR = PS, simple = TRUE,
+#' cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
 #'                             column = c(hdiv = TRUE, TV = TRUE,
 #'                                         wprob = TRUE, pos = TRUE),
 #'                             classifier1 = "qda",
@@ -137,6 +138,7 @@
 #'                             div.col = 9L)
 #' @importFrom S4Vectors mcols
 #' @importFrom caret confusionMatrix
+#' @importFrom stats addmargins
 #' @seealso \code{\link[MethylIT]{evaluateDIMPclass}}
 #' @export
 estimateCutPoint <- function(LR, control.names, treatment.names, simple = TRUE,

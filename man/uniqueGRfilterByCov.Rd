@@ -6,7 +6,8 @@
 \usage{
 uniqueGRfilterByCov(x, y = NULL, min.coverage = 4, min.meth = 0,
   percentile = 0.9999, high.coverage = NULL, columns = c(mC = 1, uC =
-  2), num.cores = 1L, tasks = 0L, verbose = TRUE, ...)
+  2), num.cores = 1L, ignore.strand = FALSE, tasks = 0L,
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{An object from the classes 'GRanges', 'InfDiv', or 'pDMP' with
@@ -36,20 +37,23 @@ files stacked.}
 coverage than this are discarded.}
 
 \item{columns}{Vector of integer numbers of the columns (from each GRanges
-meta-column) where the methylated and unmethylated counts are provided. If
-not provided, then the methylated and unmethylated counts are assumed to
-be at columns 1 and 2, respectively.}
+meta-column) where the methylated and unmethylated counts are provided.
+If not provided, then the methylated and unmethylated counts are assumed
+to be at columns 1 and 2, respectively.}
 
 \item{num.cores}{The number of cores to use, i.e. at most how many child
 processes will be run simultaneously (see bplapply function from
 BiocParallel package).}
 
+\item{ignore.strand}{When set to TRUE, the strand information is ignored in
+the overlap calculations. Default value: TRUE}
+
 \item{tasks}{integer(1). The number of tasks per job. value must be a scalar
-integer >= 0L. In this documentation a job is defined as a single call to a
-function, such as bplapply, bpmapply etc. A task is the division of the X
-argument into chunks. When tasks == 0 (default), X is divided as evenly as
-possible over the number of workers (see MulticoreParam from BiocParallel
-package).}
+integer >= 0L. In this documentation a job is defined as a single call to
+a function, such as bplapply, bpmapply etc. A task is the division of the
+X argument into chunks. When tasks == 0 (default), X is divided as evenly
+as possible over the number of workers (see MulticoreParam from
+BiocParallel package).}
 
 \item{verbose}{if TRUE, prints the function log to stdout}
 

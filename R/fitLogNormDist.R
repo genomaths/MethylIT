@@ -172,7 +172,8 @@ fitLogNormDist <- function(x, probability.x, parameter.values,
                                                maxfev = maxfev, ptol = ptol)),
                    silent = TRUE)
        if (inherits( FIT2, "try-error")) {
-           starts <- c(shape = alpha, scale = scale, mu = mu[1])
+           starts <- c(meanlog = mean( log1p( X ), na.rm = TRUE ),
+                       sdlog = sd(log1p( X ), na.rm = TRUE ) )
            FIT2 <- try(nls.lm(par=starts, fn=optFun, probfun=plnorm,
                            quantiles=X[ cros.ind.2 ], prob=pX[cros.ind.2],
                            control=nls.lm.control(maxiter=maxiter, ftol=ftol,

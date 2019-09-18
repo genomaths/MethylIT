@@ -158,8 +158,10 @@ The function performs an estimation of the optimal cutpoint for the
     control from that one induced by the treatment.
 }
 \examples{
+## Get a dataset of potential signals and the estimated cutpoint from the
+## package and performs cutpoint estimation
 data(PS, package = "MethylIT")
-cutpoint = estimateCutPoint(LR = PS, simple = TRUE,
+cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
                             column = c(hdiv = TRUE, TV = TRUE,
                                         wprob = TRUE, pos = TRUE),
                             classifier1 = "qda",

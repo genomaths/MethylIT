@@ -29,21 +29,23 @@
 #' @param high.coverage An integer for read counts. Cytosine sites having higher
 #'     coverage than this are discarded.
 #' @param columns Vector of integer numbers of the columns (from each GRanges
-#'     meta-column) where the methylated and unmethylated counts are provided. If
-#'     not provided, then the methylated and unmethylated counts are assumed to
-#'     be at columns 1 and 2, respectively.
+#'     meta-column) where the methylated and unmethylated counts are provided.
+#'     If not provided, then the methylated and unmethylated counts are assumed
+#'     to be at columns 1 and 2, respectively.
+#' @param ignore.strand When set to TRUE, the strand information is ignored in
+#'     the overlap calculations. Default value: TRUE
 #' @param num.cores The number of cores to use, i.e. at most how many child
 #'     processes will be run simultaneously (see bplapply function from
 #'     BiocParallel package).
 #' @param tasks integer(1). The number of tasks per job. value must be a scalar
-#'     integer >= 0L. In this documentation a job is defined as a single call to a
-#'     function, such as bplapply, bpmapply etc. A task is the division of the X
-#'     argument into chunks. When tasks == 0 (default), X is divided as evenly as
-#'     possible over the number of workers (see MulticoreParam from BiocParallel
-#'     package).
+#'     integer >= 0L. In this documentation a job is defined as a single call to
+#'     a function, such as bplapply, bpmapply etc. A task is the division of the
+#'     X argument into chunks. When tasks == 0 (default), X is divided as evenly
+#'     as possible over the number of workers (see MulticoreParam from
+#'     BiocParallel package).
 #' @param verbose if TRUE, prints the function log to stdout
 #' @param ... Additional parameters for 'uniqueGRanges' function.
-
+#'
 #' @return A GRanges object with the columns of methylated and unmethylated
 #'   counts filtered for each cytosine position.
 #'
@@ -62,20 +64,20 @@
 uniqueGRfilterByCov <- function(x, y=NULL, min.coverage=4, min.meth=0,
                                percentile=.9999, high.coverage=NULL,
                                columns=c(mC=1, uC=2), num.cores=1L,
-                               tasks=0L, verbose=TRUE, ...) {
+                               ignore.strand=FALSE, tasks=0L,
+                               verbose=TRUE, ...) {
 
    if (!is.null(y)) {
        x <- x[, columns]
        y <- y[, columns]
        x <- uniqueGRanges(list(x, y), num.cores=num.cores, tasks=tasks,
-                           verbose=verbose, ...)
+                           ignore.strand = ignore.strand, verbose=verbose, ...)
    } else {
        if (class(x) != "GRanges") {
            # --------------------valid "pDMP" or "InfDiv" object ---------------
            validateClass(x)
            # ----------------------------------------------------------------- #
        }
-
    }
 
    cov1 <- rowSums(as.matrix(mcols(x[,1:2])))

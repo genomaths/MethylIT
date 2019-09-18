@@ -50,10 +50,11 @@
 #'     not overlap any intervals in subject.
 #' @param ignore.strand When set to TRUE, the strand information is ignored in
 #'     the overlap calculations. Default value: TRUE
-#' @param keep.strand When set to TRUE, the strand information is preserved on 
-#'     the objects even if ignore.strand is set to TRUE.  This makes it possible 
-#'     to ignore the strand during overlap calculations but to preserve the 
-#'     strand information and not overwrite with *. Default value: TRUE
+#' @param keep.strand When set to TRUE, the strand information is preserved on
+#'     the objects even if ignore.strand is set to TRUE.  This makes it possible
+#'     to ignore the strand during overlap calculations but to preserve the
+#'     strand information and not overwrite with *. Default value is
+#'     keep.strand = !ignore.strand.
 #' @param num.cores The number of cores to use, i.e. at most how many child
 #'     processes will be run simultaneously (see bplapply function from
 #'     BiocParallel package).
@@ -86,7 +87,7 @@
 #' @importFrom S4Vectors subjectHits mcols queryHits
 #' @importFrom IRanges IRanges
 #' @importFrom GenomeInfoDb seqnames seqlevels
-#' @importFrom BiocGenerics strand end
+#' @importFrom BiocGenerics strand end strand<-
 #' @importFrom GenomicRanges GRanges GRangesList findOverlaps
 #' @importFrom S4Vectors mcols queryHits subjectHits mcols<-
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
@@ -96,8 +97,8 @@ uniqueGRanges <- function(ListOfGranges, ncols=NULL, columns=NULL,
                        chromosomes=NULL, maxgap=-1L, minoverlap=1L, missing=0,
                        type=c("any", "start", "end", "within", "equal"),
                        select=c("all", "first", "last", "arbitrary"),
-                       ignore.strand=FALSE, keep.strand=TRUE, num.cores=1, 
-                       tasks=0L, verbose=TRUE) {
+                       ignore.strand=FALSE, keep.strand=!ignore.strand,
+                       num.cores=1, tasks=0L, verbose=TRUE) {
 
    if (class(ListOfGranges) == "list" && class(ListOfGranges) != "GRangesList")
    {
@@ -148,24 +149,28 @@ uniqueGRanges <- function(ListOfGranges, ncols=NULL, columns=NULL,
 
    cond1 <- all(unlist(lapply(ListOfGranges, function(x) !is.null(mcols(x)))))
    cond2 <- all(unlist(lapply(ListOfGranges, function(x) ncol(mcols(x)) > 0)))
-   
+
    ## It assigns the data to the GRanges metacolumns
    if (verbose)
        message(" *** Building coordinates for the new GRanges object ..." )
-   
-   granges <- unique(unname(unlist(ListOfGranges)))
 
    if (ignore.strand && !keep.strand) {
        if (verbose) {
            message(" *** Setting strand information to * ..." )
        }
-       strand(granges) <- "*"
+
+       ListOfGranges <- lapply(ListOfGranges, function(GR) {
+           strand(GR) <- "*"
+           return(GR)
+       })
    } else {
        if (verbose) {
            message(" *** Strand information is preserved ..." )
        }
    }
-   
+
+   granges <- unique(unname(unlist(ListOfGranges)))
+
    if (cond1 && cond2) {
        ## This assigns the data values to the GRanges metacolumns
        l <- length(granges)

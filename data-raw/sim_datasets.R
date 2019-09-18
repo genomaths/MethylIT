@@ -41,7 +41,7 @@ nlms <- nonlinearFitDist(HD, column = 4, verbose = FALSE)
 PS <- getPotentialDIMP(LR = HD, nlms = nlms, div.col = 9L, alpha = 0.05,
                        tv.col = 7L, tv.cut = 0.92)
 
-cutpoint = estimateCutPoint(LR = PS, simple = TRUE,
+cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
                           column = c(hdiv = TRUE, TV = TRUE,
                                      wprob = TRUE, pos = TRUE),
                           classifier1 = "qda",

@@ -70,11 +70,11 @@
 #' @examples
 #' set.seed(133) # Set a seed
 #' ## A GRanges ogbject with the count matrix in the metacolumns is created
-#' countData <- matrix(sample.int(200, 10000, replace = TRUE), ncol = 4)
+#' countData <- matrix(sample.int(200, 500, replace = TRUE), ncol = 4)
 #' colnames(countData) <- c("A1","A2","B1","B2")
-#' start <- seq(1, 25e5, 1000)
-#' end <- start + 2000
-#' chr <- c(rep("chr1", 1200), rep("chr2", 1300))
+#' start <- seq(1, 25e4, 2000)
+#' end <- start + 1000
+#' chr <- c(rep("chr1", 70), rep("chr2", 55))
 #' GR <- GRanges(seqnames = chr, IRanges(start = start, end = end))
 #' mcols(GR) <- countData
 #' ## Gene IDs

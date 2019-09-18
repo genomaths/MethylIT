@@ -44,7 +44,7 @@
 #'                PRED.class = newdata.prediction$class)
 #' table(x)
 #' @importFrom MASS qda
-#' @importFrom stats prcomp
+#' @importFrom stats prcomp terms
 #' @export
 pcaQDA <- function(formula=NULL, data=NULL, grouping=NULL, n.pc=1, scale=FALSE,
                    center=FALSE, tol=1.0e-4, method="moment", max.pc=NULL) {
@@ -133,7 +133,6 @@ pcaQDA <- function(formula=NULL, data=NULL, grouping=NULL, n.pc=1, scale=FALSE,
 #'     'class', 'posterior', and 'scores' (see ?predict.QDA).
 #' @param ... Not in use.
 #' @export
-predict.pcaQDA <- function(object, ...) UseMethod("predict")
 predict.pcaQDA <- function(object, newdata,
                            type=c("qda.pred", "class", "posterior",
                                "pca.ind.coord", "all"), ...) {

@@ -29,15 +29,6 @@
 #' filenames <- getGEOSuppFiles(GEO = "GSM881757",
 #'                 pattern = "G_cytosine.txt.gz")
 #'
-#' ## Read the files with function 'readCounts2GRangesList'. Only lines starting
-#' ## with the word 'Chr1' will be read, in acccordance with the  specification
-#' ## given with parameter 'pattern'
-#'
-#' LR <- readCounts2GRangesList(filenames = filenames, remove = TRUE,
-#'                             sample.id = c("drm2_CG", "drm2_CHG"),
-#'                             columns = c(seqnames = 1, start = 2, mC = 4,
-#'                                     uC = 3),
-#'                             pattern = "^Chr1", verbose = TRUE)
 #' file.remove(filenames) ## Remove the downloaded file
 #'
 #' @importFrom RCurl getURL

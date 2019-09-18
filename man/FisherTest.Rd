@@ -81,7 +81,7 @@ BiocParallel package).}
 \item{verbose}{if TRUE, prints the function log to stdout}
 
 \item{...}{Additional parameters for function
-\code{\link[uniqueGRanges]{MethylIT}}.}
+\code{\link[MethylIT]{uniqueGRanges}}.}
 }
 \value{
 The input GRanges object with the columns of Fisher's exact test
@@ -133,5 +133,5 @@ FisherTest(LR = data, control.names = c("C1", "C2"),
 
 }
 \seealso{
-\code{\link{rmstGR}}
+\code{\link[MethylIT.utils]{rmstGR}}
 }

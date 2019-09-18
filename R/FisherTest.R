@@ -65,7 +65,7 @@
 #'     BiocParallel package).
 #' @param verbose if TRUE, prints the function log to stdout
 #' @param ... Additional parameters for function
-#'     \code{\link[uniqueGRanges]{MethylIT}}.
+#'     \code{\link[MethylIT]{uniqueGRanges}}.
 #'
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
@@ -105,7 +105,7 @@
 #'         pAdjustMethod="BH", pvalCutOff = 0.05, num.cores = 1L,
 #'         verbose=TRUE)
 #'
-#' @seealso \code{\link{rmstGR}}
+#' @seealso \code{\link[MethylIT.utils]{rmstGR}}
 #' @export
 FisherTest <- function(LR, count.col=1:2, control.names=NULL,
                        treatment.names=NULL, pooling.stat = "sum", tv.cut=NULL,

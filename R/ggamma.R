@@ -62,8 +62,8 @@
 #'         psi = 1, lower.tail = TRUE, log.p = FALSE)
 #'
 #' ## To fit random generated numbers
-#' set.seed(126)
-#' x <- rggamma(1000, alpha = 1.03, psi = 0.75, scale = 2.1)
+#' set.seed(123)
+#' x <- rggamma(2000, alpha = 1.03, psi = 0.75, scale = 2.1)
 #' fitGGammaDist(x)
 #'
 #' @importFrom stats pgamma rgamma

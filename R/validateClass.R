@@ -17,6 +17,7 @@ validateClass.default <- function(LR){
 
 #' @rdname validateClass
 #' @keywords internal
+#' @importFrom S4Vectors mcols
 #' @exportMethod validateClass.pDMP
 validateClass.pDMP <- function(LR) {
    vn <- c("hdiv", "TV", "wprob")
@@ -38,6 +39,7 @@ validateClass.pDMP <- function(LR) {
 
 #' @rdname validateClass
 #' @keywords internal
+#' @importFrom S4Vectors mcols
 #' @exportMethod validateClass.InfDiv
 validateClass.InfDiv <- function(LR) {
    vn <- c("hdiv", "TV")

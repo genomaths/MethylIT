@@ -64,8 +64,8 @@
 #' @author Robersy Sanchez - 06/03/2016
 #'
 #' @examples
-#' set.seed(126)
-#' x <- rggamma(1000, alpha = 1.03, psi = 0.75, scale = 2.1)
+#' set.seed(123)
+#' x <- rggamma(2000, alpha = 1.03, psi = 0.75, scale = 1.1)
 #' fitGGammaDist(x)
 #'
 #' @importFrom stats var stepfun as.formula coef AIC pweibull BIC vcov knots
@@ -264,7 +264,7 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
            p.FIT1 <- getPreds(coef(FIT1), x[cros.ind.2])
            p.FIT2 <- getPreds(coef(FIT2), x[cros.ind.1])
 
-           if (!is.na(p.FIT1) && !is.na(p.FIT1)) {
+           if (!all(is.na(p.FIT1)) && !all(is.na(p.FIT2))) {
                R.FIT1 <- cor(p.FIT1, Y[cros.ind.2], use="complete.obs")
                R.FIT2 <- cor(p.FIT2, Y[cros.ind.1], use="complete.obs")
                R.cross.FIT <- (length(p.FIT1) * R.FIT1 + length(p.FIT2)* R.FIT2)

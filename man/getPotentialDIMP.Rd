@@ -86,20 +86,9 @@ The potential signals are cytosine sites k with information
     distribution model that has been supplied.
 }
 \examples{
-num.points <- 1000
-num.samples <- 250
-x <- data.frame(chr = "chr1", start = 1:num.samples,
-                end = 1:num.samples,strand = '*',
-                mC = rnbinom(size = num.samples, mu = 4, n = 500),
-                uC = rnbinom(size = num.samples, mu = 4, n = 500))
-y <- data.frame(chr = "chr1", start = 1:num.samples,
-                end = 1:num.samples, strand = '*',
-                mC = rnbinom(size = num.samples, mu = 4, n = 500),
-                uC = rnbinom(size = num.samples, mu = 4, n = 500))
-x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
-y <- makeGRangesFromDataFrame(y, keep.extra.columns = TRUE)
-HD <- estimateDivergence(ref = x, indiv = list(y))
-nlms <- nonlinearFitDist(HD, column = 1, verbose = FALSE)
-getPotentialDIMP(LR = HD, nlms = nlms, div.col = 1, alpha = 0.05)
+## Get a dataset of Hellinger divergency of methylation levels and their
+## corresponding best nonlinear fit distribution models from the package
+data(HD, nlms)
+PS <- getPotentialDIMP(LR = HD, nlms = nlms, div.col = 9L, alpha = 0.05)
 
 }

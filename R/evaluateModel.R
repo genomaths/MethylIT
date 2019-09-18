@@ -15,6 +15,7 @@
 #'     best fitted model is Poisson or quasi-Poisson, then the best test is
 #'     'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
 #'     the corresponding suitable test will be applied when test = "LRT".
+#' @importFrom stats anova
 #' @return AIC value
 #' @keywords internal
 .evaluateModel <- function(model, test = c("Wald", "LRT")) {

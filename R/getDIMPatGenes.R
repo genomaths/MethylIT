@@ -1,5 +1,5 @@
 #' @rdname getDIMPatGenes
-#' @aliases getDIMPatGenes.default
+#' @name getDIMPatGene
 #' @title Count DIMPs at gene-body
 #' @description The function counts DIMPs overlapping with gene-body. In fact,
 #'     this function also can be used to count DIMPs overlapping with any set of
@@ -17,7 +17,6 @@
 #' @return A GRanges object
 #'
 #' @examples
-#' num.points <- 10000 # Number of cytosine position with methylation call
 #' ## Gene annotation
 #' genes <- GRanges(seqnames = "1",
 #'                 ranges = IRanges(start = c(3631, 6788, 11649),
@@ -26,75 +25,29 @@
 #' mcols(genes) <- data.frame(gene_id = c("AT1G01010", "AT1G01020",
 #'                                        "AT1G01030"))
 #'
-#' set.seed(123) ## To set a seed for random number generation
-#' ## GRanges object of the reference with methylation levels in
-#' ## its meta-column
-#' Ref <- makeGRangesFromDataFrame(
-#'     data.frame(chr = '1',
-#'                 start = 1:num.points,
-#'                 end = 1:num.points,
-#'                 strand = '*',
-#'                 p2 = rbeta(num.points, shape1 = 1, shape2 = 1.5)),
-#'     keep.extra.columns = TRUE)
+#' ## Get a dataset of potential signals and the estimated cutpoint from the
+#' ## package
+#' data(PS, cutpoint)
 #'
-#' ## List of Granges objects of individuals methylation levels
-#' Indiv <- GRangesList(
-#'     sample11 = makeGRangesFromDataFrame(
-#'         data.frame(chr = '1',
-#'                 start = 1:num.points,
-#'                 end = 1:num.points,
-#'                 strand = '*',
-#'                 p2 = rbeta(num.points, shape1 = 1.5, shape2 = 2)),
-#'         keep.extra.columns = TRUE),
-#'     sample12 = makeGRangesFromDataFrame(
-#'         data.frame(chr = '1',
-#'                 start = 1:num.points,
-#'                 end = 1:num.points,
-#'                 strand = '*',
-#'                 p2 = rbeta(num.points, shape1 = 1.6, shape2 = 2.1)),
-#'         keep.extra.columns = TRUE),
-#'     sample21 = makeGRangesFromDataFrame(
-#'         data.frame(chr = '1',
-#'                 start = 1:num.points,
-#'                 end = 1:num.points,
-#'                 strand = '*',
-#'                 p2 = rbeta(num.points, shape1 = 10, shape2 = 4)),
-#'         keep.extra.columns = TRUE),
-#'     sample22 = makeGRangesFromDataFrame(
-#'         data.frame(chr = '1',
-#'                 start = 1:num.points,
-#'                 end = 1:num.points,
-#'                 strand = '*',
-#'                 p2 = rbeta(num.points, shape1 = 11, shape2 = 4)),
-#'         keep.extra.columns = TRUE))
-#' ## To estimate Hellinger divergence using only the methylation levels.
-#' HD <- estimateDivergence(ref = Ref, indiv = Indiv, meth.level = TRUE,
-#'                         columns = 1)
-#' ## To perform the nonlinear regression analysis
-#' nlms <- nonlinearFitDist(HD, column = 4, verbose = FALSE)
+#' ## The estimated cutpoints are used to discriminate signals from the noise.
+#' ## That is, DMPs are selected using the cupoints
+#' DIMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint)
 #'
-#' ## Next, the potential signal can be estimated
-#' PS <- getPotentialDIMP(LR = HD, nlms = nlms, div.col = 4, alpha = 0.05)
+#' ## Finally DMPs found on genes
+#' DIMR <- getDIMPatGenes(GR = DIMPs$T1, GENES = genes)
 #'
-#' ## The cutpoint estimation used to discriminate the signal from the noise
-#' cutpoints <- estimateCutPoint(PS, control.names = c("sample11", "sample12"),
-#'                             treatment.names = c("sample21", "sample22"),
-#'                             div.col = 4, verbose = TRUE)
-#' ## DIMPs are selected using the cupoints
-#' DIMPs <- selectDIMP(PS, div.col = 4, cutpoint = min(cutpoints$cutpoint))
-#'
-#' ## Finally DIMPs found on genes
-#' DIMR <- getDIMPatGenes(GR = DIMPs$sample21, GENES = genes)
-#'
-#' @importFrom GenomicRanges GRanges findOverlaps
-#' @importFrom S4Vectors subjectHits mcols<-
+#' @importFrom GenomicRanges GRanges findOverlaps makeGRangesFromDataFrame
+#' @importFrom GenomeInfoDb seqnames
+#' @importFrom BiocGenerics start end strand
+#' @importFrom S4Vectors subjectHits mcols mcols<-
 #' @importFrom data.table data.table
 #' @importFrom rtracklayer import
-#'
 #' @export
-getDIMPatGenes <- function(GR, ...) UseMethod("getDIMPatGenes")
+getDIMPatGenes <- function(GR, GENES, ignore.strand=TRUE)
+   UseMethod("getDIMPatGenes")
 
 #' @rdname getDIMPatGenes
+#' @importFrom S4Vectors mcols
 #' @exportMethod getDIMPatGenes.default
 getDIMPatGenes.default <- function(GR, GENES, ignore.strand=TRUE) {
    gene_id <- GENES$gene_id
@@ -110,36 +63,65 @@ getDIMPatGenes.default <- function(GR, GENES, ignore.strand=TRUE) {
        GENES$gene_id <- paste(chr, starts, ends, strands, sep = "_")
    }
    Hits <- findOverlaps(GR, GENES, type="within", ignore.strand=ignore.strand)
-   DIMP <- GENES[subjectHits(Hits)]
-   DIMP <- data.table( as.data.frame( DIMP ) )
-   DIMP <- DIMP[ ,list(seqnames=unique(seqnames),
-                       start=min(start), end=max(end),
-                       DIMPs=length(start)), by=gene_id]
-   DIMP <- data.frame(DIMP)
-   DIMP <- makeGRangesFromDataFrame(DIMP, keep.extra.columns=TRUE )
-   Hits <- findOverlaps(DIMP, GENES, type="within", ignore.strand=ignore.strand)
-   GENES <- GENES[subjectHits(Hits), ]
-   DIMP <- as.data.frame(DIMP[queryHits(Hits), ])
-   mcols(GENES) <- data.frame(GeneID=GENES$gene_id, DIMPs=DIMP$DIMPs)
+   if (length(Hits) > 0) {
+       DIMP <- GENES[subjectHits(Hits)]
+       DIMP <- data.table( as.data.frame( DIMP ) )
+       DIMP <- DIMP[ ,list(seqnames=unique(seqnames),
+                           start=min(start), end=max(end),
+                           DIMPs=length(start)), by=gene_id]
+       DIMP <- data.frame(DIMP)
+       DIMP <- makeGRangesFromDataFrame(DIMP, keep.extra.columns=TRUE )
+       Hits <- findOverlaps(DIMP, GENES, type="within",
+                           ignore.strand=ignore.strand)
+       GENES <- GENES[subjectHits(Hits), ]
+       DIMP <- as.data.frame(DIMP[queryHits(Hits), ])
+       mcols(GENES) <- data.frame(GeneID=GENES$gene_id, DIMPs=DIMP$DIMPs)
+   } else {
+       GENES <- GRanges()
+       mcols(GENES) <- data.frame(GeneID = factor(), DIMPs = integer())
+   }
    return(unique(GENES))
+}
+
+#' @rdname getDIMPatGenes
+#' @importFrom S4Vectors mcols
+#' @exportMethod getDIMPatGenes.GRanges
+#' @export
+getDIMPatGenes.GRanges <- function(GR, GENES, ignore.strand=TRUE) {
+   vn <- c("hdiv", "TV", "wprob")
+   ns <- colnames(mcols(GR))
+   nams <- sum(is.element(vn, ns))
+   if (nams != 3) {
+      warning("'GRanges' metacolumn has incorrect column names")
+      cat("\n")
+      stop("A 'GRanges' metacolumn must have 'hdiv', 'TV', and 'wprob'",
+           " named columns to be used as an argument for 'getDIMPatGenes'")
+   }
+
+   GR <- getDIMPatGenes.default(GR, GENES = GENES,
+                               ignore.strand = ignore.strand)
+   return(GR)
 }
 
 #' @rdname getDIMPatGenes
 #' @exportMethod getDIMPatGenes.pDMP
 getDIMPatGenes.pDMP <- function(GR, GENES, ignore.strand=TRUE) {
-   return(lapply(GR, getDIMPatGenes.default, GENES = GENES, keep.attr = TRUE))
+   return(lapply(GR, getDIMPatGenes.default, GENES = GENES,
+               ignore.strand = ignore.strand, keep.attr = TRUE))
 }
 
 #' @rdname getDIMPatGenes
 #' @exportMethod getDIMPatGenes.InfDiv
 getDIMPatGenes.InfDiv <- function(GR, GENES, ignore.strand=TRUE) {
-   return(lapply(GR, getDIMPatGenes.default, GENES = GENES, keep.attr = TRUE))
+   return(lapply(GR, getDIMPatGenes.default, GENES = GENES,
+               ignore.strand = ignore.strand, keep.attr = TRUE))
 }
 
 #' @rdname getDIMPatGenes
 #' @exportMethod getDIMPatGenes.list
 getDIMPatGenes.list <- function(GR, GENES, ignore.strand=TRUE) {
-   return(lapply(GR, getDIMPatGenes.default, GENES = GENES ))
+   return(lapply(GR, getDIMPatGenes.default, GENES = GENES,
+               ignore.strand = ignore.strand, keep.attr = TRUE))
 }
 
 

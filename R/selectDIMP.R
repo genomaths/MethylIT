@@ -53,26 +53,13 @@
 #'     informative position (DIMPs).
 #'
 #' @examples
-#' num.points <- 1000
-#' HD <- GRangesList(
-#'     sample1 = makeGRangesFromDataFrame(
-#'         data.frame(chr = "chr1", start = 1:num.points, end = 1:num.points,
-#'                 strand = '*',
-#'                 hdiv = rweibull(1:num.points, shape = 0.75, scale = 1)),
-#'         keep.extra.columns = TRUE),
-#'     sample2 = makeGRangesFromDataFrame(
-#'         data.frame(chr = "chr1", start = 1:num.points, end = 1:num.points,
-#'                 strand = '*',
-#'                 hdiv = rweibull(1:num.points, shape = 0.75, scale = 1)),
-#'         keep.extra.columns = TRUE))
+#' ## Get a dataset of potential signals and the estimated cutpoint from the
+#' ## package
+#' data(PS, cutpoint)
 #'
-#' nlms <- nonlinearFitDist(HD, column = 1, verbose = FALSE)
-#'
-#' PS <- getPotentialDIMP(LR = HD, nlms = nlms, div.col = 1, alpha = 0.05)
-#' cutpoints <- estimateCutPoint(PS, control.names = "sample1",
-#'                             treatment.names = c("sample2"),
-#'                             div.col = 1, verbose = FALSE)
-#' DIMPs <- selectDIMP(PS, div.col = 1, cutpoint = cutpoints$cutpoint$sample1)
+#' ## The estimated cutpoints are used to discriminate signals from the noise.
+#' ## That is, DMPs are selected using the cupoints
+#' DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint)
 #'
 #' @importFrom GenomicRanges GRanges GRangesList
 #' @importFrom S4Vectors mcols

@@ -1,5 +1,4 @@
 #' @rdname predict.ldaDMP
-#' @aliases predict.pcaLDA
 #' @title Predict function for 'ldaDMP' method
 #' @description Predict using a LDA model built with function
 #'     \code{\link[MethylIT]{evaluateDIMPclass}}

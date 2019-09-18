@@ -33,7 +33,8 @@
 #'     posterior classification probabilities are returned.
 #' @importFrom GenomeInfoDb seqnames
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
-#' @exportMethod predict.LogisticR
+#' @importFrom stats na.omit
+#' @export
 predict.LogisticR <- function(object, newdata = NULL,
                               type=c("all", "class", "posterior"),
                               num.cores = 1L, tasks = 0L, ...) {
@@ -87,7 +88,7 @@ predict.LogisticR <- function(object, newdata = NULL,
                        logP=log10(newdata$wprob + 2.2e-308))
            if (is.element("pos", vn)) dt$pos = position(newdata)
            dt <- as.matrix(dt[, vn])
-           dt <- data.frame(scale(df, center = object$center,
+           dt <- data.frame(scale(dt, center = object$center,
                                   scale = object$scale))
        }
    }

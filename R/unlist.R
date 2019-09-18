@@ -28,7 +28,8 @@
 setGeneric("unlist", signature = "x")
 unlist <- function(x, recursive = TRUE, use.names = TRUE) UseMethod("unlist")
 
-#' @exportMethod unlist.default
+#' @aliases unlist.default
+#' @export
 #' @keywords internal
 unlist.default <- function(x, recursive = TRUE, use.names = TRUE) {
    n <- length(x)

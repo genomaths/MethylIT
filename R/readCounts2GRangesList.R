@@ -59,40 +59,6 @@
 #'                                     silent = TRUE)
 #' file.remove(filename) # Remove the file
 #'
-#' ## Read the file
-#' ## Create a cov file with it's file name including "gz" (tarball extension)
-#' filename <- "./file.cov"
-#' gr1 <- data.frame(chr = c("chr1", "chr1"), post = c(1,2),
-#'                 strand = c("+", "-"), ratio = c(0.9, 0.5),
-#'                 context = c("CG", "CG"), CT = c(20, 30))
-#' filename <- "./file.cov"
-#' write.table(as.data.frame(gr1), file = filename,
-#'             col.names = TRUE, row.names = FALSE, quote = FALSE)
-#'
-#' LR <- readCounts2GRangesList(filenames = filename, remove = TRUE,
-#'                              sample.id = "test",
-#'                              columns = c(seqnames = 1, start = 2,
-#'                                          strand = 3, fraction = 4,
-#'                                          context = 5, coverage = 6))
-#'
-#' ## Download supplementary files from GEO data set and store "fullpath/name"
-#' ## in variable filename. The parameter 'pattern' permits us to download only
-#' ## the specified filesCG, in this case, CG and CHG methylation contexts.
-#'
-#' filenames <- getGEOSuppFiles(GEO = "GSM881757",
-#'                             pattern = "G_cytosine.txt.gz")
-#'
-#' ## Read the files with function 'readCounts2GRangesList'. Only lines starting
-#' ## with the word 'Chr1' will be read, in acccordance with the  specification
-#' ##given with parameter 'pattern'
-#'
-#' LR <- readCounts2GRangesList(filenames = filenames, remove = TRUE,
-#'                             sample.id = c("drm2_CG", "drm2_CHG"),
-#'                             columns = c(seqnames = 1, start = 2,
-#'                                         mC = 4, uC = 3),
-#'                             pattern = "^Chr1", verbose = TRUE)
-#' file.remove(filenames) # Remove the downloaded file
-#'
 #' @importFrom data.table fread
 #' @importFrom GenomeInfoDb seqlevels
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
@@ -154,18 +120,22 @@ readCounts2GRangesList <- function(filenames=NULL, sample.id=NULL, pattern=NULL,
        }
        if (.Platform$OS.type == "unix") {
            if (!is.null(pattern)) {
-               x <- fread(paste0("grep ", pattern, " ", gunzippedfile),
-                  select=columns, ...)
+               x <- suppressMessages(
+                           fread(paste0("grep ", pattern, " ", gunzippedfile),
+                               select=columns, ...))
            } else {
                if (!is.null(chromosomes)) {
                    if (length(chromosomes) > 1) {
-                       chrom <- paste0("'", paste0(chromosomes, collapse = "|"), "'")
+                       chrom <- paste0("'", paste0(chromosomes, collapse = "|"),
+                                       "'")
                    } else chrom <- chromosomes
-                   x <- fread(paste0("egrep ", chrom, " ", gunzippedfile),
-                    select=columns, ...)
-               } else x <- fread(gunzippedfile, select=columns, ...)
+                   x <- suppressMessages(
+                           fread(paste0("egrep ", chrom, " ", gunzippedfile),
+                               select=columns, ...))
+               } else x <- suppressMessages(fread(gunzippedfile,
+                                               select=columns, ...))
            }
-       } else x <- fread(gunzippedfile, select=columns, ...)
+       } else x <- suppressMessages(fread(gunzippedfile, select=columns, ...))
 
        colns <- colnames(x)
        idx <- is.element(colns, cn)
