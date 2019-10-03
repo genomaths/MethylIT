@@ -13,8 +13,25 @@
 #'     a factor with exactly two levels. The rownames of \emph{colData}
 #'     individual samples. The row names of \emph{colData} must correspond to
 #'     th column names of the count matrix.
+#'
+#' @return A RangedGlmDataSet object, good for downstream use with
+#'     Methyl-IT \code{link{countTest2}} function.
+#'
+#' @author Robersy Sanchez
+#' @examples
+#' DMPs <- data.frame(chr = "chr1", start = 1:10,
+#'                    end = 1:10,strand = '*',
+#'                    treat1 = rnbinom(size = 10, mu = 4, n = 500),
+#'                    treat2 = rnbinom(size = 10, mu = 4, n = 500),
+#'                    cntrl1 = rnbinom(size = 10, mu = 4, n = 500),
+#'                    cntrl2 = rnbinom(size = 10, mu = 4, n = 500))
+#' DMPs <- makeGRangesFromDataFrame(DMPs, keep.extra.columns = TRUE)
+#' condition <- data.frame(condition = factor(c("TT","TT","CT","CT"),
+#'                         levels = c("CT", "TT")))
+#' rownames(condition) <- names(mcols(DMPs))
+#' DIMR <- glmDataSet(GR = DMPs, colData = condition)
+#'
 #' @export
-
 glmDataSet <- function(GR = NULL, counts = NULL, colData = NULL) {
    if (is.null(GR) && is.null(counts)) {
        cat("\n")
