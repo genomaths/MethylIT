@@ -351,7 +351,7 @@ estimateCutPoint <- function(LR, control.names, treatment.names, simple = TRUE,
            cutpoint <- min(mcols(unlist(LR)[idx, div.col])[, 1])
            res$postCut <- cutpoint
            cuts <- cutpoint
-           if (is.element(stat, 1:11))
+           if (stat != 0)
                st <- conf.mat$Performance$byClass[stat]
            if (stat == 0) st <- conf.mat$Performance$overall[1]
            if (stat == 12) st <- conf.mat$FDR
@@ -391,7 +391,7 @@ estimateCutPoint <- function(LR, control.names, treatment.names, simple = TRUE,
                        if (st == 1) opt <- TRUE
                            k <- k + 1
                        }
-                       if (is.element(stat, 1:11)) {
+                       if (stat != 0) {
                            st0 <- conf.mat$Performance$byClass[stat]
                        if (st < st0) {
                            st <- st0
@@ -432,7 +432,7 @@ estimateCutPoint <- function(LR, control.names, treatment.names, simple = TRUE,
                                                num.cores=num.cores,
                                                tasks=tasks, ...)
                if (stat == 0) st <- conf.mat$Performance$overall[1]
-               if (is.element(stat, 1:11))
+               if (stat != 0)
                    st <- conf.mat$Performance$byClass[stat]
            }
            predClasses <- predict(object = conf.mat$model, newdata = dmps,
