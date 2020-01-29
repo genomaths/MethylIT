@@ -30,7 +30,7 @@ S3 generic used internally by MethylIT to ensure correct object
 }
 \examples{
 data(HD, nlms)
-PS <- getPotentialDIMP(LR = HD, nlms = nlms, div.col = 9L, alpha = 0.05)
+PS <- getPotentialDIMP(LR = HD, nlms = gof$nlms, div.col = 9L, alpha = 0.05)
 validateClass(HD)
 validateClass(PS)
 
