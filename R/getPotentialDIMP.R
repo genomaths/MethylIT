@@ -37,7 +37,7 @@
 #'     for |TV|, then absolute must be set to TRUE.
 #' @param alpha A numerical value (usually alpha < 0.05) used to select
 #'     cytosine sites k with information divergence (DIV_k) for which Weibull
-#'     probability P[DIV_k > DIV(alpha)].
+#'     probability P`[DIV_k > DIV(alpha)]`.
 #' @param pval.col An integer denoting a column from each GRanges object from
 #'     LR where p-values are provided when \strong{dist.name == "None"} and
 #'     \strong{nlms == NULL}. Default is NULL. If NUll and

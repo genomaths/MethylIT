@@ -52,7 +52,7 @@ for |TV|, then absolute must be set to TRUE.}
 
 \item{alpha}{A numerical value (usually alpha < 0.05) used to select
 cytosine sites k with information divergence (DIV_k) for which Weibull
-probability P\link{DIV_k > DIV(alpha)}.}
+probability P\verb{[DIV_k > DIV(alpha)]}.}
 
 \item{pval.col}{An integer denoting a column from each GRanges object from
 LR where p-values are provided when \strong{dist.name == "None"} and
