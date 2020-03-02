@@ -6,7 +6,7 @@
 #' @param digits Number of significant digits to be used.
 #' @keywords internal
 #' @export
-print.glmDataSet <- function(x, digits = getOption("digits")) {
+print.glmDataSet <- function(x, digits = getOption("digits"), ...) {
    cm <- dim(counts)
    lvs <- levels(x$colData$condition)
    cat("glmDataSet with ", cm[1], " rows and ", cm[2], " columns (individuals)",

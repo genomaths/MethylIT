@@ -4,7 +4,7 @@
 #' @param digits Number of significant digits to be used.
 #' @keywords internal
 #' @export
-print.CutPoint <- function(x, digits = getOption("digits")) {
+print.CutPoint <- function(x, digits = getOption("digits"), ...) {
 
    postProbCut <- format(signif(x$postProbCut, max(1L, digits - 2L)))
    cutpoint <- format(signif(x$cutpoint, max(1L, digits - 2L)))
