@@ -4,7 +4,7 @@
 \alias{print.CutPoint}
 \title{Printing object from 'CutPoint' class by simple print methods}
 \usage{
-\method{print}{CutPoint}(x, digits = getOption("digits"))
+\method{print}{CutPoint}(x, digits = getOption("digits"), ...)
 }
 \arguments{
 \item{x}{Object of class \code{"CutPoint"}}

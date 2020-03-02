@@ -5,7 +5,7 @@
 \title{Printing object from \emph{print.qdaDMP} class by simple
 print methods.}
 \usage{
-\method{print}{qdaDMP}(x, digits = getOption("digits"))
+\method{print}{qdaDMP}(x, digits = getOption("digits"), ...)
 }
 \arguments{
 \item{x}{Object from class \emph{glmDataSet} or from class

@@ -5,7 +5,7 @@
 \title{Printing object from \emph{print.ldaDMP} class by simple
 print methods.}
 \usage{
-\method{print}{ldaDMP}(x, digits = getOption("digits"))
+\method{print}{ldaDMP}(x, digits = getOption("digits"), ...)
 }
 \arguments{
 \item{x}{Object from class \emph{glmDataSet} or from class
