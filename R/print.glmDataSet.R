@@ -4,8 +4,8 @@
 #' @param x Object from class \emph{glmDataSet} or from class
 #'     \emph{"RangedGlmDataSet"}.
 #' @param digits Number of significant digits to be used.
-#' @exportMethod print.glmDataSet
 #' @keywords internal
+#' @export
 print.glmDataSet <- function(x, digits = getOption("digits")) {
    cm <- dim(counts)
    lvs <- levels(x$colData$condition)
