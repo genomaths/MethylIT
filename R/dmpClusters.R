@@ -43,8 +43,9 @@
 #'         https://doi.org/10.1371/journal.pone.0150427
 #' }
 #'
-#' @importFrom GenomicRanges findOverlaps makeGRangesFromDataFrame
-#' @importFrom BiocGenerics unique strand strand<-
+#' @importFrom GenomicRanges findOverlaps makeGRangesFromDataFrame GRanges
+#' @importFrom IRanges gaps IRanges disjoin
+#' @importFrom BiocGenerics unique start end strand strand<-
 #' @importFrom S4Vectors subjectHits  mcols mcols<-
 #' @importFrom BiocParallel MulticoreParam bpmapply SnowParam
 #' @importFrom data.table data.table
@@ -106,6 +107,8 @@ dmpClusters <- function(GR, maxDist = 3,
    GR <- structure(GR, class = "list")
    GR <- GRangesList(GR)
    if (length(GR) == 1) GR <- unlist(GR, use.names =FALSE)
+
+   signal <- cluster <- NULL
 
    GR <- meth_status(gr = GR, chromosomes = chromosomes, num.cores = num.cores,
                        tasks = tasks,  verbose = verbose)
