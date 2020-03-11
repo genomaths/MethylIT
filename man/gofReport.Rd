@@ -70,6 +70,12 @@ parameter value. For example,  scale = 0.0000000001 in 'GGamma3P' or in
 'Weibull2P' models. This last situation can result from the numerical
 algorithm used in the parameter estimation. The numerical algorithms for
 nonlinear fit estimation are not perfect!
+
+For distribution models that include a location parameter ('Weibull3P',
+'Gamma3P', and 'GGamma4P') there is an additional important constraint, which
+cannot be evaluated with 'AIC' or 'R.Cross.val': \eqn{\mu > 0}. That is, the
+information divergences are strictly positive magnitudes, therefore, any best
+model in terms of AIC with values \eqn{\mu < 0} are meaningless and rejected.
 }
 \description{
 In Methyl-IT,  the signal detection step requires for the
@@ -117,6 +123,7 @@ dt <- gofReport(hd)
 ## To get the potential DMPs
 ps_dmp <- getPotentialDIMP(LR = hd, nlms = dt$nlms, div.col = 9L,
                             dist.name = dt$bestModel)
+
 }
 \references{
 \enumerate{

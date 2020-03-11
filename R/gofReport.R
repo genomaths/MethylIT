@@ -80,6 +80,12 @@
 #' algorithm used in the parameter estimation. The numerical algorithms for
 #' nonlinear fit estimation are not perfect!
 #'
+#' For distribution models that include a location parameter ('Weibull3P',
+#' 'Gamma3P', and 'GGamma4P') there is an additional important constraint, which
+#' cannot be evaluated with 'AIC' or 'R.Cross.val': \eqn{\mu > 0}. That is, the
+#' information divergences are strictly positive magnitudes, therefore, any best
+#' model in terms of AIC with values \eqn{\mu < 0} are meaningless and rejected.
+#'
 #' @export
 #'
 #' @author Robersy Sanchez 11/25/2019 <https://github.com/genomaths>
@@ -94,6 +100,7 @@
 #' ## To get the potential DMPs
 #' ps_dmp <- getPotentialDIMP(LR = hd, nlms = dt$nlms, div.col = 9L,
 #'                             dist.name = dt$bestModel)
+#'
 #' @references
 #' \enumerate{
 #'     \item R. Sanchez and S. A. Mackenzie, “Information Thermodynamics of
@@ -139,8 +146,18 @@ gofReport <- function(HD, model = c("Weibull2P", "Weibull3P",
                                                verbose = verbose))
        names(mdl) <- paste(names(mdl), nams[k], sep = "_")
        stat <- vapply(mdl, function(x) {
-                           c(AIC = as.numeric(x$AIC[1]),
-                               R.Cross.val = as.numeric(x$R.Cross.val[1]))
+                   AIC <- as.numeric(x$AIC[1])
+                   R.Cross.val <- as.numeric(x$R.Cross.val[1])
+                   if (is.element(x$model[1],
+                                   c('Weibull3P', 'Gamma3P', 'GGamma4P'))) {
+                      ## An important constraint must hold: mu > 0
+                      x <- x$Estimate[match("mu", rownames(x))]
+                      if (x < 0) {
+                         AIC <- Inf
+                         R.Cross.val <- 0
+                      }
+                   }
+                   c(AIC = AIC, R.Cross.val = R.Cross.val)
            }, FUN.VALUE = numeric(2))
 
        colnames(stat) <- sn
@@ -152,7 +169,12 @@ gofReport <- function(HD, model = c("Weibull2P", "Weibull3P",
        setTxtProgressBar(pb, k)
    }
    close(pb)
-   nlms <- unlist(nlms, recursive = FALSE)
+   if (length(HD) > 1) nlms <- unlist(nlms, recursive = FALSE)
+   else {
+       nms <- sapply(nlms, function(x) names(x[1]))
+       nlms <- lapply(nlms, function(x) x[[1]])
+       names(nlms) <- nms
+   }
 
    cat("\n *** Creating report ... \n")
    aic_col <- grep("AIC", colnames(stats))
