@@ -27,10 +27,11 @@
 #'     their meta-columns.
 #'@param column An integer number denoting the index of the GRanges column
 #'     where the information divergence is given. Default column = 1
-#' @param dist.name name of the distribution to fit: Weibull (default:
-#'     "Weibull"), gamma with three-parameter (Gamma3P), gamma with
-#'     two-parameter (Gamma2P), generalized gamma with three-parameter
-#'     ("GGamma3P") or four-parameter ("GGamma4P"), and Log-Normal (LogNorm).
+#' @param dist.name Name(s) of the distribution to fit. A single character
+#'     string or character vector naming the distribution(s): "Weibull"
+#'     (default), gamma with three-parameter (Gamma3P), gamma with two-parameter
+#'     (Gamma2P), generalized gamma with three-parameter ("GGamma3P") or
+#'     four-parameter ("GGamma4P"), and Log-Normal (LogNorm).
 #' @param sample.size size of the sample
 #' @param location.par whether to consider the fitting to generalized gamma
 #'     distribution (GGamma) including the location parameter, i.e., a GGamma
@@ -135,7 +136,7 @@ nonlinearFitDist <- function(LR, column=9, dist.name="Weibull",
    # ------------------------------------------------------------------------- #
 
    sn <- names(LR)
-   toFit <- function(k, sample.size, npoints, maxiter, tol, ftol,
+   toFit <- function(k, dist.name, sample.size, npoints, maxiter, tol, ftol,
                    ptol, minFactor, verbose) {
        if (verbose) message("* Processing sample #", k, " ", sn[k])
        x <- LR[[k]]
@@ -186,21 +187,27 @@ nonlinearFitDist <- function(LR, column=9, dist.name="Weibull",
        x <- structure(x, class=c("ProbDistr", "data.frame"))
        return(x)
    }
+
+   if (length(dist.name) == 1 && length(LR) > 1)
+       dist.name <- rep(dist.name, length(LR))
    if (is.null(num.cores)) {
-       x <- lapply(seq_len(length(LR)), toFit, sample.size=sample.size,
-               npoints=npoints, maxiter=maxiter,
-               tol=tol, ftol=ftol, ptol=ptol, minFactor=minFactor,
-               verbose=verbose)
+       x <- mapply(toFit, seq_along(LR), dist.name,
+                   MoreArgs = list(sample.size = sample.size, npoints = npoints,
+                                   maxiter = maxiter, tol = tol, ftol = ftol,
+                                   ptol = ptol, minFactor = minFactor,
+                                   verbose = verbose), SIMPLIFY = FALSE)
    } else {
        if (Sys.info()['sysname'] == "Linux") {
-         bpparam <- MulticoreParam(workers=num.cores, tasks=tasks)
+         bpparam <- MulticoreParam(workers = num.cores, tasks = tasks)
        } else {
          bpparam <- SnowParam(workers = num.cores, type = "SOCK")
        }
-       x <- bplapply(seq_len(length(LR)), toFit, sample.size=sample.size,
-                 npoints=npoints, maxiter=maxiter,
-                 tol=tol, ftol=ftol, ptol=ptol, minFactor=minFactor,
-                 verbose=verbose, BPPARAM=bpparam)
+       x <- bpmapply(toFit, seq_along(LR), dist.name,
+                   MoreArgs = list(sample.size = sample.size, npoints = npoints,
+                                   maxiter = maxiter, tol = tol, ftol = ftol,
+                                   ptol = ptol, minFactor = minFactor,
+                                   verbose = verbose), SIMPLIFY = FALSE,
+                   BPPARAM = bpparam)
    }
    names(x) <- sn
    x <- structure(x, class=c("ProbDistrList", "list"))
