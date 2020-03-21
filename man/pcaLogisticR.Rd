@@ -74,8 +74,8 @@ For information on how to use these objects see ?glm and ?prcomp.
 }
 \description{
 Principal components (PCs) are estimated from the predictor
-variables provided as input data. Next, the individual coordinates in the
-selected PCs are used as predictors in the logistic regression.
+variables provided as input data. Next, the individual coordinates in
+the selected PCs are used as predictors in the logistic regression.
 
 Logistic regression using Principal Components from PCA as
 predictor variables
@@ -85,8 +85,8 @@ The principal components (PCs) are obtained using the function
 \code{\link[stats]{prcomp}}, while the logistic regression is performed
 using function \code{\link[stats]{glm}}, both functions from R package
 'stats'. The current application only use basic functionalities from the
-mentioned functions. As shown in the example, 'pcaLogisticR' function can
-be used in general classification problems.
+mentioned functions. As shown in the example, 'pcaLogisticR' function
+can be used in general classification problems.
 }
 \examples{
 data(iris)

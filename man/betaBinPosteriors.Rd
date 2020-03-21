@@ -20,33 +20,31 @@ a probability
 }
 \description{
 Here, beta binomial posteriors are estimated in the context of
-the methylation level estimation. The direct use of counts for
-methylation level estimation is not recommended, since there is external
-source of noise coming from the sample manipulation, the sequencing
-machine and sequence alignment that could alter the counts and the
-number of methylated cytosines with low or zero counts (mC = 0) is
-generally high. The low counts and noise imply that read counts of
-methylated (mC) and non-methylated (uC) cytosines must not be used
-directly in the estimation of methylation levels.\preformatted{In a Bayesian framework, methylated read counts are modeled by a beta-
-binomial distribution, which accounts for both, the biological and
-sampling variations [1-3]. In our case we adopted the Bayesian approach
-suggested in reference [3](Chapter 3). Naive distribution q
-(methylation levels). In a Bayesian framework with uniform priors, the
-methylation level can be defined as:
-meth_level = ( mC + 1 )/( mC + uC + 2 ). However, the most
-natural statistical model for replicated BS-seq DNA methylation
-measurements is beta-binomial (the beta distribution is a prior
-conjugate of binomial distribution), we consider the p parameter
-(methylation level) in the binomial distribution as randomly drawn from
-a beta distribution. The hyper-parameters alpha ('a') and beta ('b')
-from the beta-binomial distribution are interpreted as pseudo-counts.
-}
+the methylation level estimation. The direct use of counts for methylation
+level estimation is not recommended, since there is external source of noise
+coming from the sample manipulation, the sequencing machine and sequence
+alignment that could alter the counts and the number of methylated cytosines
+with low or zero counts (mC = 0) is generally high. The low counts and noise
+imply that read counts of methylated (mC) and non-methylated (uC) cytosines
+must not be used directly in the estimation of methylation levels.
+
+In a Bayesian framework, methylated read counts are modeled by a beta-
+binomial distribution, which accounts for both, the biological and sampling
+variations \link{1-3}. In our case we adopted the Bayesian approach suggested in
+reference \link{3}(Chapter 3). Naive distribution q (methylation levels). In a
+Bayesian framework with uniform priors, the methylation level can be defined
+as: meth_level = ( mC + 1 )/( mC + uC + 2 ). However, the most natural
+statistical model for replicated BS-seq DNA methylation measurements is
+beta-binomial (the beta distribution is a prior conjugate of binomial
+distribution), we consider the p parameter (methylation level) in the binomial
+distribution as randomly drawn from a beta distribution. The hyper-parameters
+alpha ('a') and beta ('b') from the beta-binomial distribution are interpreted
+as pseudo-counts.
 }
 \details{
 The posterior methylation levels are estimated as
-(a + success)/(a + b + trials), where 'a' and 'b' are the shape
-parameters of the beta distribution, alpha and beta parameters,
-respectively.
+(a + success)/(a + b + trials), where 'a' and 'b' are the shape parameters
+of the beta distribution, alpha and beta parameters, respectively.
 }
 \examples{
 MethylIT:::.betaBinPosteriors(2, 8, 2, 8)

@@ -3,14 +3,14 @@
 #' @title Logistic Classification Model using Principal Component
 #'     Analysis (PCA)
 #' @description Principal components (PCs) are estimated from the predictor
-#'     variables provided as input data. Next, the individual coordinates in the
-#'     selected PCs are used as predictors in the logistic regression.
+#'     variables provided as input data. Next, the individual coordinates in
+#'     the selected PCs are used as predictors in the logistic regression.
 #' @details The principal components (PCs) are obtained using the function
 #'     \code{\link[stats]{prcomp}}, while the logistic regression is performed
 #'     using function \code{\link[stats]{glm}}, both functions from R package
 #'     'stats'. The current application only use basic functionalities from the
-#'     mentioned functions. As shown in the example, 'pcaLogisticR' function can
-#'     be used in general classification problems.
+#'     mentioned functions. As shown in the example, 'pcaLogisticR' function
+#'     can be used in general classification problems.
 #'
 #' @param formula Same as in 'glm' from package 'stats'.
 #' @param data Same as in 'glm' from package 'stats'.
@@ -130,13 +130,13 @@ pcaLogisticR <- function(formula = NULL, data = NULL,
 #' @param newdata To use with function 'predict'. New data for classification
 #'     prediction
 #' @param type To use with function 'predict'. The type of prediction required:
-#'     'class', 'posterior', 'pca.ind.coord', or 'all'. If type = 'all', function
-#'     'predict.pcaLogisticR' ('predict') returns a list with:
+#' 'class', 'posterior', 'pca.ind.coord', or 'all'. If type = 'all', function
+#' 'predict.pcaLogisticR' ('predict') returns a list with:
 #'         1) 'class': individual classification.
 #'         2) 'posterior': probabilities for the positive class.
 #'         3) 'pca.ind.coord': PC individual coordinate.
-#'     Each element of this list can be requested independently using parameter
-#'     'type'.
+#' Each element of this list can be requested independently using parameter
+#' 'type'.
 #' @param ... Not in use.
 #' @importFrom BiocGenerics start
 #' @importFrom GenomeInfoDb seqnames
@@ -210,7 +210,8 @@ predict.pcaLogisticR <- function(object, newdata, type = c("class",
     }
 
     pred <- switch(type, posterior = predict(object$logistic,
-        newdata = ind.coord, type = "response"), class = predictClass(object = object,
+        newdata = ind.coord, type = "response"),
+        class = predictClass(object = object,
         dt = ind.coord), pca.ind.coord = ind.coord,
         all = list(class = predictClass(object = object,
             dt = ind.coord), posterior = predict(object$logistic,

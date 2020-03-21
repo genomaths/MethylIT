@@ -42,7 +42,8 @@
 #' @importFrom data.table data.table
 #' @importFrom rtracklayer import
 #' @export
-getDIMPatGenes <- function(GR, GENES, ignore.strand = TRUE) UseMethod("getDIMPatGenes")
+getDIMPatGenes <- function(GR, GENES, ignore.strand = TRUE)
+                            UseMethod("getDIMPatGenes")
 
 #' @rdname getDIMPatGenes
 #' @importFrom S4Vectors mcols

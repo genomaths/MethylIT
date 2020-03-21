@@ -362,8 +362,7 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
         return(list(Performance = conf.mat, FDR = FDR,
             model = model))
     }
-    # --------------------------------------------------------------------------
-    # #
+    # ---------------------------------------------------------------- #
 
     if (output != "conf.mat") {
         if (.Platform$OS.type == "unix") {

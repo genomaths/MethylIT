@@ -109,8 +109,8 @@ fitLogNormDist <- function(x, probability.x, parameter.values,
         N <- length(X0)
 
         if (verbose && !is.null(npoints)) {
-            message(paste0("*** Trying nonlinear fit to a generalized 2P Gamma ",
-                "distribution model (summarized data: ",
+            message(paste0("*** Trying nonlinear fit to a generalized 2P ",
+                "Gamma distribution model (summarized data: ",
                 npoints, " values)..."))
         }
     }
@@ -154,7 +154,7 @@ fitLogNormDist <- function(x, probability.x, parameter.values,
             (1 - Adj.R.Square))
         rho = ifelse(is.na(rho) | rho < 0, 0, rho)
 
-        ##--- Crossvalidation standard model for Nonlinear regression: x versus r
+        ##- Crossvalidation standard model for Nonlinear regression: x versus r
         if (verbose) {
             cat(paste("*** Performing nonlinear regression model ",
                 "crossvalidation...\n"))

@@ -14,14 +14,14 @@
 #'     samples '1' and '2'.
 #' @param y A GRanges object with methylated and unmethylated counts in its
 #'     meta-column. Default is NULL. If x is a 'InfDiv', or 'pDMP', then 'y' is
-#'     not needed, since samples '1' and '2' are the first four columns of these
-#'     objects.
+#'     not needed, since samples '1' and '2' are the first four columns of
+#'     these objects.
 #' @param min.coverage An integer or an integer vector of length 2. Cytosine
-#'     sites where the coverage in both samples, 'x' and 'y', are less than
-#'     'min.coverage' are discarded. The cytosine site is preserved, however, if
-#'     the coverage is greater than 'min.coverage' in at least one sample. If
-#'     'min.coverage' is an integer vector, then the corresponding min coverage
-#'     is applied to each sample.
+#'  sites where the coverage in both samples, 'x' and 'y', are less than
+#'  'min.coverage' are discarded. The cytosine site is preserved, however, if
+#'  the coverage is greater than 'min.coverage' in at least one sample. If
+#'  'min.coverage' is an integer vector, then the corresponding min coverage is
+#'  applied to each sample.
 #' @param min.meth An integer or an integer vector of length 2. Cytosine sites
 #'     where the numbers of read counts of methylated cytosine in both samples,
 #'     '1' and '2', are less than 'min.meth' are discarded. If 'min.meth' is an
@@ -33,9 +33,9 @@
 #'     removed, where mC and uC stand for the numbers of methylated and
 #'     unmethylated reads. Default is min.umeth = 0.
 #' @param min.sitecov An integer. The minimum total coverage. Only sites where
-#'     the total coverage (cov1 + cov2) is greater than 'min.sitecov' are
-#'     considered for downstream analysis, where cov1 and cov2 are the coverages
-#'     for samples 1 and 2, respectively.
+#'  the total coverage (cov1 + cov2) is greater than 'min.sitecov' are
+#'  considered for downstream analysis, where cov1 and cov2 are the coverages
+#'  for samples 1 and 2, respectively.
 #' @param percentile Threshold to remove the outliers (PCR bias) from each file
 #'     and all files stacked. If 'high.coverage = NULL', then the threshold
 #'     \eqn{q} will be computed as:
@@ -45,11 +45,11 @@
 #'
 #'     where \eqn{cov1} and \eqn{cov2} are the coverage vectors from samples 1
 #'     and 2, respectively.
-#' @param high.coverage An integer for read counts. Cytosine sites having higher
-#'     coverage than this are discarded. Default is NULL. If
-#'     \strong{high.coverage} is not NULL, then the \strong{percentile} argument
-#'     is disregarded and \strong{high.coverage} is used as threshold to remove
-#'     the PCR bias.
+#' @param high.coverage An integer for read counts. Cytosine sites having
+#' higher coverage than this are discarded. Default is NULL. If
+#' \strong{high.coverage} is not NULL, then the \strong{percentile} argument is
+#' disregarded and \strong{high.coverage} is used as threshold to remove the
+#' PCR bias.
 #' @param columns Vector of integer numbers of the columns (from each GRanges
 #'     meta-column) where the methylated and unmethylated counts are provided.
 #'     If not provided, then the methylated and unmethylated counts are assumed
@@ -60,11 +60,11 @@
 #'     processes will be run simultaneously (see bplapply function from
 #'     BiocParallel package).
 #' @param tasks Integer(1). The number of tasks per job. value must be a scalar
-#'     integer >= 0L. In this documentation a job is defined as a single call to
-#'     a function, such as bplapply, bpmapply etc. A task is the division of the
-#'     X argument into chunks. When tasks == 0 (default), X is divided as evenly
-#'     as possible over the number of workers (see MulticoreParam from
-#'     BiocParallel package).
+#'  integer >= 0L. In this documentation a job is defined as a single call to a
+#'  function, such as bplapply, bpmapply etc. A task is the division of the X
+#'  argument into chunks. When tasks == 0 (default), X is divided as evenly as
+#'  possible over the number of workers (see MulticoreParam from BiocParallel
+#'  package).
 #' @param verbose if TRUE, prints the function log to stdout
 #' @param ... Additional parameters for 'uniqueGRanges' function.
 #'
@@ -107,11 +107,9 @@ uniqueGRfilterByCov <- function(x, y = NULL, min.coverage = 4,
             verbose = verbose, ...)
     } else {
         if (!is(x, "GRanges")) {
-            # --------------------valid 'pDMP' or 'InfDiv'
-            # object ---------------
+            # -----------------valid 'pDMP' or 'InfDiv'  object ---------------
             validateClass(x)
-            # -----------------------------------------------------------------
-            # #
+            # --------------------------------------------------------------- #
         }
     }
 

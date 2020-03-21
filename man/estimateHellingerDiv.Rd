@@ -22,17 +22,22 @@ Given a the methylation levels of two individual, the function
 computes the information divergence between methylation levels.
 }
 \details{
-Each methylation level j for cytosine site i corresponds to a
-probability vector p_j = c(p_ij, 1 - p_ij). Then, the information
-divergence between methylation levels p1 and p2 is the divergence
-between the vectors p1 = c(p_i1, 1 - p_i1) and p2 = c(p_i2, 1 - p_i2).
-If the vector of coverage is supplied, then the information divergence
-is estimated according to the formula:\preformatted{hdiv = 2*(n[1] + 1)*(n[2] + 1)*((sqrt(p[1]) - sqrt(p[2]))^2 + (sqrt(1 -
-p[1]) - sqrt(1 - p[2]))^2)/(n[1] + n[2] + 2) This formula corresponds to
-Hellinger divergence as given in the first formula from Theorem 1 from
-reference 1. Otherwise: hdiv = (sqrt(p[1]) - sqrt(p[2]))^2 + (sqrt(1 -
-p[1]) - sqrt(1 - p[2]))^2
-}
+Each methylation level \eqn{p_ij} for indiviadula \eqn{i} at
+cytosine site \eqn{j} corresponds to a probability vector \eqn{p^ij = (p_ij,
+1 - p_ij)}. Then, the information divergence between methylation levels
+\eqn{p^1j} and \eqn{p^2j} from indivudals 1 and 2 at site \eqn{j} is the
+divergence between the vectors \eqn{p^1j = (p_1j, 1 - p_1j)} and \eqn{p^2j =
+(p_2j, 1 - p_2j)}. If the vector of coverage is supplied, then the
+information divergence is estimated according to the formula:
+
+\deqn{hdiv = 2*(n_1 + 1)*(n_2 + 1)*((sqrt(p_1j) - sqrt(p_2j))^2 +
+(sqrt(1 - p_1j) - sqrt(1 - p_2j))^2)/(n_1 + n_2 + 2)}
+
+This formula corresponds to Hellinger divergence as given in the first
+formula from Theorem 1 from reference 1. Otherwise:
+
+\deqn{hdiv = (sqrt(p_1j) - sqrt(p_2j))^2 + (sqrt(1 - p_1j) -
+sqrt(1 - p_2j))^2}
 }
 \examples{
     p <- c(0.5, 0.5)

@@ -104,7 +104,7 @@
 #' @references
 #' \enumerate{
 #'     \item R. Sanchez and S. A. Mackenzie, “Information Thermodynamics of
-#'             Cytosine DNA Methylation,” PLoS One, vol. 11, no. 3, p. e0150427,
+#'           Cytosine DNA Methylation,” PLoS One, vol. 11, no. 3, p. e0150427,
 #'             Mar. 2016.
 #'     \item Stevens JP. Applied Multivariate Statistics for the Social
 #'             Sciences. Fifth Edit. Routledge Academic; 2009.
@@ -163,7 +163,8 @@ gofReport <- function(HD,
 
         nlms[[k]] <- mdl
         if (k == 1)
-            stats <- data.frame(t(stat)) else stats <- cbind(stats, data.frame(t(stat)))
+            stats <- data.frame(t(stat))
+        else stats <- cbind(stats, data.frame(t(stat)))
         setTxtProgressBar(pb, k)
     }
     close(pb)
@@ -209,7 +210,8 @@ gofReport <- function(HD,
         mdl[issue] <- "Needs revision"
         mdl <- unlist(mdl)
         warning("The best fitted model for sample(s) ",
-            paste(sn[issue], collapse = ", "), " require(s) for further analysis. \n",
+            paste(sn[issue], collapse = ", "),
+                " require(s) for further analysis. \n",
             "The model with the lowest AIC must have the highest R.Cross.val")
     } else bestAIC <- unlist(mdl)
 

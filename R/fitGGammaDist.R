@@ -230,13 +230,13 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
 
         ## Stein adjusted R square
         if (length(coef(FIT)) > 3)
-            rho <- ((N - 1)/(N - 5)) * ((N - 2)/(N -
-                6)) * ((N + 1)/N) else rho <- ((N - 1)/(N - 4)) * ((N - 2)/(N -
-            5)) * ((N + 1)/N)
+            rho <- ((N - 1)/(N - 5)) * ((N - 2)/(N - 6)) *
+                    ((N + 1)/N) else rho <- ((N - 1)/(N - 4)) *
+                    ((N - 2)/(N - 5)) * ((N + 1)/N)
         rho <- 1 - rho * (1 - Adj.R.Square)
         rho = ifelse(is.na(rho) | rho < 0, 0, rho)
 
-        ##-- Crossvalidation standard model for Nonlinear regression: x versus r
+        ##--Crossvalidation standard model for Nonlinear regression: x versus r
         if (verbose) {
             cat(paste("*** Performing nonlinear regression model ",
                 "crossvalidation...\n"))

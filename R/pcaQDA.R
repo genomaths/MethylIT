@@ -86,8 +86,8 @@ pcaQDA <- function(formula = NULL, data = NULL, grouping = NULL,
     if (is.null(formula) && !is.null(grouping)) {
         vn <- setdiff(colnames(data), as.character(grouping))
         if (length(vn) < n.pc) {
-            ans <- "The number of number predictor variables must be greater than "
-            ans1 <- "or equal the number of principal components: "
+            ans <- "The number of number predictor variables must be greater "
+            ans1 <- "than or equal the number of principal components: "
             ArgumentCheck::addError(msg = paste0(ans,
                 ans1, n.pc, "\n"), argcheck = Check)
         }

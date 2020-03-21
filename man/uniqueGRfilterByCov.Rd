@@ -30,15 +30,15 @@ samples '1' and '2'.}
 
 \item{y}{A GRanges object with methylated and unmethylated counts in its
 meta-column. Default is NULL. If x is a 'InfDiv', or 'pDMP', then 'y' is
-not needed, since samples '1' and '2' are the first four columns of these
-objects.}
+not needed, since samples '1' and '2' are the first four columns of
+these objects.}
 
 \item{min.coverage}{An integer or an integer vector of length 2. Cytosine
 sites where the coverage in both samples, 'x' and 'y', are less than
 'min.coverage' are discarded. The cytosine site is preserved, however, if
 the coverage is greater than 'min.coverage' in at least one sample. If
-'min.coverage' is an integer vector, then the corresponding min coverage
-is applied to each sample.}
+'min.coverage' is an integer vector, then the corresponding min coverage is
+applied to each sample.}
 
 \item{min.meth}{An integer or an integer vector of length 2. Cytosine sites
 where the numbers of read counts of methylated cytosine in both samples,
@@ -66,11 +66,11 @@ and all files stacked. If 'high.coverage = NULL', then the threshold
 and 2, respectively.
 }}
 
-\item{high.coverage}{An integer for read counts. Cytosine sites having higher
-coverage than this are discarded. Default is NULL. If
-\strong{high.coverage} is not NULL, then the \strong{percentile} argument
-is disregarded and \strong{high.coverage} is used as threshold to remove
-the PCR bias.}
+\item{high.coverage}{An integer for read counts. Cytosine sites having
+higher coverage than this are discarded. Default is NULL. If
+\strong{high.coverage} is not NULL, then the \strong{percentile} argument is
+disregarded and \strong{high.coverage} is used as threshold to remove the
+PCR bias.}
 
 \item{columns}{Vector of integer numbers of the columns (from each GRanges
 meta-column) where the methylated and unmethylated counts are provided.
@@ -85,11 +85,11 @@ BiocParallel package).}
 the overlap calculations. Default value: TRUE}
 
 \item{tasks}{Integer(1). The number of tasks per job. value must be a scalar
-integer >= 0L. In this documentation a job is defined as a single call to
-a function, such as bplapply, bpmapply etc. A task is the division of the
-X argument into chunks. When tasks == 0 (default), X is divided as evenly
-as possible over the number of workers (see MulticoreParam from
-BiocParallel package).}
+integer >= 0L. In this documentation a job is defined as a single call to a
+function, such as bplapply, bpmapply etc. A task is the division of the X
+argument into chunks. When tasks == 0 (default), X is divided as evenly as
+possible over the number of workers (see MulticoreParam from BiocParallel
+package).}
 
 \item{verbose}{if TRUE, prints the function log to stdout}
 

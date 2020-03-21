@@ -137,7 +137,8 @@ uniqueGRanges <- function(ListOfGranges, ncols = NULL,
     mzeros <- function(l, nc, seq, hits) {
         if (nc > 1) {
             m <- matrix(missing, l, nc)
-            m[subjectHits(hits), seq_len(nc)] <- as.matrix(mcols(seq)[queryHits(hits),
+            m[subjectHits(hits),
+                seq_len(nc)] <- as.matrix(mcols(seq)[queryHits(hits),
                 seq_len(nc)])
         } else {
             m <- rep(missing, l)
