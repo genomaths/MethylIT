@@ -16,42 +16,41 @@
 #' @keywords internal
 #' @exportMethod predict.ldaDMP
 predict.ldaDMP <- function(object, newdata,
-                           type = c("class", "posterior", "scores", "lda.pred"), ...) {
-   if (!inherits(object, "ldaDMP")) {
-       stop("* 'object' must be a model from class 'ldaDMP'")
-   }
+                        type = c("class", "posterior", "scores", "lda.pred"),
+                        ...) {
+    if (!inherits(object, "ldaDMP")) {
+        stop("* 'object' must be a model from class 'ldaDMP'")
+    }
 
-   vn <- colnames(object$means)
+    vn <- colnames(object$means)
 
-   if (!is.null(newdata) && inherits(newdata, c("pDMP", "InfDiv", "GRanges"))) {
-     if (inherits(newdata, c("pDMP", "InfDiv"))) newdata <- unlist(newdata)
-     if (is.element("pos", vn)) {
-       position <- function(gr) {
-         chrs <- split(gr, seqnames(gr))
-         gr <- lapply(chrs, function(grc) {
-           x <- start(grc)
-           x.min <- min(x)
-           x.max <- max(x)
-           delta <-  max(c(x.max - x, 1))
-           return((x - x.min) / (delta))})
-         return(unlist(gr))
-       }
-       newdata$pos <- position(newdata)
-     }
-     newdata$logP <- log10(newdata$wprob + 2.2e-308)
-     newdata <- mcols(newdata)
-     newdata <- newdata[vn]
-   } else newdata <- newdata[vn]
-   class(object) <- "lda"
+    if (!is.null(newdata) && inherits(newdata, c("pDMP", "InfDiv", "GRanges")))
+    {
+        if (inherits(newdata, c("pDMP", "InfDiv"))) newdata <- unlist(newdata)
+        if (is.element("pos", vn)) {
+            position <- function(gr) {
+                chrs <- split(gr, seqnames(gr))
+                gr <- lapply(chrs, function(grc) {
+                    x <- start(grc)
+                    x.min <- min(x)
+                    x.max <- max(x)
+                    delta <-  max(c(x.max - x, 1))
+                    return((x - x.min) / (delta))})
+                return(unlist(gr))
+            }
+            newdata$pos <- position(newdata)
+        }
+        newdata$logP <- log10(newdata$wprob + 2.2e-308)
+        newdata <- mcols(newdata)
+        newdata <- newdata[vn]
+    } else newdata <- newdata[vn]
+    class(object) <- "lda"
 
-   pred <- predict(object, newdata = newdata, prior= object$prior)
-   pred <- switch(type[1],
-                   lda.pred = pred,
-                   class = pred$class,
-                   posterior = pred$posterior,
-                   scores = pred$x, ## cases scores on discriminant variables
-                   all = list(class = pred$class,
-                               posterior = pred$posterior)
-               )
-  return(pred)
+    pred <- predict(object, newdata = newdata, prior= object$prior)
+    pred <- switch(type[1], lda.pred = pred, class = pred$class,
+                    posterior = pred$posterior,
+                    scores = pred$x, ## cases scores on discriminant variables
+                    all = list(class = pred$class, posterior = pred$posterior)
+            )
+    return(pred)
 }

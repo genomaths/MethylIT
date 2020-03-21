@@ -72,13 +72,16 @@
 #' @rdname ggamma
 #' @title Generalized Gamma distribution
 #' @export
-dggamma <- function(q, alpha=1, scale=1, mu=0, psi=1, log.p=FALSE) {
-  if (scale > 0 && alpha > 0 && psi > 0) {
-    y <- (q - mu)/scale
-    d <- exp(-y^alpha) * alpha * y^(alpha * psi - 1)/(scale * gamma(psi))
-    if (log.p) return(log(d)) else return(d)
-  } else d <- NaN
-  return(d)
+dggamma <- function(q, alpha = 1, scale = 1, mu = 0, 
+    psi = 1, log.p = FALSE) {
+    if (scale > 0 && alpha > 0 && psi > 0) {
+        y <- (q - mu)/scale
+        d <- exp(-y^alpha) * alpha * y^(alpha * psi - 
+            1)/(scale * gamma(psi))
+        if (log.p) 
+            return(log(d)) else return(d)
+    } else d <- NaN
+    return(d)
 }
 #'
 #' @name pggamma
@@ -86,13 +89,14 @@ dggamma <- function(q, alpha=1, scale=1, mu=0, psi=1, log.p=FALSE) {
 #' @title Generalized Gamma distribution
 #' @importFrom stats pgamma
 #' @export
-pggamma <- function(q, alpha=1, scale=1, mu=0,
-                    psi=1, lower.tail=TRUE, log.p=FALSE) {
-  if (scale > 0 && alpha > 0 && psi > 0) {
-    y <- ((q - mu) / scale ) ^ alpha
-    p <- pgamma(y, shape=psi, lower.tail = lower.tail, log.p = log.p)
-  } else p <- NaN
-  return(p)
+pggamma <- function(q, alpha = 1, scale = 1, mu = 0, 
+    psi = 1, lower.tail = TRUE, log.p = FALSE) {
+    if (scale > 0 && alpha > 0 && psi > 0) {
+        y <- ((q - mu)/scale)^alpha
+        p <- pgamma(y, shape = psi, lower.tail = lower.tail, 
+            log.p = log.p)
+    } else p <- NaN
+    return(p)
 }
 
 #' @name qggamma
@@ -100,13 +104,14 @@ pggamma <- function(q, alpha=1, scale=1, mu=0,
 #' @title Generalized Gamma distribution
 #' @importFrom stats qgamma
 #' @export
-qggamma <- function(p, alpha=1, scale=1, mu=0,
-                    psi=1, lower.tail=TRUE, log.p=FALSE) {
-  if (scale > 0 && alpha > 0 && psi > 0) {
-    q <- qgamma(p, shape=psi, lower.tail = lower.tail, log.p = log.p)
-    q <- scale * q^(1/alpha) + mu
-  } else q <- NaN
-  return(q)
+qggamma <- function(p, alpha = 1, scale = 1, mu = 0, 
+    psi = 1, lower.tail = TRUE, log.p = FALSE) {
+    if (scale > 0 && alpha > 0 && psi > 0) {
+        q <- qgamma(p, shape = psi, lower.tail = lower.tail, 
+            log.p = log.p)
+        q <- scale * q^(1/alpha) + mu
+    } else q <- NaN
+    return(q)
 }
 
 #' @name rggamma
@@ -114,11 +119,15 @@ qggamma <- function(p, alpha=1, scale=1, mu=0,
 #' @title Generalized Gamma distribution
 #' @importFrom stats rgamma
 #' @export
-rggamma <- function(n, alpha=1, scale=1, mu=0, psi=1) {
-  if (scale <= 0) stop("'scale' parameter must be positive")
-  if (alpha <= 0) stop("'alpha' parameter must be positive")
-  if (psi <= 0) stop("'psi' parameter must be positive")
-
-  r <- scale * (rgamma(n, psi*alpha) ^ (1/alpha))
-  return(r)
+rggamma <- function(n, alpha = 1, scale = 1, mu = 0, 
+    psi = 1) {
+    if (scale <= 0) 
+        stop("'scale' parameter must be positive")
+    if (alpha <= 0) 
+        stop("'alpha' parameter must be positive")
+    if (psi <= 0) 
+        stop("'psi' parameter must be positive")
+    
+    r <- scale * (rgamma(n, psi * alpha)^(1/alpha))
+    return(r)
 }

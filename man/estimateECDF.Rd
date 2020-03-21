@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimateECDF.R
 \name{estimateECDF}
 \alias{estimateECDF}
-\title{A variant of Empirical Cumulative Distribution Function "ecdf"}
+\title{A variant of Empirical Cumulative Distribution Function 'ecdf'}
 \usage{
 estimateECDF(x, npoints = 10)
 }

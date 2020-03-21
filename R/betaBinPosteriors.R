@@ -37,7 +37,7 @@
 #' @return a probability
 #'
 #' @examples
-#'     MethylIT:::.betaBinPosteriors(2, 8, 2, 8)
+#' MethylIT:::.betaBinPosteriors(2, 8, 2, 8)
 #'
 #' @references 1. Hebestreit K, Dugas M, Klein H-U (2013) Detection of
 #'     significantly differentially methylated regions in targeted bisulfite
@@ -51,5 +51,5 @@
 #'     approach. Second. Cambridge: MIT Press. 452 p.
 #' @keywords internal
 .betaBinPosteriors <- function(success, trials, a, b) {
-   (a + success)/(a + b + trials)
+    (a + success)/(a + b + trials)
 }

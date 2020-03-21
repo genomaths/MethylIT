@@ -5,12 +5,12 @@
 \title{Filter methylation counts by coverage}
 \usage{
 filterByCoverage(
-  x,
-  min.coverage = 4,
-  max.coverage = Inf,
-  percentile = 0.999,
-  col.names = c(coverage = NULL, mC = NULL, uC = NULL),
-  verbose = TRUE
+    x,
+    min.coverage = 4,
+    max.coverage = Inf,
+    percentile = 0.999,
+    col.names = c(coverage = NULL, mC = NULL, uC = NULL),
+    verbose = TRUE
 )
 }
 \arguments{
@@ -47,11 +47,11 @@ coverage column in the meta-column table or the columns with methylated
 (mC) and unmethylated counts (uC).
 }
 \examples{
-    gr1 <- makeGRangesFromDataFrame(
-        data.frame(chr = "chr1", start = 11:15, end = 11:15,
-                strand = c("+","-","+","*","."), mC = 1, uC = 1:5),
-        keep.extra.columns = TRUE)
-     filterByCoverage(gr1, min.coverage = 1, max.coverage = 4,
-                col.names = c(mC = 1, uC = 2), verbose = FALSE)
+gr1 <- makeGRangesFromDataFrame(data.frame(chr = 'chr1', start = 11:15,
+end = 11:15, strand = c('+','-','+','*','.'), mC = 1, uC = 1:5),
+keep.extra.columns = TRUE)
+
+filterByCoverage(gr1, min.coverage = 1, max.coverage = 4,
+col.names = c(mC = 1, uC = 2), verbose = FALSE)
 
 }

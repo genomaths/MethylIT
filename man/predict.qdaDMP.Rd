@@ -6,10 +6,10 @@
 \title{Predict function for 'qdaDMP' method}
 \usage{
 \method{predict}{qdaDMP}(
-  object,
-  newdata,
-  type = c("all", "class", "posterior", "scores", "qda.pred"),
-  ...
+    object,
+    newdata,
+    type = c("all", "class", "posterior", "scores", "qda.pred"),
+    ...
 )
 }
 \arguments{
@@ -19,8 +19,8 @@
 prediction}
 
 \item{type}{To use with function 'predict'. The type of prediction
-required. The default is "all" basic predictions: classes and posterior
-classification probabilities. Option "qda.pred" returns the
+required. The default is 'all' basic predictions: classes and posterior
+classification probabilities. Option 'qda.pred' returns the
 object given by function 'predict.qda' from MASS package: 'class',
 'posterior', 'scores' (cases scores on discriminant variables,
 see \code{\link[MASS]{qda}}.}

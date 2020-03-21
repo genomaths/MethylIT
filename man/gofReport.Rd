@@ -5,23 +5,23 @@
 \title{Report the Best Fitted Probability Distribution Model}
 \usage{
 gofReport(
-  HD,
-  model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"),
-  column = 9,
-  absolute = FALSE,
-  output = c("best.model", "all"),
-  confl_model = FALSE,
-  num.cores = 1L,
-  verbose = FALSE,
-  ...
+    HD,
+    model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"),
+    column = 9,
+    absolute = FALSE,
+    output = c("best.model", "all"),
+    confl_model = FALSE,
+    num.cores = 1L,
+    verbose = FALSE,
+    ...
 )
 }
 \arguments{
-\item{HD}{An "InfDiv" object returned by function
+\item{HD}{An 'InfDiv' object returned by function
 \code{\link{estimateDivergence}}.}
 
 \item{model}{A character vector naming the models to fit. Default is
-model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"). See
+model = c('Weibull2P', 'Weibull3P', 'Gamma2P', 'Gamma3P'). See
 \code{\link{nonlinearFitDist}} for more options.}
 
 \item{column}{An integer number denoting the index of the GRanges column where
@@ -34,9 +34,9 @@ of methylation levels) is normally an output in the downstream MethylIT
 analysis. If 'absolute = TRUE', then TV is transformed into |TV|, which
 is an information divergence that can be fitted as well.}
 
-\item{output}{If output == "all", the table with the GoF statistics is
+\item{output}{If output == 'all', the table with the GoF statistics is
 returned in a list together with the best fitted model and the
-corresponding statistics. Default is "best.model"}
+corresponding statistics. Default is 'best.model'}
 
 \item{confl_model}{Logic. If TRUE, then the best model based on highest
 R.Cross.val is returned for those samples where the model(s) with lowest
@@ -51,7 +51,7 @@ at most how many child processes will be run simultaneously (see
 \item{...}{Further arguments to pass to \code{\link{nonlinearFitDist}}.}
 }
 \value{
-If 'output = "best.model"', a character vector with the name of the
+If 'output = 'best.model'', a character vector with the name of the
 best fitted model for each sample and model statistics, which can be used the
 next step to get the potential DMPs with function
 \code{\link{getPotentialDIMP}}. Otherwise, it will return a list with the

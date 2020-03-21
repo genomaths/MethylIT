@@ -5,27 +5,27 @@
 \title{Fisher's exact test for read counts on GRanges objects}
 \usage{
 FisherTest(
-  LR,
-  count.col = c(1, 2),
-  control.names = NULL,
-  treatment.names = NULL,
-  pooling.stat = "sum",
-  tv.cut = NULL,
-  hdiv.cut = NULL,
-  hdiv.col = NULL,
-  pAdjustMethod = "BH",
-  pvalCutOff = 0.05,
-  saveAll = FALSE,
-  num.cores = 1L,
-  tasks = 0L,
-  verbose = FALSE,
-  progressbar = TRUE,
-  ...
+    LR,
+    count.col = c(1, 2),
+    control.names = NULL,
+    treatment.names = NULL,
+    pooling.stat = "sum",
+    tv.cut = NULL,
+    hdiv.cut = NULL,
+    hdiv.col = NULL,
+    pAdjustMethod = "BH",
+    pvalCutOff = 0.05,
+    saveAll = FALSE,
+    num.cores = 1L,
+    tasks = 0L,
+    verbose = FALSE,
+    progressbar = TRUE,
+    ...
 )
 }
 \arguments{
 \item{LR}{A list of GRanges, a GRangesList, a CompressedGRangesList object,
-or an object from Methyl-IT downstream analyses: 'InfDiv' or "pDMP"
+or an object from Methyl-IT downstream analyses: 'InfDiv' or 'pDMP'
 object. Each GRanges object from the list must have two columns:
 methylated (mC) and unmethylated (uC) counts. The name of each element
 from the list must coincide with a control or a treatment name.}
@@ -120,21 +120,17 @@ built for range from GRanges object.
 ## Get a dataset of Hellinger divergency of methylation levels
 ## from the package
 data(HD)
+
 ### --- To get the read counts
 hd <- lapply(HD, function(hd) {
-   hd = hd[1:10,3:4]
-   colnames(mcols(hd)) <- c("mC", "uC")
-   return(hd)
+hd = hd[1:10,3:4]
+colnames(mcols(hd)) <- c('mC', 'uC')
+return(hd)
 })
 
-FisherTest(LR = hd,
-       pooling.stat = NULL,
-        control.names = "C1",
-        treatment.names = "T1",
-        pAdjustMethod="BH",
-        pvalCutOff = 0.05,
-        num.cores = 1L,
-        verbose=FALSE)
+FisherTest(LR = hd, pooling.stat = NULL, control.names = 'C1',
+treatment.names = 'T1', pAdjustMethod='BH', pvalCutOff = 0.05,
+num.cores = 1L, verbose=FALSE)
 
 }
 \seealso{

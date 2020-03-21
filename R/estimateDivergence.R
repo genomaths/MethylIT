@@ -29,12 +29,12 @@
 #' present case:
 #'
 #' \deqn{H = 2 (n_1 + 1) (n_2 + 1)*((sqrt(p_1) - sqrt(p_2))^2 +
-#'          (sqrt(1-p_2) - sqrt(1-p_2))^2)/(n_1 + n_2 + 2)}
+#' (sqrt(1-p_2) - sqrt(1-p_2))^2)/(n_1 + n_2 + 2)}
 #'
 #' where \eqn{n_1} and \eqn{n_2} are the coverage for the control and
 #' treatment, respectively. Notice that each row from the matrix of counts
 #' correspond to a single cytosine position and has four values corresponding to
-#' "mC1" and "uC1" (control), and mC2" and "uC2" for treatment.
+#' 'mC1' and 'uC1' (control), and mC2' and 'uC2' for treatment.
 #'
 #' According with the above equation, to estimate Hellinger divergence, not only
 #' the methylation levels are considered in the estimation of H, but also the
@@ -134,26 +134,31 @@
 #' @param verbose if TRUE, prints the function log to stdout
 #' @param ... Additional parameters for 'uniqueGRanges' function.
 #'
-#' @return An object from "infDiv" class with the four columns of counts, the
+#' @return An object from 'infDiv' class with the four columns of counts, the
 #' information divergence, and additional columns:
 #' \describe{
-#' \item{1)}{The original matrix of methylated \eqn{c_{ij}} and unmethylated
-#' \eqn{t_{ij}} read counts from control \eqn{j=1} and treatment \eqn{j=2}
-#' samples at positions \eqn{i}.}
-#' \item{2)}{"p1" and "p2": methylation levels for control and treatment,
-#' respectively. If 'meth.level = FALSE' and 'Bayesian = TRUE' (recommended),
-#' "p1" and "p2" are estimated following the Bayesian approach described in
-#' reference (1).}
-#' \item{3)}{"bay.TV": total variation TV = p2 - p1}
-#' \item{4)}{"TV": total variation based on simple counts:
+#' \item{1) \strong{A matrix:}}{The original matrix of methylated
+#' \eqn{c_{ij}} and unmethylated \eqn{t_{ij}} read counts from control \eqn{j=1}
+#' and treatment \eqn{j=2} samples at positions \eqn{i}.}
+#'
+#' \item{2) \strong{'p1' and 'p2':}}{methylation levels for control and
+#' treatment, respectively. If 'meth.level = FALSE' and 'Bayesian = TRUE'
+#' (recommended), 'p1' and 'p2' are estimated following the Bayesian approach
+#' described in reference (1).}
+#'
+#' \item{3) \strong{'bay.TV':}}{total variation TV = p2 - p1}
+#'
+#' \item{4) \strong{'TV':}}{total variation based on simple counts:
 #' \eqn{TV=c_1/(c_1+t_1)-c_2/(c_2+t_2)}, where \eqn{c_i} and \eqn{t_i} denote
 #' methylated and unmethylated read counts, respectively.}
-#' \item{5)}{"hdiv": Hellinger divergence. If Bayesian = TRUE, the results are
-#' based on the posterior estimations of methylation levels. if meth.level =
-#' FALSE', then "hdiv" is computed as given in reference (2), otherwise as:
-#' \deqn{hdiv = (sqrt(p_1) - sqrt(p_2))^2 + (sqrt(1 -p_1) - sqrt(1 -
-#' p_2))^2}}
+#'
+#' \item{5) \strong{Hellinger divergence, 'hdiv':}}{If Bayesian = TRUE, the
+#' results are based on the posterior estimations of methylation levels. if
+#' meth.level = FALSE', then 'hdiv' is computed as given in reference (2),
+#' otherwise as: \deqn{hdiv = (sqrt(p_1) - sqrt(p_2))^2 + (sqrt(1 -p_1) - sqrt(1
+#' - p_2))^2}}
 #' }
+#'
 #' @references
 #' \enumerate{
 #' \item Sanchez R, Yang X, Maher T, Mackenzie S. Discrimination of DNA
@@ -166,81 +171,91 @@
 #' @author Robersy Sanchez (\url{https://genomaths.com})
 #' @examples
 #' ## The read count data are created
-#'     num.samples <- 250
-#'     x <- data.frame(chr = "chr1", start = 1:num.samples,
-#'                     end = 1:num.samples,strand = '*',
-#'                     mC = rnbinom(size = num.samples, mu = 4, n = 500),
-#'                     uC = rnbinom(size = num.samples, mu = 4, n = 500))
-#'     y <- data.frame(chr = "chr1", start = 1:num.samples,
-#'                     end = 1:num.samples, strand = '*',
-#'                     mC = rnbinom(size = num.samples, mu = 4, n = 500),
-#'                     uC = rnbinom(size = num.samples, mu = 4, n = 500))
-#'     x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
-#'     y <- makeGRangesFromDataFrame(y, keep.extra.columns = TRUE)
-#'     hd <- estimateDivergence(ref = x, indiv = list(y), JD = TRUE,
-#'                             verbose = FALSE)[[1]]
+#' num.samples <- 250
+#' x <- data.frame(chr = 'chr1', start = 1:num.samples,
+#' end = 1:num.samples,strand = '*',
+#' mC = rnbinom(size = num.samples, mu = 4,
+#' n = 500), uC = rnbinom(size = num.samples, mu = 4, n = 500))
+#'
+#' y <- data.frame(chr = 'chr1', start = 1:num.samples, end = 1:num.samples,
+#' strand = '*', mC = rnbinom(size = num.samples, mu = 4, n = 500),
+#' uC = rnbinom(size = num.samples, mu = 4, n = 500))
+#'
+#' x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
+#' y <- makeGRangesFromDataFrame(y, keep.extra.columns = TRUE)
+#' hd <- estimateDivergence(ref = x, indiv = list(y), JD = TRUE,
+#' verbose = FALSE)[[1]]
 #'
 #' ## Keep in mind that Hellinger and J divergences are, in general, correlated!
-#'     cor.test(x = as.numeric(hd$hdiv), y = as.numeric(hd$jdiv),
-#'             method = "kendall")
+#' cor.test(x = as.numeric(hd$hdiv), y = as.numeric(hd$jdiv),
+#' method = 'kendall')
 #'
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom GenomicRanges GRanges GRangesList
 #' @seealso \code{\link{estimateBayesianDivergence}}
 #' @export
-estimateDivergence <- function(ref, indiv, Bayesian = FALSE, columns = NULL,
-                           min.coverage = 4, min.meth = 4, min.umeth = 0,
-                           min.sitecov = 4, high.coverage = NULL,
-                           percentile = 0.999, JD = FALSE, num.cores = 1L,
-                           tasks = 0L, meth.level = FALSE, logbase = 2,
-                           verbose = TRUE, ...) {
+estimateDivergence <- function(ref, indiv, Bayesian = FALSE,
+    columns = NULL, min.coverage = 4, min.meth = 4,
+    min.umeth = 0, min.sitecov = 4, high.coverage = NULL,
+    percentile = 0.999, JD = FALSE, num.cores = 1L,
+    tasks = 0L, meth.level = FALSE, logbase = 2, verbose = TRUE,
+    ...) {
 
-   if (is.null(columns) && (!meth.level)) columns <- c(1,2)
-   if (meth.level && (is.null(columns))) columns <- 1
-   sn <- names(indiv)
+    if (is.null(columns) && (!meth.level))
+        columns <- c(1, 2)
+    if (meth.level && (is.null(columns)))
+        columns <- 1
+    sn <- names(indiv)
 
-   if (Sys.info()['sysname'] == "Linux") {
-       bpparam <- MulticoreParam(workers=num.cores, tasks=tasks)
-   } else {
-       bpparam <- SnowParam(workers = num.cores, type = "SOCK")
-   }
-   if (ncol(mcols(ref)) > 2) ref <- ref[ , columns]
-   indiv <- lapply(indiv, function(x) x[, columns])
+    if (Sys.info()["sysname"] == "Linux") {
+        bpparam <- MulticoreParam(workers = num.cores,
+            tasks = tasks)
+    } else {
+        bpparam <- SnowParam(workers = num.cores, type = "SOCK")
+    }
+    if (ncol(mcols(ref)) > 2)
+        ref <- ref[, columns]
+    indiv <- lapply(indiv, function(x) x[, columns])
 
-   if (meth.level) {
-       x = bplapply(seq_len(length(indiv)), function(k, ref, indv, sn) {
-           if (verbose) message("*** Processing sample #", k, " ", sn[k])
-           x <- indv[[k]]
-           x <- x[ ,columns]
-           x <- uniqueGRanges(list(ref,x), num.cores=1L, tasks=tasks,
-                               verbose=verbose, ...)
-           x = estimateBayesianDivergence(x, Bayesian=Bayesian,
-                               num.cores=1L, tasks=tasks,
-                               meth.level=meth.level, verbose=verbose)
-           return(x)
-           }, BPPARAM=bpparam, ref=ref, indv=indiv, sn=sn)
-   } else {
-       x = bplapply(seq_len(length(indiv)), function(k, ref, indv, sn) {
-           if (verbose) message("*** Processing sample #", k, " ", sn[ k ])
-           x = uniqueGRfilterByCov(x = ref, y = indv[[k]],
-                               min.coverage = min.coverage, min.meth = min.meth,
-                               min.umeth = min.umeth, min.sitecov = min.sitecov,
-                               percentile = percentile,
-                               high.coverage = high.coverage, num.cores = 1L,
-                               tasks=tasks, verbose = verbose, ...)
-           if (length(x) < 2)
-               stop("*** At least two cytosine sites must pass the filtering ",
-                   "conditions to estimate informations divergences. \n",
-                   "The issue was found at sample number: ", k, ", id: ",
-                   names(indv)[k])
-           x = estimateBayesianDivergence(x, Bayesian = Bayesian, JD = JD,
-                               num.cores = 1L, tasks = tasks,
-                               meth.level = meth.level, logbase = logbase,
-                               verbose = verbose)
-           return(x)
-           }, BPPARAM=bpparam, ref=ref, indv=indiv, sn=sn)
-   }
-   names(x) <- sn
-   x <- structure(x, class=c("InfDiv", "list"))
-   return(x)
+    if (meth.level) {
+        x = bplapply(seq_len(length(indiv)), function(k,
+            ref, indv, sn) {
+            if (verbose)
+                message("*** Processing sample #", k, " ", sn[k])
+            x <- indv[[k]]
+            x <- x[, columns]
+            x <- uniqueGRanges(list(ref, x), num.cores = 1L,
+                tasks = tasks, verbose = verbose, ...)
+            x = estimateBayesianDivergence(x, Bayesian = Bayesian,
+                num.cores = 1L, tasks = tasks, meth.level = meth.level,
+                verbose = verbose)
+            return(x)
+        }, BPPARAM = bpparam, ref = ref, indv = indiv,
+            sn = sn)
+    } else {
+        x = bplapply(seq_len(length(indiv)), function(k,
+            ref, indv, sn) {
+            if (verbose)
+                message("*** Processing sample #", k, " ", sn[k])
+            x = uniqueGRfilterByCov(x = ref, y = indv[[k]],
+                            min.coverage = min.coverage, min.meth = min.meth,
+                            min.umeth = min.umeth, min.sitecov = min.sitecov,
+                            percentile = percentile,
+                            high.coverage = high.coverage, num.cores = 1L,
+                            tasks = tasks, verbose = verbose, ...)
+            if (length(x) < 2)
+                stop("*** At least two cytosine sites must pass the filtering",
+                    " conditions to estimate informations divergences. \n",
+                    "The issue was found at sample number: ",
+                    k, ", id: ", names(indv)[k])
+            x = estimateBayesianDivergence(x, Bayesian = Bayesian,
+                                        JD = JD, num.cores = 1L, tasks = tasks,
+                                        meth.level = meth.level,
+                                        logbase = logbase, verbose = verbose)
+            return(x)
+        }, BPPARAM = bpparam, ref = ref, indv = indiv, sn = sn)
+    }
+    names(x) <- sn
+    x <- structure(x, class = c("InfDiv", "list"))
+    return(x)
 }

@@ -7,22 +7,22 @@
 (PCA)}
 \usage{
 pcaLDA(
-  formula = NULL,
-  data = NULL,
-  grouping = NULL,
-  n.pc = 1,
-  scale = FALSE,
-  center = FALSE,
-  tol = 1e-04,
-  method = "moment",
-  max.pc = NULL
+    formula = NULL,
+    data = NULL,
+    grouping = NULL,
+    n.pc = 1,
+    scale = FALSE,
+    center = FALSE,
+    tol = 1e-04,
+    method = "moment",
+    max.pc = NULL
 )
 
 \method{predict}{pcaLDA}(
-  object,
-  newdata,
-  type = c("lda.pred", "class", "posterior", "scores", "pca.ind.coord", "all"),
-  ...
+    object,
+    newdata,
+    type = c("lda.pred", "class", "posterior", "scores", "pca.ind.coord", "all"),
+    ...
 )
 }
 \arguments{
@@ -45,15 +45,15 @@ pcaLDA(
 \item{max.pc}{Same as in parameter 'rank.' from package 'prcomp'.}
 
 \item{object}{To use with function 'predict'. A 'pcaLDA' object containing a
-list of two objects: 1) an object of class inheriting from "lda" and 2)
-an object of class inheriting from "prcomp".}
+list of two objects: 1) an object of class inheriting from 'lda' and 2)
+an object of class inheriting from 'prcomp'.}
 
 \item{newdata}{To use with function 'predict'. New data for classification
 prediction}
 
 \item{type}{To use with function 'predict'. The type of prediction
-required.  The default is "all" basic predictions: classes and posterior
-classification probabilities. Option "lda.pred" returns the
+required.  The default is 'all' basic predictions: classes and posterior
+classification probabilities. Option 'lda.pred' returns the
 object given by function 'predict.lda' from MASS package: 'class',
 'posterior', 'scores' (cases scores on discriminant variables,
 see \code{\link[MASS]{lda}}.}
@@ -88,19 +88,22 @@ pcaLDA' function can be used in general classification problems.
 \examples{
 data(iris)
 ld1 <- pcaLDA(formula = Species ~ Petal.Length + Sepal.Length + Sepal.Width,
-            data = iris, n.pc = 1, max.pc = 2, scale = TRUE, center = TRUE)
-## === Prediction === ##
+data = iris, n.pc = 1, max.pc = 2, scale = TRUE, center = TRUE)
+
+## ===== Prediction ===== ##
 ld2 <- pcaLDA(formula = Species ~., data = iris, n.pc = 1, max.pc = 2,
-             scale = TRUE, center = TRUE)
+scale = TRUE, center = TRUE)
+
 set.seed(123)
 idx <- sample.int(150, 40)
 newdata <- iris[idx, 1:4]
 newdata.prediction <- predict(ld2, newdata = newdata)
 
-## The confusion matrix
+## ==== The confusion matrix
 x <- data.frame(TRUE.class = iris$Species[idx],
-               PRED.class = newdata.prediction$class)
+PRED.class = newdata.prediction$class)
 table(x)
+
 }
 \seealso{
 \code{\link{pcaQDA}}, \code{\link[MASS]{lda}} and

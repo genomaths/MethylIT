@@ -49,7 +49,7 @@ parameters of the beta distribution, alpha and beta parameters,
 respectively.
 }
 \examples{
-    MethylIT:::.betaBinPosteriors(2, 8, 2, 8)
+MethylIT:::.betaBinPosteriors(2, 8, 2, 8)
 
 }
 \references{

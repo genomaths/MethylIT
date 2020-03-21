@@ -73,12 +73,15 @@
 #'
 #' @examples
 #' ### Create new data
-#' df1 <- data.frame(chr = "chr1", start = 11:16, end = 11:16,
-#'                   mC = c(2,10,7,9,1,10), uC = c(30,20,4,8,0,10))
-#' df2 <- data.frame(chr = "chr1", start = 12:18, end = 12:18,
-#'                   mC2 = 1:7, uC2 = 0:6)
+#' df1 <- data.frame(chr = 'chr1', start = 11:16, end = 11:16,
+#' mC = c(2,10,7,9,1,10), uC = c(30,20,4,8,0,10))
+#'
+#' df2 <- data.frame(chr = 'chr1', start = 12:18, end = 12:18,
+#' mC2 = 1:7, uC2 = 0:6)
+#'
 #' gr1 <- makeGRangesFromDataFrame(df1, keep.extra.columns = TRUE)
 #' gr2 <- makeGRangesFromDataFrame(df2, keep.extra.columns = TRUE)
+#'
 #' ## Filtering
 #' r1 <- uniqueGRfilterByCov(gr1, gr2, ignore.strand = TRUE)
 #' r1
@@ -90,84 +93,94 @@
 #' r1 <- uniqueGRfilterByCov(gr1, gr2, min.meth = 1, ignore.strand = TRUE)
 #' r1
 #' @export
-uniqueGRfilterByCov <- function(x, y = NULL, min.coverage = 4, min.meth = 0,
-                               min.umeth = 0, min.sitecov = 4,
-                               percentile = 0.9999, high.coverage = NULL,
-                               columns = c(mC = 1, uC = 2), num.cores = 1L,
-                               ignore.strand = FALSE, tasks = 0L,
-                               verbose = TRUE, ...) {
+uniqueGRfilterByCov <- function(x, y = NULL, min.coverage = 4,
+    min.meth = 0, min.umeth = 0, min.sitecov = 4, percentile = 0.9999,
+    high.coverage = NULL, columns = c(mC = 1, uC = 2),
+    num.cores = 1L, ignore.strand = FALSE, tasks = 0L,
+    verbose = TRUE, ...) {
 
-   if (!is.null(y)) {
-       x <- x[, columns]
-       y <- y[, columns]
-       x <- uniqueGRanges(list(x, y), num.cores=num.cores, tasks=tasks,
-                           ignore.strand = ignore.strand, verbose=verbose, ...)
-   } else {
-       if (!is(x, "GRanges")) {
-           # --------------------valid "pDMP" or "InfDiv" object ---------------
-           validateClass(x)
-           # ----------------------------------------------------------------- #
-       }
-   }
+    if (!is.null(y)) {
+        x <- x[, columns]
+        y <- y[, columns]
+        x <- uniqueGRanges(list(x, y), num.cores = num.cores,
+            tasks = tasks, ignore.strand = ignore.strand,
+            verbose = verbose, ...)
+    } else {
+        if (!is(x, "GRanges")) {
+            # --------------------valid 'pDMP' or 'InfDiv'
+            # object ---------------
+            validateClass(x)
+            # -----------------------------------------------------------------
+            # #
+        }
+    }
 
-   if (length(min.coverage) == 1) min.coverage <- c(min.coverage, min.coverage)
-   if (length(min.meth) == 1) min.meth <- c(min.meth, min.meth)
-   if (length(min.umeth) == 1) min.umeth <- c(min.umeth, min.umeth)
+    if (length(min.coverage) == 1)
+        min.coverage <- c(min.coverage, min.coverage)
+    if (length(min.meth) == 1)
+        min.meth <- c(min.meth, min.meth)
+    if (length(min.umeth) == 1)
+        min.umeth <- c(min.umeth, min.umeth)
 
-   cov1 <- rowSums(as.matrix(mcols(x[,c(1,2)])))
-   cov2 <- rowSums(as.matrix(mcols(x[,c(3,4)])))
-   total_cov <- cov1 + cov2
+    cov1 <- rowSums(as.matrix(mcols(x[, c(1, 2)])))
+    cov2 <- rowSums(as.matrix(mcols(x[, c(3, 4)])))
+    total_cov <- cov1 + cov2
 
-   if (is.null(high.coverage)) {
-       q1 <- quantile(cov1, probs=percentile)
-       q2 <- quantile(cov2, probs=percentile)
-       q <- min(q1, q2)
-   } else q <- high.coverage
+    if (is.null(high.coverage)) {
+        q1 <- quantile(cov1, probs = percentile)
+        q2 <- quantile(cov2, probs = percentile)
+        q <- min(q1, q2)
+    } else q <- high.coverage
 
-   idx1 <- which((cov1 >= min.coverage[1]) | (cov2 >= min.coverage[2]))
-   if (!(length(idx1) > 0))
-       stop("*** Some filtering condition from min.coverage = c(",
-           paste(min.coverage, collapse = ","), ") is not hold by the sample")
-   idx2 <- which((cov1 <= q) & (cov2 <= q))
-   idx <- intersect(idx1, idx2)
-   idx <- intersect(idx, which(total_cov >= min.sitecov))
-   if (!(length(idx) > 0))
-       stop("*** Some filtering condition is not hold by the sample")
+    idx1 <- which((cov1 >= min.coverage[1]) | (cov2 >=
+        min.coverage[2]))
+    if (!(length(idx1) > 0))
+        stop("*** Some filtering condition from min.coverage = c(",
+            paste(min.coverage, collapse = ","), ") is not hold by the sample")
+    idx2 <- which((cov1 <= q) & (cov2 <= q))
+    idx <- intersect(idx1, idx2)
+    idx <- intersect(idx, which(total_cov >= min.sitecov))
+    if (!(length(idx) > 0))
+        stop("*** Some filtering condition is not hold by the sample")
 
-   x <- x[idx]
-   if (max(min.meth) > 0) {
-       c1 <- mcols(x[, 1])[, 1]
-       c2 <- mcols(x[, 3])[, 1]
+    x <- x[idx]
+    if (max(min.meth) > 0) {
+        c1 <- mcols(x[, 1])[, 1]
+        c2 <- mcols(x[, 3])[, 1]
 
-       idx <- which((c1 >= min.meth[1]) | (c2 >= min.meth[2]))
-       if (!(length(idx) > 0))
-           stop("*** Some filtering condition from min.meth = c(",
-               paste(min.meth, collapse = ","), ") is not hold by the sample")
+        idx <- which((c1 >= min.meth[1]) | (c2 >= min.meth[2]))
+        if (!(length(idx) > 0))
+            stop("*** Some filtering condition from min.meth = c(",
+                paste(min.meth, collapse = ","), ") is not hold by the sample")
 
-       x <- x[ idx ]
+        x <- x[idx]
 
-       # To remove positions similar to, e.g., c1 = 20, 40, c2 = 1 & t2 = 0,
-       # not captured on the above filtering conditions (see example).
-       if (length(x) == 1) {
-           cov1 <- sum(as.matrix(mcols(x[,c(1,2)])))
-           cov2 <- sum(as.matrix(mcols(x[,c(3,4)])))
-       } else {
-           cov1 <- rowSums(as.matrix(mcols(x[,c(1,2)])))
-           cov2 <- rowSums(as.matrix(mcols(x[,c(3,4)])))
-       }
+        # To remove positions similar to, e.g., c1 = 20,
+        # 40, c2 = 1 & t2 = 0, not captured on the above
+        # filtering conditions (see example).
+        if (length(x) == 1) {
+            cov1 <- sum(as.matrix(mcols(x[, c(1, 2)])))
+            cov2 <- sum(as.matrix(mcols(x[, c(3, 4)])))
+        } else {
+            cov1 <- rowSums(as.matrix(mcols(x[, c(1,
+                2)])))
+            cov2 <- rowSums(as.matrix(mcols(x[, c(3,
+                4)])))
+        }
 
-       c1 <- mcols(x[, 1])[, 1]
-       c2 <- mcols(x[, 3])[, 1]
+        c1 <- mcols(x[, 1])[, 1]
+        c2 <- mcols(x[, 3])[, 1]
 
-       t1 <- mcols(x[, 2])[, 1]
-       t2 <- mcols(x[, 4])[, 1]
+        t1 <- mcols(x[, 2])[, 1]
+        t2 <- mcols(x[, 4])[, 1]
 
-       idx <- which((t1 <= min.umeth[1]) & (c1 > 0) & (c1 <= min.meth[1]) &
-                       cov1 < min.coverage[1])
-       idx1 <- which((t2 <= min.umeth[2]) & (c2 > 0) & (c2 <= min.meth[2]) &
-                       cov2 < min.coverage[2])
-       idx <- union(idx, idx1)
-       if (length(idx) > 0) x <- x[ -idx ]
-   }
-   return(x)
+        idx <- which((t1 <= min.umeth[1]) & (c1 > 0) &
+            (c1 <= min.meth[1]) & cov1 < min.coverage[1])
+        idx1 <- which((t2 <= min.umeth[2]) & (c2 >
+            0) & (c2 <= min.meth[2]) & cov2 < min.coverage[2])
+        idx <- union(idx, idx1)
+        if (length(idx) > 0)
+            x <- x[-idx]
+    }
+    return(x)
 }

@@ -5,12 +5,12 @@
 \title{Predict function for logistic regression model from 'LogisticR' class}
 \usage{
 \method{predict}{LogisticR}(
-  object,
-  newdata = NULL,
-  type = c("all", "class", "posterior"),
-  num.cores = 1L,
-  tasks = 0L,
-  ...
+    object,
+    newdata = NULL,
+    type = c("all", "class", "posterior"),
+    num.cores = 1L,
+    tasks = 0L,
+    ...
 )
 }
 \arguments{
@@ -19,12 +19,12 @@ class. A logistic model given by function
 \code{\link{evaluateDIMPclass}}.}
 
 \item{newdata}{To use with function 'predict'. New data for classification
-prediction. Optionally, an object from class "GRanges", a list of
-GRanges, "pDMP" or "InfDIv", in which to look for variables with which to
+prediction. Optionally, an object from class 'GRanges', a list of
+GRanges, 'pDMP' or 'InfDIv', in which to look for variables with which to
 predict. If omitted, the fitted linear predictors are used.}
 
 \item{type}{The type of output required. Possible outputs are: 'class',
-"posterior" and "all". The default is "all".}
+'posterior' and 'all'. The default is 'all'.}
 
 \item{num.cores, tasks}{Parameters for parallel computation using package
 \code{\link[BiocParallel]{BiocParallel-package}}: the number of cores to
@@ -40,7 +40,7 @@ added, predicted classes and 'posterior' probabilities, in the
 meta-columns of each GRanges object are given. If 'newdata' is null, then
 the predictions given for the model by function
 \code{\link[stats]{predict.glm}} are returned. if type is set to 'class'
-or to "posterior", then the unlisted predicted classification or
+or to 'posterior', then the unlisted predicted classification or
 posterior classification probabilities are returned.
 }
 \description{

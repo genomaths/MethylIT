@@ -5,24 +5,24 @@
 \title{Nonlinear fit of Information divergences distribution}
 \usage{
 nonlinearFitDist(
-  LR,
-  column = 9,
-  dist.name = "Weibull",
-  sample.size = 20,
-  location.par = FALSE,
-  absolute = FALSE,
-  npoints = NULL,
-  model = "all",
-  maxiter = 1024,
-  tol = 1e-12,
-  ftol = 1e-12,
-  ptol = 1e-12,
-  minFactor = 10^-6,
-  num.cores = NULL,
-  tasks = 0L,
-  maxfev = 1e+05,
-  verbose = TRUE,
-  ...
+    LR,
+    column = 9,
+    dist.name = "Weibull",
+    sample.size = 20,
+    location.par = FALSE,
+    absolute = FALSE,
+    npoints = NULL,
+    model = "all",
+    maxiter = 1024,
+    tol = 1e-12,
+    ftol = 1e-12,
+    ptol = 1e-12,
+    minFactor = 10^-6,
+    num.cores = NULL,
+    tasks = 0L,
+    maxfev = 1e+05,
+    verbose = TRUE,
+    ...
 )
 }
 \arguments{
@@ -33,10 +33,10 @@ their meta-columns.}
 where the information divergence is given. Default column = 1}
 
 \item{dist.name}{Name(s) of the distribution to fit. A single character
-string or character vector naming the distribution(s): "Weibull"
+string or character vector naming the distribution(s): 'Weibull'
 (default), gamma with three-parameter (Gamma3P), gamma with two-parameter
-(Gamma2P), generalized gamma with three-parameter ("GGamma3P") or
-four-parameter ("GGamma4P"), and Log-Normal (LogNorm).}
+(Gamma2P), generalized gamma with three-parameter ('GGamma3P') or
+four-parameter ('GGamma4P'), and Log-Normal (LogNorm).}
 
 \item{sample.size}{size of the sample}
 
@@ -52,11 +52,11 @@ Generalized Gamma distribution.}
 
 \item{npoints}{number of points used in the fit}
 
-\item{model}{Optional. Only when dist.name = "Weibull". A selection of the
+\item{model}{Optional. Only when dist.name = 'Weibull'. A selection of the
 distribution model, two-parameters and three-parameters Weibull model
-("2P" and "3P"). Default is "all" and the model with the best AIC
-criterion is reported. Alternatively, just use dist.name = "Weibull2P" or
-dist.name = "Weibull3P".}
+('2P' and '3P'). Default is 'all' and the model with the best AIC
+criterion is reported. Alternatively, just use dist.name = 'Weibull2P' or
+dist.name = 'Weibull3P'.}
 
 \item{maxiter}{positive integer. Termination occurs when the number of
 iterations reaches maxiter. Default value: 1024}
@@ -113,7 +113,7 @@ A wrapper to call functions 'Weibull3P' and
 \details{
 The algorithm prepares the information divergence variable
 to try fitting Weibull or generalized gamma distribution model to the data.
-If Weibull distribution is selected (default: "Weibull"), function
+If Weibull distribution is selected (default: 'Weibull'), function
 'Weibull2P' first attempts fitting to the two-parameter Weibull CDF
 (Weibull2P). If Weibull2P did not fit, then the algorithm will try to fit
 Weibull3P. The Levenberg-Marquardt algorithm implemented in R package
@@ -123,9 +123,9 @@ described in reference (1-2). In addition, Stein's formula for adjusted R
 squared (rho) is used as an estimator of the average cross-validation
 predictive power (2).
 
-If "GGamma3P" is selected the call to function 'fitGGammaDist' permits the
-fitting to the three-parameter GGamma CDF ("GGamma3P"). The fit to the
-four-parameter GGamma ("GGamma4P") is also available. GGamma distribution are
+If 'GGamma3P' is selected the call to function 'fitGGammaDist' permits the
+fitting to the three-parameter GGamma CDF ('GGamma3P'). The fit to the
+four-parameter GGamma ('GGamma4P') is also available. GGamma distribution are
 fitted using a modification of Levenberg-Marquardt algorithm implemented in
 function 'nls.lm' from the 'minpack.lm' R package. Notice that the fit to
 GGamma distribution is computationally time consuming (see ?fitGGammaDist for
@@ -135,25 +135,24 @@ additional information).
 ## Load a dataset with Hellinger Divergence of methylation levels on it.
 data(HD)
 ## The nonlinear fit based on three-parameter GGamma distribution
-nlms2 <- nonlinearFitDist(HD, npoints = 100, dist.name = "GGamma3P",
-                          verbose = FALSE)
+nlms2 <- nonlinearFitDist(HD, npoints = 100, dist.name = 'GGamma3P',
+verbose = FALSE)
 ## Weilbull distribution is a particular case of GGamma.
 nlms <- nonlinearFitDist(HD, npoints = 100, verbose = FALSE)
 
 ## The goodness-of-fit indicators AIC suggests that the best fitted model is
 ## obtained with GGamma distribution (in this example).
-res <- mapply(function(m1,m2) {
-  as.numeric(c(Weibull = m1$AIC[1], GGamma = m2$AIC[1]))
-}, nlms, nlms2)
-rownames(res) <-c("Weibull", "GGamma")
+res <- mapply(function(m1,m2)
+as.numeric(c(Weibull = m1$AIC[1], GGamma = m2$AIC[1])), nlms, nlms2)
+rownames(res) <-c('Weibull', 'GGamma')
 res
 
 ## However, the Cross-validations correlation coefficient is saying that
 ## the Weibull distribution would be a little better probability predictor.
-res <- mapply(function(m1,m2) {
-  as.numeric(c(Weibull = m1$R.Cross.val[1], GGamma = m2$R.Cross.val[1]))
-}, nlms, nlms2)
-rownames(res) <-c("Weibull", "GGamma")
+res <- mapply(function(m1,m2)
+as.numeric(c(Weibull = m1$R.Cross.val[1], GGamma = m2$R.Cross.val[1])),
+nlms, nlms2)
+rownames(res) <-c('Weibull', 'GGamma')
 res
 
 }

@@ -33,7 +33,10 @@ abstract: |
   the information divergence of methylation levels and a proper evaluation of
   the classification performance of differentially methylated positions (DMPs)
   into two classes: DMPs from control and DMPs from treatment.
-  
+vignette: >
+  %\VignetteIndexEntry{Optimal cutpoint for the methylation signal}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}  
 ---
 
 <style type="text/css">

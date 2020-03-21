@@ -9,7 +9,7 @@
 #'     (control and treatment) in the metacolumn. So, a contingency table can be
 #'     built for range from GRanges object.
 #' @param LR A list of GRanges, a GRangesList, a CompressedGRangesList object,
-#'     or an object from Methyl-IT downstream analyses: 'InfDiv' or "pDMP"
+#'     or an object from Methyl-IT downstream analyses: 'InfDiv' or 'pDMP'
 #'     object. Each GRanges object from the list must have two columns:
 #'     methylated (mC) and unmethylated (uC) counts. The name of each element
 #'     from the list must coincide with a control or a treatment name.
@@ -80,179 +80,191 @@
 #' ## Get a dataset of Hellinger divergency of methylation levels
 #' ## from the package
 #' data(HD)
+#'
 #' ### --- To get the read counts
 #' hd <- lapply(HD, function(hd) {
-#'    hd = hd[1:10,3:4]
-#'    colnames(mcols(hd)) <- c("mC", "uC")
-#'    return(hd)
+#' hd = hd[1:10,3:4]
+#' colnames(mcols(hd)) <- c('mC', 'uC')
+#' return(hd)
 #' })
 #'
-#' FisherTest(LR = hd,
-#'        pooling.stat = NULL,
-#'         control.names = "C1",
-#'         treatment.names = "T1",
-#'         pAdjustMethod="BH",
-#'         pvalCutOff = 0.05,
-#'         num.cores = 1L,
-#'         verbose=FALSE)
+#' FisherTest(LR = hd, pooling.stat = NULL, control.names = 'C1',
+#' treatment.names = 'T1', pAdjustMethod='BH', pvalCutOff = 0.05,
+#' num.cores = 1L, verbose=FALSE)
 #'
 #' @seealso \code{\link[MethylIT.utils]{rmstGR}}
 #' @export
-FisherTest <- function(LR, count.col=c(1,2), control.names=NULL,
-                       treatment.names=NULL, pooling.stat = "sum", tv.cut=NULL,
-                       hdiv.cut=NULL, hdiv.col=NULL, pAdjustMethod="BH",
-                       pvalCutOff=0.05, saveAll=FALSE, num.cores=1L, tasks=0L,
-                       verbose=FALSE, progressbar = TRUE, ...) {
+FisherTest <- function(LR, count.col = c(1, 2), control.names = NULL,
+    treatment.names = NULL, pooling.stat = "sum", tv.cut = NULL,
+    hdiv.cut = NULL, hdiv.col = NULL, pAdjustMethod = "BH",
+    pvalCutOff = 0.05, saveAll = FALSE, num.cores = 1L,
+    tasks = 0L, verbose = FALSE, progressbar = TRUE, ...) {
 
-   if (any(!unlist(lapply(LR, function(GR) is(GR, "GRanges")))))
-       stop("At least one element from 'LR' is not a 'GRanges' object")
+    if (any(!unlist(lapply(LR, function(GR) is(GR,
+        "GRanges")))))
+        stop("At least one element from 'LR' is not a 'GRanges' object")
 
-   if (inherits(LR, c('InfDiv', "pDMP"))) {
-       validateClass(LR)
-   }
+    if (inherits(LR, c("InfDiv", "pDMP"))) {
+        validateClass(LR)
+    }
 
-   if (!is.null(control.names)&&!is.null(treatment.names))
-     LR = try(LR[c(control.names, treatment.names)], silent=TRUE)
-   if (inherits(LR, "try-error"))
-     stop("List's names does not match control & treatment names")
+    if (!is.null(control.names) && !is.null(treatment.names))
+        LR = try(LR[c(control.names, treatment.names)],
+            silent = TRUE)
+    if (inherits(LR, "try-error"))
+        stop("List's names does not match control & treatment names")
 
-   # === Auxiliar function to perform FT ===
-   ftest <- function(GR, num.cores = num.cores, tasks = tasks, ...) {
-       count.matrix = as.matrix(mcols(GR))
-       p1 <- count.matrix[, c(1,2)]
-       p1 <- p1[, 1]/rowSums(p1)
-       p2 <- count.matrix[, 3:4]
-       p2 <- p2[, 1]/rowSums(p2)
-       TV = p2 - p1; rm(p1, p2); gc()
+    # === Auxiliar function to perform FT ===
+    ftest <- function(GR, num.cores = num.cores, tasks = tasks,
+        ...) {
+        count.matrix = as.matrix(mcols(GR))
+        p1 <- count.matrix[, c(1, 2)]
+        p1 <- p1[, 1]/rowSums(p1)
+        p2 <- count.matrix[, 3:4]
+        p2 <- p2[, 1]/rowSums(p2)
+        TV = p2 - p1
+        rm(p1, p2)
+        gc()
 
-       ind <- FALSE; idx <- c()
-       if (!is.null(tv.cut)) idx.tv <- which(abs(TV) >= tv.cut)
-       if (!is.null(hdiv.cut) && !is.null(hdiv.col))
-           idx.hdiv <- which(mcols(GR[, hdiv.col])[,1] >= hdiv.cut)
+        ind <- FALSE
+        idx <- c()
+        if (!is.null(tv.cut))
+            idx.tv <- which(abs(TV) >= tv.cut)
+        if (!is.null(hdiv.cut) && !is.null(hdiv.col))
+            idx.hdiv <- which(mcols(GR[, hdiv.col])[,
+                1] >= hdiv.cut)
 
-       if (!is.null(tv.cut) && (!is.null(hdiv.cut) && !is.null(hdiv.col))) {
-           idx <- unique(c(idx.tv, idx.hdiv))
-           ind <- !is.na(idx)
-       } else {
-           if (!is.null(tv.cut)) {idx <- idx.tv; ind <- !is.na(idx)}
-           if (!is.null(hdiv.cut) && !is.null(hdiv.col)) {
-               idx <- idx.hdiv;
-               ind <- !is.na(idx)
+        if (!is.null(tv.cut) && (!is.null(hdiv.cut) &&
+            !is.null(hdiv.col))) {
+            idx <- unique(c(idx.tv, idx.hdiv))
+            ind <- !is.na(idx)
+        } else {
+            if (!is.null(tv.cut)) {
+                idx <- idx.tv
+                ind <- !is.na(idx)
             }
-       }
+            if (!is.null(hdiv.cut) && !is.null(hdiv.col)) {
+                idx <- idx.hdiv
+                ind <- !is.na(idx)
+            }
+        }
 
-       if (sum(ind) > 0) {
-           idx = idx[ind]
-           count.matrix = as.matrix(mcols(GR[idx]))
-       } else count.matrix = as.matrix(mcols(GR))
+        if (sum(ind) > 0) {
+            idx = idx[ind]
+            count.matrix = as.matrix(mcols(GR[idx]))
+        } else count.matrix = as.matrix(mcols(GR))
 
-       if (nrow(count.matrix) > 1 ) {
-           count.matrix <- count.matrix[, c(1,2,3,4)]
-           sites <- nrow(count.matrix)
-           GR$TV <- TV
-           GR$pvalue <- rep(1, length(GR))
-           GR$adj.pval <- rep(1, length(GR))
-           count.matrix <- split(count.matrix, row(count.matrix))
-           if (verbose)
-             cat("*** Performing Fisher's exact test... \n
-                 # of sites after filtering: ", sites, "\n")
-           if (Sys.info()['sysname'] == "Linux") {
-             bpparam <- MulticoreParam(workers=num.cores, tasks=tasks,
-                                       progressbar = progressbar)
-           } else {
-             bpparam <- SnowParam(workers = num.cores, type = "SOCK",
-                                   progressbar = progressbar)
-           }
-           pvals <- unname(unlist(bplapply(count.matrix, function(v) {
-             fisher.test(matrix(as.integer(v), 2, byrow = TRUE))$p.value
-           }, BPPARAM=bpparam)))
-       } else {
-           count.matrix = count.matrix[c(1,2,3,4)]
-           pvals <- fisher.test(matrix(count.matrix, 2, byrow = TRUE))$p.value
-       }
+        if (nrow(count.matrix) > 1) {
+            count.matrix <- count.matrix[, c(1, 2,
+                3, 4)]
+            sites <- nrow(count.matrix)
+            GR$TV <- TV
+            GR$pvalue <- rep(1, length(GR))
+            GR$adj.pval <- rep(1, length(GR))
+            count.matrix <- split(count.matrix, row(count.matrix))
+            if (verbose)
+                cat("*** Performing Fisher's exact test... \n ",
+                    "# of sites after filtering:", sites, "\n")
+            if (Sys.info()["sysname"] == "Linux") {
+                bpparam <- MulticoreParam(workers = num.cores,
+                                    tasks = tasks, progressbar = progressbar)
+            } else {
+                bpparam <- SnowParam(workers = num.cores,
+                                    type = "SOCK", progressbar = progressbar)
+            }
+            pvals <- unname(unlist(bplapply(count.matrix,
+                function(v) {
+                    fisher.test(matrix(as.integer(v), 2, byrow = TRUE))$p.value
+                }, BPPARAM = bpparam)))
+        } else {
+            count.matrix = count.matrix[c(1, 2, 3, 4)]
+            pvals <- fisher.test(matrix(count.matrix, 2, byrow = TRUE))$p.value
+        }
 
-       if ((!is.null(tv.cut) | !is.null(hdiv.cut)) &&
-           !saveAll && length(idx) > 0) {
-           GR <- GR[idx]
-           GR$pvalue <- pvals
-           GR$adj.pval <- p.adjust(pvals, method=pAdjustMethod)
-       } else {
-           if ((!is.null(tv.cut) | !is.null(hdiv.cut)) &&
-               saveAll && length(idx) > 0) {
-               GR$pvalue[idx] <- pvals
-               GR$adj.pval[idx] <- p.adjust(pvals, method=pAdjustMethod)
-           }
-           if (is.null(tv.cut) && is.null(hdiv.cut)) {
-               GR$pvalue <- pvals
-               GR$adj.pval <- p.adjust(pvals, method=pAdjustMethod)
-           }
-       }
+        if ((!is.null(tv.cut) | !is.null(hdiv.cut)) &&
+            !saveAll && length(idx) > 0) {
+            GR <- GR[idx]
+            GR$pvalue <- pvals
+            GR$adj.pval <- p.adjust(pvals, method = pAdjustMethod)
+        } else {
+            if ((!is.null(tv.cut) | !is.null(hdiv.cut)) &&
+                saveAll && length(idx) > 0) {
+                GR$pvalue[idx] <- pvals
+                GR$adj.pval[idx] <- p.adjust(pvals, method = pAdjustMethod)
+            }
+            if (is.null(tv.cut) && is.null(hdiv.cut)) {
+                GR$pvalue <- pvals
+                GR$adj.pval <- p.adjust(pvals, method = pAdjustMethod)
+            }
+        }
 
-       if (!is.null(pvalCutOff) && !saveAll) {
-           GR <- GR[ GR$adj.pval < pvalCutOff ]
-       }
+        if (!is.null(pvalCutOff) && !saveAll) {
+            GR <- GR[GR$adj.pval < pvalCutOff]
+        }
 
-       return(GR)
-   }
+        return(GR)
+    }
 
-   # This tests each sample against the reference
-   if (is.null(control.names) || is.null(treatment.names)) {
-       res <- lapply(LR, function(GR) ftest(GR, num.cores = num.cores,
-                                            tasks = tasks, verbose = verbose) )
-   }
+    # This tests each sample against the reference
+    if (is.null(control.names) || is.null(treatment.names)) {
+        res <- lapply(LR, function(GR) ftest(GR, num.cores = num.cores,
+            tasks = tasks, verbose = verbose))
+    }
 
-   if (!is.null(control.names)&&!is.null(treatment.names)) {
-       ctrl <- LR[control.names]
+    if (!is.null(control.names) && !is.null(treatment.names)) {
+        ctrl <- LR[control.names]
 
-       treat <- LR[treatment.names]
+        treat <- LR[treatment.names]
 
-       if (!is.null(pooling.stat)) {
-           ctrl <- poolFromGRlist(ctrl, stat=pooling.stat,
-                                   num.cores=num.cores, verbose=verbose)
-           colnames(mcols(ctrl)) <- c("c1", "t1") # control counts
+        if (!is.null(pooling.stat)) {
+            ctrl <- poolFromGRlist(ctrl, stat = pooling.stat,
+                num.cores = num.cores, verbose = verbose)
+            colnames(mcols(ctrl)) <- c("c1", "t1")  # control counts
 
-           treat <- poolFromGRlist(treat, stat=pooling.stat,
-                                   num.cores=num.cores, verbose=verbose)
-           colnames(mcols(treat)) <- c("c2", "t2") # treatment counts
+            treat <- poolFromGRlist(treat, stat = pooling.stat,
+                num.cores = num.cores, verbose = verbose)
+            colnames(mcols(treat)) <- c("c2", "t2")  # treatment counts
 
-           GR <- uniqueGRanges(list(ctrl, treat), verbose=verbose, ...)
-           res <- ftest(GR, num.cores = num.cores, tasks = tasks,
-                       verbose=verbose )
-       } else {
-           ctrl <- lapply(ctrl, function(GR) {
-               GR <- GR[, count.col]
-               colnames(mcols(GR)) <- c("c1", "t1") # Control counts
-               return(GR)
-           })
+            GR <- uniqueGRanges(list(ctrl, treat),
+                verbose = verbose, ...)
+            res <- ftest(GR, num.cores = num.cores,
+                tasks = tasks, verbose = verbose)
+        } else {
+            ctrl <- lapply(ctrl, function(GR) {
+                GR <- GR[, count.col]
+                colnames(mcols(GR)) <- c("c1", "t1")  # Control counts
+                return(GR)
+            })
 
-           treat <- lapply(treat, function(GR) {
-               GR <- GR[, count.col]
-               colnames(mcols(GR)) <- c("c2", "t2") # Treatment counts
-               return(GR)
-           })
-           res = list()
-           i = 1
-           test.name = c()
-           for(j in seq_len(length(ctrl))){
-               for (k in seq_len(length(treat))) {
-                   test.name = c(test.name, paste0(control.names[j], ".",
-                                               treatment.names[k]))
-                   GR <- uniqueGRanges(list(ctrl[[j]], treat[[k]]),
-                                       verbose = verbose, ...)
-                   if (verbose)
-                       cat("*** Testing", paste0(control.names[k], " versus ",
-                           treatment.names[j]), "\n")
-                   res[[i]]=ftest(GR, num.cores = num.cores,
-                                   tasks = tasks, verbose = verbose)
-                   i = i + 1
-               }
-               names(res) <- test.name
-           }
-       }
-   }
-   if (!is.list(res)) res <- list(groupComparison = res)
-   if (inherits(LR, "InfDiv") || inherits(LR, "pDMP")) cl <- class(LR)
-   else cl <- class(res)
-   res <- structure(res, class = c(cl, "testDMP"))
-   return(res)
+            treat <- lapply(treat, function(GR) {
+                GR <- GR[, count.col]
+                colnames(mcols(GR)) <- c("c2", "t2")  # Treatment counts
+                return(GR)
+            })
+            res = list()
+            i = 1
+            test.name = c()
+            for (j in seq_len(length(ctrl))) {
+                for (k in seq_len(length(treat))) {
+                    test.name = c(test.name, paste0(control.names[j],
+                                                    ".", treatment.names[k]))
+                    GR <- uniqueGRanges(list(ctrl[[j]],
+                                            treat[[k]]), verbose = verbose, ...)
+                    if (verbose)
+                        cat("*** Testing", paste0(control.names[k]," versus ",
+                                            treatment.names[j]), "\n")
+                    res[[i]] = ftest(GR, num.cores = num.cores,
+                                    tasks = tasks, verbose = verbose)
+                    i = i + 1
+                }
+                names(res) <- test.name
+            }
+        }
+    }
+    if (!is.list(res))
+        res <- list(groupComparison = res)
+    if (inherits(LR, "InfDiv") || inherits(LR, "pDMP"))
+        cl <- class(LR) else cl <- class(res)
+    res <- structure(res, class = c(cl, "testDMP"))
+    return(res)
 }

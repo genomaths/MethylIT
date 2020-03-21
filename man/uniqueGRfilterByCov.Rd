@@ -5,20 +5,20 @@
 \title{Unique GRanges of methylation read counts filtered by coverages}
 \usage{
 uniqueGRfilterByCov(
-  x,
-  y = NULL,
-  min.coverage = 4,
-  min.meth = 0,
-  min.umeth = 0,
-  min.sitecov = 4,
-  percentile = 0.9999,
-  high.coverage = NULL,
-  columns = c(mC = 1, uC = 2),
-  num.cores = 1L,
-  ignore.strand = FALSE,
-  tasks = 0L,
-  verbose = TRUE,
-  ...
+    x,
+    y = NULL,
+    min.coverage = 4,
+    min.meth = 0,
+    min.umeth = 0,
+    min.sitecov = 4,
+    percentile = 0.9999,
+    high.coverage = NULL,
+    columns = c(mC = 1, uC = 2),
+    num.cores = 1L,
+    ignore.strand = FALSE,
+    tasks = 0L,
+    verbose = TRUE,
+    ...
 )
 }
 \arguments{
@@ -112,12 +112,15 @@ that the columns of methylated and unmethylated counts are given.
 }
 \examples{
 ### Create new data
-df1 <- data.frame(chr = "chr1", start = 11:16, end = 11:16,
-                  mC = c(2,10,7,9,1,10), uC = c(30,20,4,8,0,10))
-df2 <- data.frame(chr = "chr1", start = 12:18, end = 12:18,
-                  mC2 = 1:7, uC2 = 0:6)
+df1 <- data.frame(chr = 'chr1', start = 11:16, end = 11:16,
+mC = c(2,10,7,9,1,10), uC = c(30,20,4,8,0,10))
+
+df2 <- data.frame(chr = 'chr1', start = 12:18, end = 12:18,
+mC2 = 1:7, uC2 = 0:6)
+
 gr1 <- makeGRangesFromDataFrame(df1, keep.extra.columns = TRUE)
 gr2 <- makeGRangesFromDataFrame(df2, keep.extra.columns = TRUE)
+
 ## Filtering
 r1 <- uniqueGRfilterByCov(gr1, gr2, ignore.strand = TRUE)
 r1

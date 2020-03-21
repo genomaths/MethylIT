@@ -38,7 +38,7 @@ plot(x, y)
 nlm <- nls(Y ~ a * exp( b * X), data = data.frame(X=x, Y=y),
             start=list(a=1.5, b=-0.7),
             control=nls.control(maxiter=10^4, tol=1e-05),
-            algorithm="port")
+            algorithm='port')
 ## The estimations of Akaike information criteria given by 'AIC' function
 ## from stats' R package and from 'AICmodel' function are equal.
 AICmodel(nlm) == AIC(nlm)

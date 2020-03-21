@@ -43,7 +43,7 @@
 #'     specifies the maximum difference in the starts, ends or both,
 #'     respectively. For within, it is the maximum amount by which the subject
 #'     may be wider than the query.
-#' @param select When select is "all" (the default), the results are returned as
+#' @param select When select is 'all' (the default), the results are returned as
 #'     a Hits object. Otherwise the returned value is an integer vector parallel
 #'     to query (i.e. same length) containing the first, last, or arbitrary
 #'     overlapping interval in subject, with NA indicating intervals that did
@@ -69,18 +69,18 @@
 #' @return a GRanges object
 #'
 #' @examples
-#' dfChr1 <- data.frame(chr = "chr1", start = 11:15, end = 11:15,
-#'                     strand = c("+","-","+","*","."), score = 1:5)
-#' dfChr2 <- data.frame(chr = "chr1", start = 11:15, end = 11:15,
-#'                     strand = c("+","-","+","*","."), score = 1:5)
-#' dfChr3 <- data.frame(chr = "chr1", start = 11:15, end = 11:15,
-#'                     strand = c("+","-","+","*","."), score = 1:5)
+#' dfChr1 <- data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+#'                     strand = c('+','-','+','*','.'), score = 1:5)
+#' dfChr2 <- data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+#'                     strand = c('+','-','+','*','.'), score = 1:5)
+#' dfChr3 <- data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+#'                     strand = c('+','-','+','*','.'), score = 1:5)
 #'
 #' gr1 <- makeGRangesFromDataFrame(dfChr1, keep.extra.columns = TRUE)
 #' gr2 <- makeGRangesFromDataFrame(dfChr2, keep.extra.columns = TRUE)
 #' gr3 <- makeGRangesFromDataFrame(dfChr3, keep.extra.columns = TRUE)
 #'
-#' grList <- GRangesList("gr1" = gr1, "gr2" = gr2, "gr3" = gr3)
+#' grList <- GRangesList('gr1' = gr1, 'gr2' = gr2, 'gr3' = gr3)
 #'
 #' uniqueGRanges(grList)
 #'
@@ -93,148 +93,171 @@
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @author Robersy Sanchez (\url{https://genomaths.com}).
 #' @export
-uniqueGRanges <- function(ListOfGranges, ncols=NULL, columns=NULL,
-                       chromosomes=NULL, maxgap=-1L, minoverlap=1L, missing=0,
-                       type=c("any", "start", "end", "within", "equal"),
-                       select=c("all", "first", "last", "arbitrary"),
-                       ignore.strand=FALSE, keep.strand=!ignore.strand,
-                       num.cores=1, tasks=0L, verbose=TRUE) {
+uniqueGRanges <- function(ListOfGranges, ncols = NULL,
+    columns = NULL, chromosomes = NULL, maxgap = -1L,
+    minoverlap = 1L, missing = 0, type = c("any", "start",
+        "end", "within", "equal"), select = c("all",
+        "first", "last", "arbitrary"), ignore.strand = FALSE,
+    keep.strand = !ignore.strand, num.cores = 1, tasks = 0L,
+    verbose = TRUE) {
 
-   if (is(ListOfGranges, "list") && !is(ListOfGranges, "GRangesList")) {
-       GR <- try(as(ListOfGranges, "GRangesList"), silent=TRUE)
+    if (is(ListOfGranges, "list") && !is(ListOfGranges,
+        "GRangesList")) {
+        GR <- try(as(ListOfGranges, "GRangesList"),
+            silent = TRUE)
 
-       if (inherits(ListOfGranges, "try-error")) {
-         numgr <- sum(unlist(lapply(ListOfGranges, function(l)
-                                               is(l, "GRanges"))))
-           if (numgr != length(ListOfGranges)) {stop(
-               "Not all the elements from the list are valid GRanges objects")
-           } else {ListOfGranges <- GR; rm(GR); gc()}
-       }
-   }
+        if (inherits(ListOfGranges, "try-error")) {
+            numgr <- sum(unlist(lapply(ListOfGranges,
+                function(l) is(l, "GRanges"))))
+            if (numgr != length(ListOfGranges)) {
+                stop("Not all the elements from the list",
+                    " are valid GRanges objects")
+            } else {
+                ListOfGranges <- GR
+                rm(GR)
+                gc()
+            }
+        }
+    }
 
-   if (length(ListOfGranges) == 1) return(ListOfGranges)
+    if (length(ListOfGranges) == 1)
+        return(ListOfGranges)
 
-   # Set parallel computation
-   if (Sys.info()['sysname'] == "Linux") {
-       bpparam <- MulticoreParam(workers=num.cores, tasks=tasks)
-   } else bpparam <- SnowParam(workers = num.cores, type = "SOCK")
+    # Set parallel computation
+    if (Sys.info()["sysname"] == "Linux") {
+        bpparam <- MulticoreParam(workers = num.cores,
+            tasks = tasks)
+    } else bpparam <- SnowParam(workers = num.cores,
+        type = "SOCK")
 
-   ##samples = names(ListOfGranges)
-   unlistfn <- function(x) {
-       matrix(unlist(x), ncol=3, byrow=TRUE)
-   }
-   mzeros <- function(l, nc, seq, hits) {
-       if (nc > 1) {
-           m <- matrix(missing, l, nc)
-           m[subjectHits(hits), seq_len(nc)] <- as.matrix(mcols(seq)[queryHits(hits),
-                                                         seq_len(nc)])
-       } else{
-           m <- rep(missing, l)
-           seq <- as.vector(mcols(seq)[queryHits(hits), 1])
-           if (is(seq, "factor") || is(seq, "character")) {
-               m[subjectHits(hits)] <- as.character(seq)
-           } else m[subjectHits(hits)] <- as.numeric(seq)
-       }
-       m
-   }
+    ## samples = names(ListOfGranges)
+    unlistfn <- function(x) {
+        matrix(unlist(x), ncol = 3, byrow = TRUE)
+    }
+    mzeros <- function(l, nc, seq, hits) {
+        if (nc > 1) {
+            m <- matrix(missing, l, nc)
+            m[subjectHits(hits), seq_len(nc)] <- as.matrix(mcols(seq)[queryHits(hits),
+                seq_len(nc)])
+        } else {
+            m <- rep(missing, l)
+            seq <- as.vector(mcols(seq)[queryHits(hits),
+                1])
+            if (is(seq, "factor") || is(seq, "character")) {
+                m[subjectHits(hits)] <- as.character(seq)
+            } else m[subjectHits(hits)] <- as.numeric(seq)
+        }
+        m
+    }
 
-   if (is.null(chromosomes)) {
-       chromosomes <- try(lapply(ListOfGranges, seqlevels), silent=TRUE)
-       if (inherits(chromosomes, "try-error")) {
-           warning("* Chromosome labels could not be determined. \n",
-                   "Arbitrary Arabidopsis thaliana labels are used instead \n")
-           chromosomes <- c("Chr1", "Chr2", "Chr3", "Chr4", "Chr5")
-       }
-       chromosomes <- unique(as.character(unlist(chromosomes)))
-   }
+    if (is.null(chromosomes)) {
+        chromosomes <- try(lapply(ListOfGranges, seqlevels),
+            silent = TRUE)
+        if (inherits(chromosomes, "try-error")) {
+            warning("* Chromosome labels could not be determined. \n",
+                "Arbitrary Arabidopsis thaliana labels are used instead \n")
+            chromosomes <- c("Chr1", "Chr2", "Chr3",
+                "Chr4", "Chr5")
+        }
+        chromosomes <- unique(as.character(unlist(chromosomes)))
+    }
 
-   cond1 <- all(unlist(lapply(ListOfGranges, function(x) !is.null(mcols(x)))))
-   cond2 <- all(unlist(lapply(ListOfGranges, function(x) ncol(mcols(x)) > 0)))
+    cond1 <- all(unlist(lapply(ListOfGranges, function(x) !is.null(mcols(x)))))
+    cond2 <- all(unlist(lapply(ListOfGranges, function(x) ncol(mcols(x)) >
+        0)))
 
-   ## It assigns the data to the GRanges metacolumns
-   if (verbose)
-       message(" *** Building coordinates for the new GRanges object ..." )
+    ## It assigns the data to the GRanges metacolumns
+    if (verbose)
+        message(" *** Building coordinates for the new GRanges object ...")
 
-   if (ignore.strand && !keep.strand) {
-       if (verbose) {
-           message(" *** Setting strand information to * ..." )
-       }
+    if (ignore.strand && !keep.strand) {
+        if (verbose) {
+            message(" *** Setting strand information to * ...")
+        }
 
-       ListOfGranges <- lapply(ListOfGranges, function(GR) {
-           strand(GR) <- "*"
-           return(GR)
-       })
-   } else {
-       if (verbose) {
-           message(" *** Strand information is preserved ..." )
-       }
-   }
+        ListOfGranges <- lapply(ListOfGranges, function(GR) {
+            strand(GR) <- "*"
+            return(GR)
+        })
+    } else {
+        if (verbose) {
+            message(" *** Strand information is preserved ...")
+        }
+    }
 
-   granges <- unique(unname(unlist(ListOfGranges)))
+    granges <- unique(unname(unlist(ListOfGranges)))
 
-   if (cond1 && cond2) {
-       ## This assigns the data values to the GRanges metacolumns
-       l <- length(granges)
-       n <- length(ListOfGranges)
+    if (cond1 && cond2) {
+        ## This assigns the data values to the GRanges
+        ## metacolumns
+        l <- length(granges)
+        n <- length(ListOfGranges)
 
-       if (verbose) message(" *** Processing GRanges for sample: #", 1 )
-       seq <- ListOfGranges[[1]]
-       if (is.null(ncols) && is.null(columns)) {
-           snames <- colnames(mcols(seq))
-           ncol <- length(snames)
-       } else {
-           if (!is.null(columns)) {
-               snames <- colnames(mcols(seq))[columns]
-               ncol = length(snames)
-               seq = seq[, snames]
-           }
-           if (!is.null(ncols)) {
-               ncol <- ncols
-               snames <- colnames(mcols(seq))[seq_len(ncol)]
-           }
-       }
+        if (verbose)
+            message(" *** Processing GRanges for sample: #",
+                1)
+        seq <- ListOfGranges[[1]]
+        if (is.null(ncols) && is.null(columns)) {
+            snames <- colnames(mcols(seq))
+            ncol <- length(snames)
+        } else {
+            if (!is.null(columns)) {
+                snames <- colnames(mcols(seq))[columns]
+                ncol = length(snames)
+                seq = seq[, snames]
+            }
+            if (!is.null(ncols)) {
+                ncol <- ncols
+                snames <- colnames(mcols(seq))[seq_len(ncol)]
+            }
+        }
 
-       Hits <- findOverlaps(seq, granges, maxgap=maxgap, minoverlap=minoverlap,
-                       type=type, select=select, ignore.strand=ignore.strand)
-       x <- mzeros(l, nc=ncol, seq, Hits)
-       methl <- data.frame(x, stringsAsFactors=FALSE)
-       rm(x, seq, Hits); gc()
+        Hits <- findOverlaps(seq, granges, maxgap = maxgap,
+            minoverlap = minoverlap, type = type, select = select,
+            ignore.strand = ignore.strand)
+        x <- mzeros(l, nc = ncol, seq, Hits)
+        methl <- data.frame(x, stringsAsFactors = FALSE)
+        rm(x, seq, Hits)
+        gc()
 
-       for (k in 2:n) {
-           seq <- ListOfGranges[[k]]
-           if (is.null(ncols) && is.null(columns)) {
-               nam <- colnames(mcols(seq))
-               ncol <- length(nam)
-           } else {
-               if (!is.null(columns)) {
-                   nam <- colnames(mcols(seq))[columns]
-                   ncol = length(nam)
-                   seq = seq[, nam]
-               }
-               if (!is.null(ncols)) {
-                   ncol <- ncols
-                   nam <- colnames(mcols(seq))[seq_len(ncol)]
-               }
-           }
+        for (k in 2:n) {
+            seq <- ListOfGranges[[k]]
+            if (is.null(ncols) && is.null(columns)) {
+                nam <- colnames(mcols(seq))
+                ncol <- length(nam)
+            } else {
+                if (!is.null(columns)) {
+                    nam <- colnames(mcols(seq))[columns]
+                    ncol = length(nam)
+                    seq = seq[, nam]
+                }
+                if (!is.null(ncols)) {
+                    ncol <- ncols
+                    nam <- colnames(mcols(seq))[seq_len(ncol)]
+                }
+            }
 
-           snames <- c(snames, nam)
-           if (verbose)
-               message(" *** Processing GRanges for sample: #", k, "...")
-           Hits <- findOverlaps(seq, granges, maxgap=maxgap,
-                           minoverlap=minoverlap, type=type, select=select,
-                           ignore.strand=ignore.strand)
-           x <- mzeros(l, nc=ncol, seq, Hits)
-           methl <- cbind(methl, x)
-           rm(x, seq, Hits); gc()
-       }
-       colnames(methl) <- snames
-       mcols(granges) <- methl
-       rm(methl); gc()
-       colnames(mcols(granges)) <- make.unique(colnames(mcols(granges)))
-   } else warnings("At least one GRanges has zero metacolumns")
+            snames <- c(snames, nam)
+            if (verbose)
+                message(" *** Processing GRanges for sample: #", k, "...")
+            Hits <- findOverlaps(seq, granges, maxgap = maxgap,
+                                minoverlap = minoverlap, type = type,
+                                select = select, ignore.strand = ignore.strand)
+            x <- mzeros(l, nc = ncol, seq, Hits)
+            methl <- cbind(methl, x)
+            rm(x, seq, Hits)
+            gc()
+        }
+        colnames(methl) <- snames
+        mcols(granges) <- methl
+        rm(methl)
+        gc()
+        colnames(mcols(granges)) <- make.unique(colnames(mcols(granges)))
+    } else warnings("At least one GRanges has zero metacolumns")
 
-   if (verbose) message(" *** Sorting by chromosomes and start positions...")
-   granges <- sortBySeqnameAndStart(granges)
-   return(granges)
+    if (verbose)
+        message(" *** Sorting by chromosomes and start positions...")
+    granges <- sortBySeqnameAndStart(granges)
+    return(granges)
 }
 

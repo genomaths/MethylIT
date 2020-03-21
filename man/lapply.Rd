@@ -29,7 +29,7 @@ which is the result of applying FUN to the corresponding element of 'x'.
 \examples{
 # Create a list
 x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
-class(x) <- "nice"
+class(x) <- 'nice'
 
 # compute the list mean for each list element using 'base::lapply'
 class(lapply(x, mean))

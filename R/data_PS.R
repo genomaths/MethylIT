@@ -2,7 +2,7 @@
 #'
 #' Each individuals sample includes 10000 cytosine positions
 #'
-#' @format PS is an object from class "pDMP" carrying in the meta-columns the
+#' @format PS is an object from class 'pDMP' carrying in the meta-columns the
 #' following variables:
 #' \describe{
 #'     \item{p1}{methylation level from the reference sample}
@@ -14,7 +14,7 @@
 #'     \eqn{wprob = 1 - CDF probability}}
 #' }
 #'
-#''PS' is an object from class "pDMP" carrying the same meta-columns as 'HD'
+#''PS' is an object from class 'pDMP' carrying the same meta-columns as 'HD'
 #'(dataset) plus the probabilities: \eqn{wprob = 1 - CDF probability}. 'PS'
 #'was obtained with function \code{\link{getPotentialDIMP}}.
 "PS"

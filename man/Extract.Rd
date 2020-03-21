@@ -30,8 +30,8 @@ the class from the original object \eqn{x}.
 \description{
 \eqn{x[i]} returns an object of the length as \eqn{i} preserving
 the class from the original object \eqn{x}. The following Methyl-IT
-classes are considered: "InfDiv","pDMP", "glmDataSet", and
-"RangedGlmDataSet".
+classes are considered: 'InfDiv','pDMP', 'glmDataSet', and
+'RangedGlmDataSet'.
 }
 \seealso{
 base::\code{\link[base]{Extract}}

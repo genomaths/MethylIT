@@ -25,7 +25,7 @@
 #'                 mu = as.numeric(wei.model$Estimate[3]) )
 #'
 #' @export
-pweibull3P <- function(q, shape=1, scale=1, mu=0) {
-   y <- q - mu
-   pweibull(y, shape, scale)
+pweibull3P <- function(q, shape = 1, scale = 1, mu = 0) {
+    y <- q - mu
+    pweibull(y, shape, scale)
 }

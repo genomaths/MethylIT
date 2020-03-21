@@ -5,23 +5,23 @@
 \title{Potential methylation signal}
 \usage{
 getPotentialDIMP(
-  LR,
-  nlms = NULL,
-  div.col,
-  dist.name = "Weibull2P",
-  absolute = FALSE,
-  alpha = 0.05,
-  pval.col = NULL,
-  tv.col = NULL,
-  tv.cut = NULL,
-  min.coverage = NULL,
-  hdiv.col = NULL,
-  hdiv.cut = NULL,
-  pAdjustMethod = NULL
+    LR,
+    nlms = NULL,
+    div.col,
+    dist.name = "Weibull2P",
+    absolute = FALSE,
+    alpha = 0.05,
+    pval.col = NULL,
+    tv.col = NULL,
+    tv.cut = NULL,
+    min.coverage = NULL,
+    hdiv.col = NULL,
+    hdiv.cut = NULL,
+    pAdjustMethod = NULL
 )
 }
 \arguments{
-\item{LR}{An object from 'InfDiv' or "testDMP" class. These objects are
+\item{LR}{An object from 'InfDiv' or 'testDMP' class. These objects are
 previously obtained with function \code{\link{estimateDivergence}} or
 \code{\link{FisherTest}}.}
 
@@ -34,14 +34,14 @@ meta-column.}
 
 \item{dist.name}{Name of the fitted distribution. This could be the name of
 one distribution or a characters vector of length(nlms). Default is two
-parameters Weibull distribution: "Weibull2P". The available options are
-Weibull three- parameters ("Weibull3P"), gamma with three-parameter
-("Gamma3P"), gamma with two-parameter ("Gamma2P"), generalized gamma with
-three-parameter ("GGamma3P") or four-parameter ("GGamma4P"), the
-empirical cumulative distribution function ("ECDF") or "None". If
-\strong{dist.name != "None"}, and \strong{nlms != NULL}, then a column
-named "wprob" with a probability vector derived from the application of
-model "nlms" will be returned.}
+parameters Weibull distribution: 'Weibull2P'. The available options are
+Weibull three- parameters ('Weibull3P'), gamma with three-parameter
+('Gamma3P'), gamma with two-parameter ('Gamma2P'), generalized gamma with
+three-parameter ('GGamma3P') or four-parameter ('GGamma4P'), the
+empirical cumulative distribution function ('ECDF') or 'None'. If
+\strong{dist.name != 'None'}, and \strong{nlms != NULL}, then a column
+named 'wprob' with a probability vector derived from the application of
+model 'nlms' will be returned.}
 
 \item{absolute}{Logic (default, FALSE). Total variation (TV, the difference
 of methylation levels) is normally an output in the downstream MethylIT
@@ -55,9 +55,9 @@ cytosine sites \eqn{k} with information divergence (\eqn{DIV_k}) for
 which the the probabilities hold: \eqn{P(DIV_k > DIV(\alpha))}.}
 
 \item{pval.col}{An integer denoting a column from each GRanges object from
-LR where p-values are provided when \strong{dist.name == "None"} and
+LR where p-values are provided when \strong{dist.name == 'None'} and
 \strong{nlms == NULL}. Default is NULL. If NUll and
-\strong{dist.name == "None"} and \strong{nlms == NULL}, then a column
+\strong{dist.name == 'None'} and \strong{nlms == NULL}, then a column
 named \strong{adj.pval} will used to select the potential DMPs.}
 
 \item{tv.col}{Column number for the total variation to be used for filtering

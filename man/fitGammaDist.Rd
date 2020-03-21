@@ -5,18 +5,18 @@
 \title{Nonlinear fit of Gamma CDF (Gamma)}
 \usage{
 fitGammaDist(
-  x,
-  probability.x,
-  parameter.values,
-  location.par = FALSE,
-  sample.size = 20,
-  npoints = NULL,
-  maxiter = 1024,
-  ftol = 1e-12,
-  ptol = 1e-12,
-  maxfev = 1e+05,
-  nlms = FALSE,
-  verbose = TRUE
+    x,
+    probability.x,
+    parameter.values,
+    location.par = FALSE,
+    sample.size = 20,
+    npoints = NULL,
+    maxiter = 1024,
+    ftol = 1e-12,
+    ptol = 1e-12,
+    maxfev = 1e+05,
+    nlms = FALSE,
+    verbose = TRUE
 )
 }
 \arguments{
@@ -74,7 +74,7 @@ variable x
 }
 \details{
 The algorithm tries to fit the two-parameter Gamma CDF
-("Gamma2P") or the three-parameter Gamma ("Gamma3P") using a modification of
+('Gamma2P') or the three-parameter Gamma ('Gamma3P') using a modification of
 Levenberg-Marquardt algorithm implemented in function 'nls.lm' from
 'minpack.lm' package that is used to perform the nonlinear fit.
 Cross-validations for the nonlinear regressions (R.Cross.val) were performed

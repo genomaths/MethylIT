@@ -5,17 +5,17 @@
 \title{Selection of DMPs}
 \usage{
 selectDIMP(
-  LR,
-  div.col = NULL,
-  pval.col = NULL,
-  absolute = FALSE,
-  cutpoint,
-  tv.col = NULL,
-  tv.cut = NULL
+    LR,
+    div.col = NULL,
+    pval.col = NULL,
+    absolute = FALSE,
+    cutpoint,
+    tv.col = NULL,
+    tv.cut = NULL
 )
 }
 \arguments{
-\item{LR}{An object from "pDMP" class.}
+\item{LR}{An object from 'pDMP' class.}
 
 \item{div.col}{Number of the column where the divergence variable (i.e.,
 Hellinger divergence or total variation) is located in the GRanges
@@ -43,7 +43,7 @@ cytosine positions (if provided).}
 with \eqn{|TV| < tv.cut} are removed.}
 }
 \value{
-An object from "pDMP" class containing only differentially
+An object from 'pDMP' class containing only differentially
 informative position (DMPs).
 }
 \description{

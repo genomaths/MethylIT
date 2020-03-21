@@ -5,23 +5,23 @@
 \title{Information Divergences of Methylation Levels}
 \usage{
 estimateDivergence(
-  ref,
-  indiv,
-  Bayesian = FALSE,
-  columns = NULL,
-  min.coverage = 4,
-  min.meth = 4,
-  min.umeth = 0,
-  min.sitecov = 4,
-  high.coverage = NULL,
-  percentile = 0.999,
-  JD = FALSE,
-  num.cores = 1L,
-  tasks = 0L,
-  meth.level = FALSE,
-  logbase = 2,
-  verbose = TRUE,
-  ...
+    ref,
+    indiv,
+    Bayesian = FALSE,
+    columns = NULL,
+    min.coverage = 4,
+    min.meth = 4,
+    min.umeth = 0,
+    min.sitecov = 4,
+    high.coverage = NULL,
+    percentile = 0.999,
+    JD = FALSE,
+    num.cores = 1L,
+    tasks = 0L,
+    meth.level = FALSE,
+    logbase = 2,
+    verbose = TRUE,
+    ...
 )
 }
 \arguments{
@@ -99,25 +99,29 @@ logbase = \eqn{exp(1)} for natural logarithm.}
 \item{...}{Additional parameters for 'uniqueGRanges' function.}
 }
 \value{
-An object from "infDiv" class with the four columns of counts, the
+An object from 'infDiv' class with the four columns of counts, the
 information divergence, and additional columns:
 \describe{
-\item{1)}{The original matrix of methylated \eqn{c_{ij}} and unmethylated
-\eqn{t_{ij}} read counts from control \eqn{j=1} and treatment \eqn{j=2}
-samples at positions \eqn{i}.}
-\item{2)}{"p1" and "p2": methylation levels for control and treatment,
-respectively. If 'meth.level = FALSE' and 'Bayesian = TRUE' (recommended),
-"p1" and "p2" are estimated following the Bayesian approach described in
-reference (1).}
-\item{3)}{"bay.TV": total variation TV = p2 - p1}
-\item{4)}{"TV": total variation based on simple counts:
+\item{1) \strong{A matrix:}}{The original matrix of methylated
+\eqn{c_{ij}} and unmethylated \eqn{t_{ij}} read counts from control \eqn{j=1}
+and treatment \eqn{j=2} samples at positions \eqn{i}.}
+
+\item{2) \strong{'p1' and 'p2':}}{methylation levels for control and
+treatment, respectively. If 'meth.level = FALSE' and 'Bayesian = TRUE'
+(recommended), 'p1' and 'p2' are estimated following the Bayesian approach
+described in reference (1).}
+
+\item{3) \strong{'bay.TV':}}{total variation TV = p2 - p1}
+
+\item{4) \strong{'TV':}}{total variation based on simple counts:
 \eqn{TV=c_1/(c_1+t_1)-c_2/(c_2+t_2)}, where \eqn{c_i} and \eqn{t_i} denote
 methylated and unmethylated read counts, respectively.}
-\item{5)}{"hdiv": Hellinger divergence. If Bayesian = TRUE, the results are
-based on the posterior estimations of methylation levels. if meth.level =
-FALSE', then "hdiv" is computed as given in reference (2), otherwise as:
-\deqn{hdiv = (sqrt(p_1) - sqrt(p_2))^2 + (sqrt(1 -p_1) - sqrt(1 -
-p_2))^2}}
+
+\item{5) \strong{Hellinger divergence, 'hdiv':}}{If Bayesian = TRUE, the
+results are based on the posterior estimations of methylation levels. if
+meth.level = FALSE', then 'hdiv' is computed as given in reference (2),
+otherwise as: \deqn{hdiv = (sqrt(p_1) - sqrt(p_2))^2 + (sqrt(1 -p_1) - sqrt(1
+- p_2))^2}}
 }
 }
 \description{
@@ -150,12 +154,12 @@ as given in the first formula from Theorem 1 from reference (1). In the
 present case:
 
 \deqn{H = 2 (n_1 + 1) (n_2 + 1)*((sqrt(p_1) - sqrt(p_2))^2 +
-         (sqrt(1-p_2) - sqrt(1-p_2))^2)/(n_1 + n_2 + 2)}
+(sqrt(1-p_2) - sqrt(1-p_2))^2)/(n_1 + n_2 + 2)}
 
 where \eqn{n_1} and \eqn{n_2} are the coverage for the control and
 treatment, respectively. Notice that each row from the matrix of counts
 correspond to a single cytosine position and has four values corresponding to
-"mC1" and "uC1" (control), and mC2" and "uC2" for treatment.
+'mC1' and 'uC1' (control), and mC2' and 'uC2' for treatment.
 
 According with the above equation, to estimate Hellinger divergence, not only
 the methylation levels are considered in the estimation of H, but also the
@@ -200,23 +204,24 @@ called by 'estimateDivergence').
 }
 \examples{
 ## The read count data are created
-    num.samples <- 250
-    x <- data.frame(chr = "chr1", start = 1:num.samples,
-                    end = 1:num.samples,strand = '*',
-                    mC = rnbinom(size = num.samples, mu = 4, n = 500),
-                    uC = rnbinom(size = num.samples, mu = 4, n = 500))
-    y <- data.frame(chr = "chr1", start = 1:num.samples,
-                    end = 1:num.samples, strand = '*',
-                    mC = rnbinom(size = num.samples, mu = 4, n = 500),
-                    uC = rnbinom(size = num.samples, mu = 4, n = 500))
-    x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
-    y <- makeGRangesFromDataFrame(y, keep.extra.columns = TRUE)
-    hd <- estimateDivergence(ref = x, indiv = list(y), JD = TRUE,
-                            verbose = FALSE)[[1]]
+num.samples <- 250
+x <- data.frame(chr = 'chr1', start = 1:num.samples,
+end = 1:num.samples,strand = '*',
+mC = rnbinom(size = num.samples, mu = 4,
+n = 500), uC = rnbinom(size = num.samples, mu = 4, n = 500))
+
+y <- data.frame(chr = 'chr1', start = 1:num.samples, end = 1:num.samples,
+strand = '*', mC = rnbinom(size = num.samples, mu = 4, n = 500),
+uC = rnbinom(size = num.samples, mu = 4, n = 500))
+
+x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
+y <- makeGRangesFromDataFrame(y, keep.extra.columns = TRUE)
+hd <- estimateDivergence(ref = x, indiv = list(y), JD = TRUE,
+verbose = FALSE)[[1]]
 
 ## Keep in mind that Hellinger and J divergences are, in general, correlated!
-    cor.test(x = as.numeric(hd$hdiv), y = as.numeric(hd$jdiv),
-            method = "kendall")
+cor.test(x = as.numeric(hd$hdiv), y = as.numeric(hd$jdiv),
+method = 'kendall')
 
 }
 \references{

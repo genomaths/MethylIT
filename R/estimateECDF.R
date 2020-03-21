@@ -1,6 +1,6 @@
 #' @rdname estimateECDF
 #'
-#' @title A variant of Empirical Cumulative Distribution Function "ecdf"
+#' @title A variant of Empirical Cumulative Distribution Function 'ecdf'
 #' @description This function is used to reduce the number of points used to
 #'     build a ecdf of an experimental variable. When a variable has a very
 #'     high amount of experimental values (several millions) could be
@@ -23,17 +23,19 @@
 #' @keywords internal
 #' @export
 estimateECDF <- function(x, npoints = 10) {
-   x <- sort(x)
-   n <- length(x)
-   if (n < 10) stop("'x' must have 10 or more non-missing values")
-
-   ## To reduce the number of point used in the nonlinear fit
-   h <- hist(x, breaks=npoints, plot=FALSE )
-   vals <- h$mids
-   rval <- approxfun(vals, cumsum(h$counts) / n, method="constant", yleft=0,
-                       yright=1, f=0, ties="ordered")
-   class(rval) <- c("ecdf", "stepfun", class(rval))
-   assign("nobs", n, envir=environment(rval))
-   attr(rval, "call") <- sys.call()
-   return(rval)
+    x <- sort(x)
+    n <- length(x)
+    if (n < 10) 
+        stop("'x' must have 10 or more non-missing values")
+    
+    ## To reduce the number of point used in the
+    ## nonlinear fit
+    h <- hist(x, breaks = npoints, plot = FALSE)
+    vals <- h$mids
+    rval <- approxfun(vals, cumsum(h$counts)/n, method = "constant", 
+        yleft = 0, yright = 1, f = 0, ties = "ordered")
+    class(rval) <- c("ecdf", "stepfun", class(rval))
+    assign("nobs", n, envir = environment(rval))
+    attr(rval, "call") <- sys.call()
+    return(rval)
 }

@@ -32,18 +32,18 @@
 #'     Lett 80: 206-214.
 #'
 #' @export
-estimateHellingerDiv <- function(p, n=NULL) {
-   hdiv <- 0
-   if (!is.na(sum(p)) && (sum(p) > 0)) {
-       if (is.null(n)) {
-           hdiv <- (2 * ((sqrt(p[1]) - sqrt(p[2]))^2 + (sqrt(1 - p[1]) -
-                   sqrt(1 - p[2]))^2))
-       } else {
-           ## Hellinger Chi-squared (Hellinger divergence)
-           hdiv <- (2 * (n[1] + 1) * (n[2] + 1) * ((sqrt(p[1]) -
-                   sqrt(p[2]))^2 + (sqrt(1 - p[1]) - sqrt(1 - p[2]))^2) /
-                   (n[1] + n[2] + 2))
-       }
-   }
-   return(hdiv)
+estimateHellingerDiv <- function(p, n = NULL) {
+    hdiv <- 0
+    if (!is.na(sum(p)) && (sum(p) > 0)) {
+        if (is.null(n)) {
+            hdiv <- (2 * ((sqrt(p[1]) - sqrt(p[2]))^2 +
+                (sqrt(1 - p[1]) - sqrt(1 - p[2]))^2))
+        } else {
+            ## Hellinger Chi-squared (Hellinger divergence)
+            hdiv <- (2 * (n[1] + 1) * (n[2] + 1) *
+                        ((sqrt(p[1]) - sqrt(p[2]))^2 +
+                        (sqrt(1 - p[1]) - sqrt(1 - p[2]))^2)/(n[1] + n[2] + 2))
+        }
+    }
+    return(hdiv)
 }

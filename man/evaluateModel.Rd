@@ -9,16 +9,16 @@
 \arguments{
 \item{model}{glm object}
 
-\item{test}{A character string matching one of "Wald" or "LRT". If test =
-"Wald", then the p-value of the Wald test for the coefficient of the
+\item{test}{A character string matching one of 'Wald' or 'LRT'. If test =
+'Wald', then the p-value of the Wald test for the coefficient of the
 independent variable (\emph{treatment group}) will be reported.
-If test = "LRT", then the p-value from a likelihood ratio test given by
+If test = 'LRT', then the p-value from a likelihood ratio test given by
 \code{\link[stats]{anova}} function from \emph{stats} packages will be
 the reported p-value for the group comparison when the best fitted model
 is the negative binomial. As suggested for \code{\link[stats]{glm}}, if
 best fitted model is Poisson or quasi-Poisson, then the best test is
 'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
-the corresponding suitable test will be applied when test = "LRT".}
+the corresponding suitable test will be applied when test = 'LRT'.}
 }
 \value{
 AIC value

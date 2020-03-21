@@ -5,10 +5,10 @@
 \title{Predict function for 'ldaDMP' method}
 \usage{
 \method{predict}{ldaDMP}(
-  object,
-  newdata,
-  type = c("class", "posterior", "scores", "lda.pred"),
-  ...
+    object,
+    newdata,
+    type = c("class", "posterior", "scores", "lda.pred"),
+    ...
 )
 }
 \arguments{

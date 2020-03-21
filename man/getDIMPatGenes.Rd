@@ -46,12 +46,11 @@ regions given in a GRanges object.
 }
 \examples{
 ## Gene annotation
-genes <- GRanges(seqnames = "1",
-                ranges = IRanges(start = c(3631, 6788, 11649),
-                                 end = c(5899, 9130, 13714)),
-                strand = c("+", "-", "-"))
-mcols(genes) <- data.frame(gene_id = c("AT1G01010", "AT1G01020",
-                                       "AT1G01030"))
+genes <- GRanges(seqnames = '1',
+ranges = IRanges(start = c(3631, 6788, 11649), end = c(5899, 9130, 13714)),
+strand = c('+', '-', '-'))
+mcols(genes) <- data.frame(gene_id = c('AT1G01010', 'AT1G01020',
+'AT1G01030'))
 
 ## Get a dataset of potential signals and the estimated cutpoint from the
 ## package

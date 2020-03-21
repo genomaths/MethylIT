@@ -5,13 +5,13 @@
 \title{Filter methylation counts by coverage in a GRanges object}
 \usage{
 filterGRange(
-  x,
-  min.coverage = 4,
-  max.coverage = Inf,
-  percentile = 0.999,
-  col.names = c(coverage = NULL, mC = NULL, uC = NULL),
-  sample.name = "",
-  verbose = TRUE
+    x,
+    min.coverage = 4,
+    max.coverage = Inf,
+    percentile = 0.999,
+    col.names = c(coverage = NULL, mC = NULL, uC = NULL),
+    sample.name = "",
+    verbose = TRUE
 )
 }
 \arguments{
@@ -51,8 +51,8 @@ counts (uC).
 }
 \examples{
     gr1 <- makeGRangesFromDataFrame(
-        data.frame(chr = "chr1", start = 11:15, end = 11:15,
-                strand = c("+","-","+","*","."), mC = 1, uC = 1:5),
+        data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+                strand = c('+','-','+','*','.'), mC = 1, uC = 1:5),
         keep.extra.columns = TRUE)
     filterGRange(gr1, min.coverage = 1, max.coverage = 4,
                 col.names = c(mC = 1, uC = 2), verbose = FALSE)

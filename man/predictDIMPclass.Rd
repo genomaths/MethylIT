@@ -5,19 +5,19 @@
 \title{Predict DIMP class}
 \usage{
 predictDIMPclass(
-  LR,
-  model,
-  conf.matrix = FALSE,
-  control.names = NULL,
-  treatment.names = NULL
+    LR,
+    model,
+    conf.matrix = FALSE,
+    control.names = NULL,
+    treatment.names = NULL
 )
 }
 \arguments{
 \item{LR}{A list of GRanges objects obtained through the through MethylIT
 downstream analysis. Basically, this object is a list of GRanges
 containing only differentially methylated position (DMPs). The metacolumn
-of each GRanges must contain the column: Hellinger divergence "hdiv",
-total variation "TV", the probability of potential DMP "wprob", which
+of each GRanges must contain the column: Hellinger divergence 'hdiv',
+total variation 'TV', the probability of potential DMP 'wprob', which
 naturally are added in the downstream analysis of MethylIT.}
 
 \item{model}{A classifier model obtained with the function
@@ -33,10 +33,10 @@ be include in the variable LR (default, NULL).}
 must be include in the variable LR (default, NULL).}
 }
 \value{
-The same LR object with tow new columns named "class" and "posterior"
+The same LR object with tow new columns named 'class' and 'posterior'
 added to each GRanges object from LR (default). Based on the model
-prediction each DMP is labeled as control "CT" or as treatment "TT" in
-column "class". Column "posterior" provides, for each DMP, the posterior
+prediction each DMP is labeled as control 'CT' or as treatment 'TT' in
+column 'class'. Column 'posterior' provides, for each DMP, the posterior
 probability that the given DMP can be classified as induced by the
 'treatment' (a treatment DMP).\preformatted{Control DMPs classified as 'treatment' are false positives. However, if
 the same cytosine position is classified as 'treatment DMP' in both
@@ -44,7 +44,7 @@ groups, control and treatment, but with higher posterior probability
 in the treatment group, then this would indicate a reinforcement of the
 methylation status in such a position induced by the treatment.
 
-If "conf.matrix" is TRUE and the arguments control.names and
+If 'conf.matrix' is TRUE and the arguments control.names and
 treatment.names are provided, then the overall confusion matrix is
 returned.
 }
@@ -60,27 +60,21 @@ same condition set for the DMPs used to build the model.
 }
 \examples{
 
-data(cutpoint, PS, package = "MethylIT")
+data(cutpoint, PS, package = 'MethylIT')
 
 ## DMPs are selected using the cupoints
 DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
-                   tv.cut = 0.92)
+tv.cut = 0.92)
 
 ## Classification of DMPs into two clases: DMPS from control and DMPs from
 ## treatment samples and evaluation of the classifier performance (for more
 ## details see ?evaluateDIMPclass).
-perf <- evaluateDIMPclass(LR = DMPs,
-                          column = c(hdiv = TRUE, TV = TRUE,
-                                     wprob = TRUE, pos = TRUE),
-                          classifier = "lda", n.pc = 4L,
-                          control.names =  c("C1", "C2", "C3"),
-                          treatment.names = c("T1", "T2", "T3"),
-                          center = TRUE, scale = TRUE,
-                          prop = 0.6)
+perf <- evaluateDIMPclass(LR = DMPs, column = c(hdiv = TRUE, TV = TRUE,
+wprob = TRUE, pos = TRUE), classifier = 'lda', n.pc = 4L,
+control.names =  c('C1', 'C2', 'C3'), treatment.names = c('T1', 'T2', 'T3'),
+center = TRUE, scale = TRUE, prop = 0.6)
 
-#' Now predictions of DMP for control and treament can be obtained
-pred = predictDIMPclass(LR = DMPs, model = perf$model,
-                        conf.matrix = TRUE,
-                        control.names = c("C1", "C2", "C3"),
-                        treatment.names = c("T1", "T2", "T3"))
+## Now predictions of DMP for control and treament can be obtained
+pred = predictDIMPclass(LR = DMPs, model = perf$model, conf.matrix = TRUE,
+control.names = c('C1', 'C2', 'C3'), treatment.names = c('T1', 'T2', 'T3'))
 }

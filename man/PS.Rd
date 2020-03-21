@@ -4,7 +4,8 @@
 \name{PS}
 \alias{PS}
 \title{Simulated dataset of potential DMPs used in examples}
-\format{PS is an object from class "pDMP" carrying in the meta-columns the
+\format{
+PS is an object from class 'pDMP' carrying in the meta-columns the
 following variables:
 \describe{
 \item{p1}{methylation level from the reference sample}
@@ -16,9 +17,10 @@ methylation levels)}
 \eqn{wprob = 1 - CDF probability}}
 }
 
-'PS' is an object from class "pDMP" carrying the same meta-columns as 'HD'
+'PS' is an object from class 'pDMP' carrying the same meta-columns as 'HD'
 (dataset) plus the probabilities: \eqn{wprob = 1 - CDF probability}. 'PS'
-was obtained with function \code{\link{getPotentialDIMP}}.}
+was obtained with function \code{\link{getPotentialDIMP}}.
+}
 \usage{
 PS
 }

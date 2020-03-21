@@ -2,7 +2,7 @@
 #'
 #' Each individuals sample includes 10000 cytosine positions
 #'
-#' @format HD is an object from class "InfDiv" carrying in the meta-columns the
+#' @format HD is an object from class 'InfDiv' carrying in the meta-columns the
 #'     following variables:
 #'     \describe{
 #'         \item{p1}{methylation level from the reference sample}

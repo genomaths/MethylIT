@@ -5,16 +5,16 @@
 \title{Read files of methylation count tables}
 \usage{
 readCounts2GRangesList(
-  filenames = NULL,
-  sample.id = NULL,
-  pattern = NULL,
-  remove = FALSE,
-  columns = c(seqnames = NULL, start = NULL, end = NULL, strand = NULL, fraction = NULL,
-    percent = NULL, mC = NULL, uC = NULL, coverage = NULL, context = NULL),
-  chromosome.names = NULL,
-  chromosomes = NULL,
-  verbose = TRUE,
-  ...
+    filenames = NULL,
+    sample.id = NULL,
+    pattern = NULL,
+    remove = FALSE,
+    columns = c(seqnames = NULL, start = NULL, end = NULL, strand = NULL, fraction =
+    NULL, percent = NULL, mC = NULL, uC = NULL, coverage = NULL, context = NULL),
+    chromosome.names = NULL,
+    chromosomes = NULL,
+    verbose = TRUE,
+    ...
 )
 }
 \arguments{
@@ -44,8 +44,8 @@ files.}
 \item{chromosome.names}{If provided, for each GRanges object, chromosome
 names will be changed to those provided in 'chromosome.names' applying
 seqlevels(x) <- chromosome.names'. This option permits to use all the
-functionality of the function "seqlevels" defined from package
-"GenomeInfoDb", which rename, add, and reorder the seqlevels all at once
+functionality of the function 'seqlevels' defined from package
+'GenomeInfoDb', which rename, add, and reorder the seqlevels all at once
 (see ?seqlevels).}
 
 \item{chromosomes}{If provided, it must be a character vector with the names
@@ -70,18 +70,18 @@ the function fread from the package 'data.table' and and yields a list of
 GRanges objects with the information provided.
 }
 \examples{
-## Create a cov file with it's file name including "gz" (tarball extension)
-filename <- "./file.cov"
-gr1 <- data.frame(chr = c("chr1", "chr1"), post = c(1,2),
-                strand = c("+", "-"), ratio = c(0.9, 0.5),
-                context = c("CG", "CG"), CT = c(20, 30))
-filename <- "./file.cov"
+## Create a cov file with it's file name including 'gz' (tarball extension)
+filename <- './file.cov'
+gr1 <- data.frame(chr = c('chr1', 'chr1'), post = c(1,2),
+                strand = c('+', '-'), ratio = c(0.9, 0.5),
+                context = c('CG', 'CG'), CT = c(20, 30))
+filename <- './file.cov'
 write.table(as.data.frame(gr1), file = filename,
             col.names = TRUE, row.names = FALSE, quote = FALSE)
 
-## Read the file. It does not work. Typing mistake: "fractions"
+## Read the file. It does not work. Typing mistake: 'fractions'
 LR <- try(readCounts2GRangesList(filenames = filename, remove = FALSE,
-                            sample.id = "test",
+                            sample.id = 'test',
                             columns = c(seqnames = 1, start = 2,
                                     strand = 3, fractions = 4,
                                     context = 5, coverage = 6)),
