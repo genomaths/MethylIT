@@ -2,15 +2,15 @@
 #' @title Simple Cutpoint estimation
 #' @description Internal function to estimate simple cutpoint according to
 #'  Youden Index.
-#' @details This function is called by function \code{\linl{estimateCutPoint}}.
+#' @details This function is called by function \code{\link{estimateCutPoint}}.
 #' @param LR,res,control.names,treatment.names,column,div.col Same as in
-#'  \code{\linl{estimateCutPoint}}
+#'  \code{\link{estimateCutPoint}}
 #' @param column,div.col,tv.col,tv.cut,clas.perf Same as in
-#'  \code{\linl{estimateCutPoint}}
+#'  \code{\link{estimateCutPoint}}
 #' @param classifier,n.pc,prop,cutp_data,num.cores,tasks Same as in
-#'  \code{\linl{estimateCutPoint}}
+#'  \code{\link{estimateCutPoint}}
 #'
-#' @return Specified in function \code{\linl{estimateCutPoint}} for parameter
+#' @return Specified in function \code{\link{estimateCutPoint}} for parameter
 #'  setting \emph{simple = TRUE}
 #' @importFrom caret confusionMatrix
 #' @keywords internal
