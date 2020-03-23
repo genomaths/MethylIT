@@ -30,16 +30,20 @@ which the function 'AIC' from the 'stats' package does not work.
 if for a given model 'm' AIC(m) works, then AICmodel(m) = AIC(m).
 }
 \examples{
+## Build a set of point holding an exponential decay
+## and adding random noise.
 set.seed(77)
 x = runif(100, 1, 5)
 y = 2 * exp(-0.5 * x) + runif(100, 0, 0.1)
 plot(x, y)
 
+## Non-linear regression
 nlm <- nls(Y ~ a * exp( b * X), data = data.frame(X=x, Y=y),
             start=list(a=1.5, b=-0.7),
             control=nls.control(maxiter=10^4, tol=1e-05),
-            algorithm="port")
-## The estimations of Akaike information criteria given by 'AIC' function
+            algorithm='port')
+
+## Estimations of Akaike information criteria given by 'AIC' function
 ## from stats' R package and from 'AICmodel' function are equal.
 AICmodel(nlm) == AIC(nlm)
 

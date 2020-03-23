@@ -8,6 +8,6 @@
 #'
 #' @return geometric mean
 #' @keywords internal
-.gmMean <- function(x, na.rm=TRUE){
-   exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+.gmMean <- function(x, na.rm = TRUE) {
+    exp(sum(log(x[x > 0]), na.rm = na.rm)/length(x))
 }

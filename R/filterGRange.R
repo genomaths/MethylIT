@@ -27,8 +27,8 @@
 #'
 #' @examples
 #'     gr1 <- makeGRangesFromDataFrame(
-#'         data.frame(chr = "chr1", start = 11:15, end = 11:15,
-#'                 strand = c("+","-","+","*","."), mC = 1, uC = 1:5),
+#'         data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+#'                 strand = c('+','-','+','*','.'), mC = 1, uC = 1:5),
 #'         keep.extra.columns = TRUE)
 #'     filterGRange(gr1, min.coverage = 1, max.coverage = 4,
 #'                 col.names = c(mC = 1, uC = 2), verbose = FALSE)
@@ -36,24 +36,26 @@
 #' @importFrom S4Vectors mcols
 #'
 #' @export
-filterGRange <- function(x, min.coverage=4, max.coverage=Inf,
-                         percentile=.999,
-                         col.names=c(coverage=NULL, mC=NULL, uC=NULL ),
-                         sample.name='', verbose=TRUE) {
-
-   if (!is(x, 'GRanges')) {
-       stop("* Unable to process a non-GRanges object!")
-   }
-   if (verbose)
-       message( "*** Processing the GRanges sample ", sample.name, " ..." )
-   if (is.element("coverage", names(col.names))) {
-       cov <- mcols(x[ ,col.names['coverage']])[ ,1]
-   } else {
-       cov <- rowSums(as.matrix(mcols(x[ ,col.names[c('mC','uC')]])))
-   }
-   idx <- which((cov >= min.coverage) & (cov <= max.coverage))
-   cov <- cov[idx]
-   x <- x[idx]
-   x <- x[cov < quantile(cov, probs=percentile) ]
-   return(x)
+filterGRange <- function(x, min.coverage = 4, max.coverage = Inf, 
+    percentile = 0.999, col.names = c(coverage = NULL, 
+        mC = NULL, uC = NULL), sample.name = "", verbose = TRUE) {
+    
+    if (!is(x, "GRanges")) {
+        stop("* Unable to process a non-GRanges object!")
+    }
+    if (verbose) 
+        message("*** Processing the GRanges sample ", 
+            sample.name, " ...")
+    if (is.element("coverage", names(col.names))) {
+        cov <- mcols(x[, col.names["coverage"]])[, 
+            1]
+    } else {
+        cov <- rowSums(as.matrix(mcols(x[, col.names[c("mC", 
+            "uC")]])))
+    }
+    idx <- which((cov >= min.coverage) & (cov <= max.coverage))
+    cov <- cov[idx]
+    x <- x[idx]
+    x <- x[cov < quantile(cov, probs = percentile)]
+    return(x)
 }

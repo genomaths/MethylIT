@@ -13,9 +13,38 @@
  *
  */
 
+ #sidebar { font-size: 1.5em; }
+ #sidebarContainer .sideHeader { font-size: 1.5em; }
+
+.tocify-subheader .tocify-item {
+    /* font-size: 1em; */
+    text-indent: initial;
+    padding-left: 2em;
+}
+
+.tocify-header .tocify-item {
+    /* font-size: 1.1em; */
+    padding-left: 20px;
+    text-indent: 0;
+}
+
+.tocify-subheader li {
+    /* font-size: 1em; */
+}
+
+body{ /* Normal  */
+    font-size: 1.5em;
+    font-family: "Times New Roman", Times, serif;
+    text-align: justify
+}
+td {  /* Table  */
+    font-size: 0.6em;
+}
+
+
 html, body {
   height: 100%;
-  font-size: 18px;
+  font-size: 1.5em;
   font-family: "Times New Roman", Times, serif;
   text-align: justify
 }
@@ -28,6 +57,45 @@ body > .container {
 
 body > .container .row {
   flex: 1 0 auto;
+}
+
+h1.title {
+    /* font-size: 3em; */
+    font-family: "Times New Roman", Times, serif;
+    color: DarkRed;
+}
+.subTitle {
+        /*font-size: 2em; */
+        font-family: "Times New Roman", Times, serif;
+        color: DarkRed;
+}
+
+h1 { /* Header 1 */
+    /*font-size: 2.5em;*/
+    font-family: "Times New Roman", Times, serif;
+    color: DarkBlue;
+}
+
+h2 { /* Header 2 */
+    /* font-size: 2em;*/
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+h3 { /* Header 3 */
+    /* font-size: 1.5em; */
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+code.r{ /* Code block */
+    font-size: 14px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+
+TOC {
+font: 0.5em;
+color: blue;
 }
 
 footer {
@@ -112,14 +180,21 @@ a.anchor {
   top: 70px;
 }
 
+
 #pkgdown-sidebar h2 {
-  font-size: 1.5em;
+  /* font-size: 0.1em; */
+  margin-top: 1em;
+}
+
+#pkgdown-sidebar h1 {
+  /*font-size: 0.1em;*/
   margin-top: 1em;
 }
 
 #pkgdown-sidebar h2:first-child {
   margin-top: 0;
 }
+
 
 #pkgdown-sidebar .list-unstyled li {
   margin-bottom: 0.5em;

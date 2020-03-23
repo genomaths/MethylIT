@@ -44,21 +44,21 @@ be the reported cutpoint, except if a better cutpoint is found in the set
 of values provided by the user in the parameter \emph{cut.values}.}
 
 \item{column}{a logical vector for column names for the predictor variables
-to be used: Hellinger divergence "hdiv", total variation "TV",
-probability of potential DMP "wprob", and the relative cytosine site
-position "pos" in respect to the chromosome where it is located. The
+to be used: Hellinger divergence 'hdiv', total variation 'TV',
+probability of potential DMP 'wprob', and the relative cytosine site
+position 'pos' in respect to the chromosome where it is located. The
 relative position is estimated as (x - x.min)/(x.max - x), where x.min
 and x.max are the maximum and minimum for the corresponding chromosome,
-respectively. If "wprob = TRUE", then Logarithm base-10 of "wprob" will
-be used as predictor in place of "wprob".}
+respectively. If 'wprob = TRUE', then Logarithm base-10 of 'wprob' will
+be used as predictor in place of 'wprob'.}
 
-\item{classifier1, classifier2}{Classification model to use. Option "logistic"
-applies a logistic regression model; option "lda" applies a Linear
-Discriminant Analysis (LDA); "qda" applies a Quadratic Discriminant
-Analysis (QDA), "pca.logistic" applies logistic regression model using
+\item{classifier1, classifier2}{Classification model to use. Option 'logistic'
+applies a logistic regression model; option 'lda' applies a Linear
+Discriminant Analysis (LDA); 'qda' applies a Quadratic Discriminant
+Analysis (QDA), 'pca.logistic' applies logistic regression model using
 the Principal Component (PCs) estimated with Principal Component Analysis
-(PCA) as predictor variables. pca.lda" applies LDA using PCs as predictor
-variables, and the option "pca.qda" applies a Quadratic Discriminant
+(PCA) as predictor variables. pca.lda' applies LDA using PCs as predictor
+variables, and the option 'pca.qda' applies a Quadratic Discriminant
 Analysis (QDA) using PCs as predictor variables. If classifier2 is not
 NULL, then it will be used to evaluate the classification performance,
 and the corresponding best fitted model will be returned.}
@@ -90,8 +90,8 @@ not 'logistic'. In the current case, the maximun number of PCs is 4.}
 
 \item{interaction}{If a logistic classifier is used. Variable interactions to
 consider in a logistic regression model. Any pairwise combination of the
-variable "hdiv", "TV", "wprob", and "pos" can be provided. For example:
-"hdiv:TV", "wprob:pos", "wprob:TV", etc.}
+variable 'hdiv', 'TV', 'wprob', and 'pos' can be provided. For example:
+'hdiv:TV', 'wprob:pos', 'wprob:TV', etc.}
 
 \item{cut.values}{Cut values of the information divergence (ID) specified  in
 \emph{div.col} where to check the classification performance
@@ -101,18 +101,18 @@ cutpoint will include these values.}
 \item{stat}{An integer number indicating the statistic to be used in the
 testing when \emph{simple} = FALSE The mapping for statistic names are:
 \itemize{
-\item 0 = "Accuracy"
-\item 1 = "Sensitivity"
-\item 2 = "Specificity"
-\item 3 = "Pos Pred Value"
-\item 4 = "Neg Pred Value"
-\item 5 = "Precision"
-\item 6 = "Recall"
-\item 7 = "F1"
-\item 8 = "Prevalence"
-\item 9 = "Detection Rate"
-\item 10 = "Detection Prevalence"
-\item 11 = "Balanced Accuracy"
+\item 0 = 'Accuracy'
+\item 1 = 'Sensitivity'
+\item 2 = 'Specificity'
+\item 3 = 'Pos Pred Value'
+\item 4 = 'Neg Pred Value'
+\item 5 = 'Precision'
+\item 6 = 'Recall'
+\item 7 = 'F1'
+\item 8 = 'Prevalence'
+\item 9 = 'Detection Rate'
+\item 10 = 'Detection Prevalence'
+\item 11 = 'Balanced Accuracy'
 \item 12 = FDR
 }}
 
@@ -139,8 +139,8 @@ elements:
 \item testSetPerformance: Performance evaluation on the test set.
 \item testSetModel.FDR: False discovery rate on the test set.
 \item model: Model used in the performance evaluation.
-\item modelConfMatrix: Confusion matrix for the whole dataset derived
-applying the model classifier used in the performance
+\item modelConfMatrix: Confusion matrix for the whole dataset
+derived applying the model classifier used in the performance
 evaluation.
 \item initModel: Initial classifier model applied to estimate
 posterior classifications used in the cutpoint estimation.
@@ -150,7 +150,8 @@ cutpoint
 performance evaluation.
 \item statistic: Name of the performance statistic used to find the
 cutpoint when \emph{simple} =  FALSE.
-\item optStatVal: Value of the performance statistic at the cutpoint.
+\item optStatVal: Value of the performance statistic at the
+cutpoint.
 }
 }
 \description{
@@ -195,15 +196,15 @@ model can be used for predictions in further analyses with function
 \code{\link{predictDIMPclass}}.
 }
 \examples{
-## Get a dataset of potential signals and the estimated cutpoint from the
-## package and performs cutpoint estimation
-data(PS, package = "MethylIT")
+## Get a dataset of potential signals and the estimates cutpoint
+## from the package and performs cutpoint estimation
+data(PS)
 cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
                             column = c(hdiv = TRUE, TV = TRUE,
                                         wprob = TRUE, pos = TRUE),
-                            classifier1 = "qda",
-                            control.names = c("C1", "C2", "C3"),
-                            treatment.names = c("T1", "T2", "T3"),
+                            classifier1 = 'qda',
+                            control.names = c('C1', 'C2', 'C3'),
+                            treatment.names = c('T1', 'T2', 'T3'),
                             tv.cut = 0.68, clas.perf = TRUE, prop = 0.6,
                             div.col = 9L)
 }

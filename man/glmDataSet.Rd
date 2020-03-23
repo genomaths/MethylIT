@@ -27,17 +27,17 @@ individual samples. The row names of \emph{colData} must correspond to
 th column names of the count matrix.}
 
 \item{x}{Object from class \emph{glmDataSet} or from class
-\emph{"RangedGlmDataSet"}.}
+\emph{'RangedGlmDataSet'}.}
 
 \item{digits}{Number of significant digits to be used.}
 }
 \value{
-An object from "RangedGlmDataSet" class containing these attributes:
-"GR": the GRanges of the object, "counts": the counts for each sample
-at that genomic position, "colData": the condition of each sample,
-treatment or control, "sampleNames": the names of the samples, "levels":
+An object from 'RangedGlmDataSet' class containing these attributes:
+'GR': the GRanges of the object, 'counts': the counts for each sample
+at that genomic position, 'colData': the condition of each sample,
+treatment or control, 'sampleNames': the names of the samples, 'levels':
 the values (perhaps TT and CT for treatment and control)  permitted in
-the "colData" attribute, optionData: additional metadata or NULL
+the 'colData' attribute, optionData: additional metadata or NULL
 }
 \description{
 This function is used to build a object suitable to be used
@@ -50,19 +50,20 @@ Data set constructor for class glmDataSet also validate the object
 set.seed(133) # Set a seed
 ## A GRanges object with the count matrix in the metacolumns is created
 countData <- matrix(sample.int(200, 500, replace = TRUE), ncol = 4)
-colnames(countData) <- c("A1","A2","B1","B2")
+colnames(countData) <- c('A1','A2','B1','B2')
 start <- seq(1, 25e4, 2000)
 end <- start + 1000
-chr <- c(rep("chr1", 70), rep("chr2", 55))
+chr <- c(rep('chr1', 70), rep('chr2', 55))
 GR <- GRanges(seqnames = chr, IRanges(start = start, end = end))
 mcols(GR) <- countData
+
 ## Gene IDs
-names(GR) <- paste0("gene", 1:length(GR))
+names(GR) <- paste0('gene', 1:length(GR))
 
 ## An experiment design is set.
-colData <- data.frame(condition = factor(c("A","A","B","B")),
-                      c("A1","A2","B1","B2"),
-                      row.names = 2)
+colData <- data.frame(condition = factor(c('A','A','B','B')),
+c('A1','A2','B1','B2'), row.names = 2)
+
 ## A RangedGlmDataSet is created
 ds <- glmDataSet(GR = GR, colData = colData)
 

@@ -2,6 +2,8 @@
 * Current version 
 * Actively used in methylome analysis
 * In development
+   * 03-23-20:  
+         1) Update documentation and code style reformatted
 
 ## New features
 

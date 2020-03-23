@@ -7,7 +7,7 @@ author: |
  | $^1$Department of Biology. 
  | Pennsylvania State University, University Park, PA 16802
 date: "`r format(Sys.time(), '%d %B %Y')`"
-fontsize: 11pt
+fontsize: 0.85em
 fontfamily: "serif"
 bibliography: bibliography.bib
 output: 
@@ -26,6 +26,42 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+<style type="text/css">
+h1 { /* Header 1 */
+    /* font-size: 2.5em; */
+    font-family: "Times New Roman", Times, serif;
+    color: DarkBlue;
+}
+
+h2 { /* Header 2 */
+    /* font-size: 22px; */
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+h3 { /* Header 3 */
+    /* font-size: 18px; */
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+
+body{ /* Normal  */
+    /* font-size: 18px; */
+    font-family: "Times New Roman", Times, serif;
+    text-align: justify
+}
+
+code.r{ /* Code block */
+    font-size: 14px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+
+#sidebar { font-size: 0.5em; }
+#sidebarContainer .sideHeader { font-size: 0.5em; }
+
+</style>
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

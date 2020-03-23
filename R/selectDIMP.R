@@ -26,7 +26,7 @@
 #' ontogenetic developments. Hence, the DMP concept holds in the mentioned
 #' circumstances where the uncertainty of methylation is present.
 #'
-#' @param LR An object from "pDMP" class.
+#' @param LR An object from 'pDMP' class.
 #' @param div.col Number of the column where the divergence variable (i.e.,
 #'     Hellinger divergence or total variation) is located in the GRanges
 #'     meta-columns.
@@ -47,7 +47,7 @@
 #' @param tv.cut If tv.cut and tv.col are provided, then cytosine sites \eqn{k}
 #'     with \eqn{|TV| < tv.cut} are removed.
 #'
-#' @return An object from "pDMP" class containing only differentially
+#' @return An object from 'pDMP' class containing only differentially
 #'     informative position (DMPs).
 #'
 #' @examples
@@ -62,31 +62,32 @@
 #' @importFrom GenomicRanges GRanges GRangesList
 #' @importFrom S4Vectors mcols
 #' @export
-selectDIMP <- function(LR, div.col=NULL, pval.col=NULL, absolute=FALSE,
-                       cutpoint, tv.col=NULL, tv.cut=NULL) {
-   if (!inherits(LR, what=c("pDMP", "InfDiv")))
-       stop("*** LR object must be from 'pDMP' or 'InfDiv' class")
+selectDIMP <- function(LR, div.col = NULL, pval.col = NULL,
+    absolute = FALSE, cutpoint, tv.col = NULL, tv.cut = NULL) {
+    if (!inherits(LR, what = c("pDMP", "InfDiv")))
+        stop("*** LR object must be from 'pDMP' or 'InfDiv' class")
 
-  # -------------------------- valid "pDMP" object -------------------------- #
-  validateClass(LR)
-  # ------------------------------------------------------------------------- #
+    # ---------------------- valid 'pDMP' object -------------------------- #
+    validateClass(LR)
+    # -------------------------------------------------------------------------
+    # #
 
-   if (is.null(div.col) && is.null(pval.col))
-       stop("*** One of the parameters 'div.col'
-           or 'pval.col' must be not NULL")
-   if (is.null(div.col)) target.col = pval.col else target.col = div.col
+    if (is.null(div.col) && is.null(pval.col))
+        stop("*** One of the parameters 'div.col' or",
+            " 'pval.col' must be not NULL")
+    if (is.null(div.col)) target.col = pval.col else target.col = div.col
 
-   for (k in seq_along(LR)) {
-       x <- LR[[k]]
-       if (!is.null(tv.cut) && !is.null(tv.col))
-           x <- x[which(abs(mcols(x[, tv.col])[, 1]) > tv.cut)]
-       if (is.null(div.col)) {
-           LR[[k]] <- x[which(mcols(x[, target.col])[, 1] < cutpoint)]
-       } else {
-           if (absolute)
-               LR[[k]] <- x[which(abs(mcols(x[, target.col])[, 1]) > cutpoint)]
-           else LR[[k]] <- x[which(mcols(x[, target.col])[, 1] > cutpoint)]
-       }
-   }
-   return(LR)
+    for (k in seq_along(LR)) {
+        x <- LR[[k]]
+        if (!is.null(tv.cut) && !is.null(tv.col))
+            x <- x[which(abs(mcols(x[, tv.col])[, 1]) > tv.cut)]
+        if (is.null(div.col)) {
+            LR[[k]] <- x[which(mcols(x[, target.col])[, 1] < cutpoint)]
+        } else {
+            if (absolute)
+                LR[[k]] <- x[which(abs(mcols(x[, target.col])[, 1]) > cutpoint)]
+            else LR[[k]] <- x[which(mcols(x[, target.col])[, 1] > cutpoint)]
+        }
+    }
+    return(LR)
 }

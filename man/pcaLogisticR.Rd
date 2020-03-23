@@ -40,13 +40,13 @@ pcaLogisticR(
 
 \item{object}{To use with function 'predict'. A 'pcaLogisticR' object
 containing a list of two objects: 1) an object of class inheriting from
-"glm" and 2) an object of class inheriting from "prcomp".}
+'glm' and 2) an object of class inheriting from 'prcomp'.}
 
 \item{newdata}{To use with function 'predict'. New data for classification
 prediction}
 
 \item{type}{To use with function 'predict'. The type of prediction required:
-"class", "posterior", "pca.ind.coord", or "all". If type = 'all', function
+'class', 'posterior', 'pca.ind.coord', or 'all'. If type = 'all', function
 'predict.pcaLogisticR' ('predict') returns a list with:
 1) 'class': individual classification.
 2) 'posterior': probabilities for the positive class.
@@ -63,8 +63,8 @@ containing a list of two objects:
     \\item 'logistic': an object of class 'glm' from package 'stats'.
     \\item 'pca': an object of class 'prcomp' from package 'stats'.
     \\item reference.level: response level used as reference.
-    \\item positive.level: response level that corresponds to a "positive"
-        result. When type = "response", the probability vector returned
+    \\item positive.level: response level that corresponds to a 'positive'
+        result. When type = 'response', the probability vector returned
         correspond to the probabilities of each individual to be a
         result, i.e., the probability to belong to the class of positive
         level.
@@ -74,8 +74,8 @@ For information on how to use these objects see ?glm and ?prcomp.
 }
 \description{
 Principal components (PCs) are estimated from the predictor
-variables provided as input data. Next, the individual coordinates in the
-selected PCs are used as predictors in the logistic regression.
+variables provided as input data. Next, the individual coordinates in
+the selected PCs are used as predictors in the logistic regression.
 
 Logistic regression using Principal Components from PCA as
 predictor variables
@@ -85,12 +85,12 @@ The principal components (PCs) are obtained using the function
 \code{\link[stats]{prcomp}}, while the logistic regression is performed
 using function \code{\link[stats]{glm}}, both functions from R package
 'stats'. The current application only use basic functionalities from the
-mentioned functions. As shown in the example, 'pcaLogisticR' function can
-be used in general classification problems.
+mentioned functions. As shown in the example, 'pcaLogisticR' function
+can be used in general classification problems.
 }
 \examples{
 data(iris)
-data <- iris[ iris$Species != "virginica", ]
+data <- iris[ iris$Species != 'virginica', ]
 data$Species <- droplevels(data$Species)
 formula <- Species ~ Petal.Length + Sepal.Length + Petal.Width
 pca.logistic <- pcaLogisticR(formula = formula,
@@ -98,6 +98,6 @@ pca.logistic <- pcaLogisticR(formula = formula,
                             center = TRUE, max.pc = 2)
 set.seed(123)
 newdata <- iris[sample.int(150, 40), 1:4]
-newdata.prediction <- predict(pca.logistic, newdata, type = "all")
+newdata.prediction <- predict(pca.logistic, newdata, type = 'all')
 
 }

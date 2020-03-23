@@ -46,15 +46,15 @@ pcaQDA(
 \code{\link[stats]{prcomp}} from package 'stats'.}
 
 \item{object}{To use with function 'predict'. A 'pcaQDA' object containing a
-list of two objects: 1) an object of class inheriting from "qda" and 2)
-an object of class inheriting from "prcomp".}
+list of two objects: 1) an object of class inheriting from 'qda' and 2)
+an object of class inheriting from 'prcomp'.}
 
 \item{newdata}{To use with function 'predict'. New data for classification
 prediction.}
 
 \item{type}{To use with function 'predict'. The type of prediction
-required. The default is "all" basic predictions: classes and posterior
-classification probabilities. Option "qda.pred" returns the
+required. The default is 'all' basic predictions: classes and posterior
+classification probabilities. Option 'qda.pred' returns the
 object given by function 'predict.qda' from MASS package: 'class',
 'posterior', 'scores' (cases scores on discriminant variables,
 see \code{\link[MASS]{qda}}.}
@@ -62,7 +62,7 @@ see \code{\link[MASS]{qda}}.}
 \item{...}{Not in use.}
 }
 \value{
-Function 'pcaQDA' returns an object ("pcaQDA") consisting of a list with
+Function 'pcaQDA' returns an object ('pcaQDA') consisting of a list with
 two objects:
 \enumerate{
 \item 'qda': an object of class \code{\link[MASS]{qda}} from package
@@ -89,18 +89,20 @@ basic functionalities of mentioned functions. As shown in the example,
 \examples{
 data(iris)
 qd1 <- pcaQDA(formula = Species ~ Petal.Length + Sepal.Length + Sepal.Width,
-            data = iris, n.pc = 1, max.pc = 2, scale = TRUE, center = TRUE)
+data = iris, n.pc = 1, max.pc = 2, scale = TRUE, center = TRUE)
 ## === Prediction === ##
 qd2 <- pcaQDA(formula = Species ~., data = iris, n.pc = 1, max.pc = 2,
-             scale = TRUE, center = TRUE)
+scale = TRUE, center = TRUE)
+
+## Set a random seed to reproduce the sampling
 set.seed(123)
 idx <- sample.int(150, 40)
 newdata <- iris[idx, 1:4]
-newdata.prediction <- predict(qd2, newdata = newdata, type = "all")
+newdata.prediction <- predict(qd2, newdata = newdata, type = 'all')
 
 ## The confusion matrix
 x <- data.frame(TRUE.class = iris$Species[idx],
-               PRED.class = newdata.prediction$class)
+PRED.class = newdata.prediction$class)
 table(x)
 }
 \seealso{

@@ -35,7 +35,7 @@ use, i.e. at most how many child processes will be run simultaneously
 
 \item{countFilter}{whether or not to filter the counts according to the
 minimum count per region per each individual/sample, which is setting by
-"minCountPerIndv".}
+'minCountPerIndv'.}
 
 \item{CountPerBp}{for each group the count per bp must be equal or greater
 than CountPerBp. The filter is applied if 'CountPerBp' is given and if
@@ -71,19 +71,19 @@ treatment is differentially expressed in respect to the control}
 
 \item{Minlog2FC}{minimum logarithm base 2 of fold changes.}
 
-\item{test}{A character string matching one of "Wald" or "LRT". If test =
-"Wald", then the p-value of the Wald test for the coefficient of the
+\item{test}{A character string matching one of 'Wald' or 'LRT'. If test =
+'Wald', then the p-value of the Wald test for the coefficient of the
 independent variable (\emph{treatment group}) will be reported.
-If test = "LRT", then the p-value from a likelihood ratio test given by
+If test = 'LRT', then the p-value from a likelihood ratio test given by
 \code{\link[stats]{anova}} function from \emph{stats} packages will be
 the reported p-value for the group comparison when the best fitted model
 is the negative binomial. As suggested for \code{\link[stats]{glm}}, if
 best fitted model is Poisson or quasi-Poisson, then the best test is
 'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
-the corresponding suitable test will be applied when test = "LRT".}
+the corresponding suitable test will be applied when test = 'LRT'.}
 
 \item{scaling}{integer (default 1). Scaling factor estimate the
-signal density as: scaling x "DMP-Count-Per-Bp". For example,
+signal density as: scaling x 'DMP-Count-Per-Bp'. For example,
 if scaling = 1000, then signal density denotes the number of DMPs in
 1000 bp.}
 
@@ -112,19 +112,21 @@ The experimental design settings must be introduced using function
 set.seed(133) # Set a seed
 ## A GRanges object with the count matrix in the metacolumns is created
 countData <- matrix(sample.int(200, 500, replace = TRUE), ncol = 4)
-colnames(countData) <- c("A1","A2","B1","B2")
+colnames(countData) <- c('A1','A2','B1','B2')
+
 start <- seq(1, 25e4, 2000)
 end <- start + 1000
-chr <- c(rep("chr1", 70), rep("chr2", 55))
+chr <- c(rep('chr1', 70), rep('chr2', 55))
 GR <- GRanges(seqnames = chr, IRanges(start = start, end = end))
 mcols(GR) <- countData
+
 ## Gene IDs
-names(GR) <- paste0("gene", 1:length(GR))
+names(GR) <- paste0('gene', 1:length(GR))
 
 ## An experiment design is set.
-colData <- data.frame(condition = factor(c("A","A","B","B")),
-                      c("A1","A2","B1","B2"),
-                      row.names = 2)
+colData <- data.frame(condition = factor(c('A','A','B','B')),
+                    c('A1','A2','B1','B2'), row.names = 2)
+
 ## A RangedGlmDataSet is created
 ds <- glmDataSet(GR = GR, colData = colData)
 

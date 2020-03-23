@@ -30,15 +30,15 @@ samples '1' and '2'.}
 
 \item{y}{A GRanges object with methylated and unmethylated counts in its
 meta-column. Default is NULL. If x is a 'InfDiv', or 'pDMP', then 'y' is
-not needed, since samples '1' and '2' are the first four columns of these
-objects.}
+not needed, since samples '1' and '2' are the first four columns of
+these objects.}
 
 \item{min.coverage}{An integer or an integer vector of length 2. Cytosine
 sites where the coverage in both samples, 'x' and 'y', are less than
 'min.coverage' are discarded. The cytosine site is preserved, however, if
 the coverage is greater than 'min.coverage' in at least one sample. If
-'min.coverage' is an integer vector, then the corresponding min coverage
-is applied to each sample.}
+'min.coverage' is an integer vector, then the corresponding min coverage is
+applied to each sample.}
 
 \item{min.meth}{An integer or an integer vector of length 2. Cytosine sites
 where the numbers of read counts of methylated cytosine in both samples,
@@ -66,11 +66,11 @@ and all files stacked. If 'high.coverage = NULL', then the threshold
 and 2, respectively.
 }}
 
-\item{high.coverage}{An integer for read counts. Cytosine sites having higher
-coverage than this are discarded. Default is NULL. If
-\strong{high.coverage} is not NULL, then the \strong{percentile} argument
-is disregarded and \strong{high.coverage} is used as threshold to remove
-the PCR bias.}
+\item{high.coverage}{An integer for read counts. Cytosine sites having
+higher coverage than this are discarded. Default is NULL. If
+\strong{high.coverage} is not NULL, then the \strong{percentile} argument is
+disregarded and \strong{high.coverage} is used as threshold to remove the
+PCR bias.}
 
 \item{columns}{Vector of integer numbers of the columns (from each GRanges
 meta-column) where the methylated and unmethylated counts are provided.
@@ -85,11 +85,11 @@ BiocParallel package).}
 the overlap calculations. Default value: TRUE}
 
 \item{tasks}{Integer(1). The number of tasks per job. value must be a scalar
-integer >= 0L. In this documentation a job is defined as a single call to
-a function, such as bplapply, bpmapply etc. A task is the division of the
-X argument into chunks. When tasks == 0 (default), X is divided as evenly
-as possible over the number of workers (see MulticoreParam from
-BiocParallel package).}
+integer >= 0L. In this documentation a job is defined as a single call to a
+function, such as bplapply, bpmapply etc. A task is the division of the X
+argument into chunks. When tasks == 0 (default), X is divided as evenly as
+possible over the number of workers (see MulticoreParam from BiocParallel
+package).}
 
 \item{verbose}{if TRUE, prints the function log to stdout}
 
@@ -112,20 +112,26 @@ that the columns of methylated and unmethylated counts are given.
 }
 \examples{
 ### Create new data
-df1 <- data.frame(chr = "chr1", start = 11:16, end = 11:16,
-                  mC = c(2,10,7,9,1,10), uC = c(30,20,4,8,0,10))
-df2 <- data.frame(chr = "chr1", start = 12:18, end = 12:18,
-                  mC2 = 1:7, uC2 = 0:6)
+df1 <- data.frame(chr = 'chr1', start = 11:16, end = 11:16,
+                mC = c(2,10,7,9,1,10), uC = c(30,20,4,8,0,10))
+
+df2 <- data.frame(chr = 'chr1', start = 12:18, end = 12:18,
+                mC2 = 1:7, uC2 = 0:6)
+
 gr1 <- makeGRangesFromDataFrame(df1, keep.extra.columns = TRUE)
 gr2 <- makeGRangesFromDataFrame(df2, keep.extra.columns = TRUE)
+
 ## Filtering
 r1 <- uniqueGRfilterByCov(gr1, gr2, ignore.strand = TRUE)
 r1
+
 ## Cytosine position with coordinate 15 (rows #2) can pass the
 ## filtering conditions of min.coverage = 4 and lead to meaningless
 ## situations with methylation levels p = 1/(1 + 0) = 1
 r1[2]
-## The last situation can be prevent, in this case, by setting min.meth = 1:
+
+## The last situation can be prevent, in this case, by setting
+## min.meth = 1:
 r1 <- uniqueGRfilterByCov(gr1, gr2, min.meth = 1, ignore.strand = TRUE)
 r1
 }

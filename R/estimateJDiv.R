@@ -7,9 +7,9 @@
 #'     \emph{JD} in Methyl-IT is founded on:
 #'     \enumerate{
 #'         \item It is a symmetrised form of Kullback–Leibler divergence
-#'             (\eqn{D_KL}). Kullback and Leibler themselves actually defined
-#'             the divergence as: \eqn{D_KL(P || Q) + D_KL(Q || P)}, which is
-#'             symmetric and nonnegative, where the probability distributions
+#'             (\eqn{D_{KL}}). Kullback and Leibler themselves actually defined
+#'             the divergence as: \eqn{D_{KL}(P || Q) + D_{KL}(Q || P)}, which
+#'             is symmetric and nonnegative, where the probability distributions
 #'             \emph{P} and \emph{Q} are defined on the same probability space
 #'             (see
 #'             \href{https://is.gd/oS8Bwv}{Wikipedia}).
@@ -22,17 +22,19 @@
 #'             information-thermodynamics analyses.
 #'     }
 #'
-#' @details The methylation level \eqn{p_ij} at a given cytosine site \emph{i}
-#'     from an individual \emph{j} corresponds to a probability vector \eqn{q_ij
-#'     = c(p_ij, 1 - p_ij)}. Then, the J-information divergence between the
-#'     methylation levels \emph{p_i1} and \emph{p_i2} is the divergence between
-#'     the vectors \eqn{q_i1 = (p_i1, 1 - p_i1)} and \eqn{q_i2 = c(p_i2, 1 -
-#'     p_i2)}. \emph{JD} is computed as in reference (1):
+#' @details The methylation levels \eqn{p_{ij}}, at a given cytosine site
+#' \emph{i} from an individual \emph{j}, lead to the probability vectors
+#' \eqn{p^{ij} = (p_{ij}, 1 - p_{ij})}. Then, the J-information divergence
+#' between the methylation levels \eqn{p_{ij}} and the methylation levels
+#' \eqn{q_i}, used as reference, corresponds to the divergence between the
+#' probability vectors \eqn{p^{ij}} and \eqn{q^i = (q_i, 1 - q_i)}. \emph{JD}
+#' is computed as in reference (1), adapted here for discrete probability
+#' distributions:
 #'
-#' \deqn{JD(q_i1, q_i2) = (q_i1[1] * log(q_i1[1]/q_i2[1]) + q_i1[2] *
-#'                         log(q_i1[2]/q_i2[2]) +
-#'                 q_i2[1] * log(q_i2[1]/q_i1[1]) + q_i2[2] *
-#'                             log(q_i2[2]/q_i1[2]))/2}.
+#' \deqn{JD(p^{ij}, q^i) = (p_{ij} * log(p_{ij}/q_i) +
+#'                         (1 - p_{ij}) * log((1 - p_{ij})/(1 - q_i)) +
+#'                 q_i * log(q_i/p_ij) +
+#'                 (1 - q_i) * log((1 - q_i)/(1 - p_{ij})))/2}.
 #'
 #' @param p A numerical vector of the methylation levels p = c(p1, p2) from
 #'     individuals 1 and 2.
@@ -67,32 +69,32 @@
 #'
 #' @export
 estimateJDiv <- function(p, logbase = 2) {
-   if (any(p > 1) | any(p < 0))
-       stop("*** Vector p has values out of the range [0, 1]")
-   jdiv <- 0
-   if (!is.na(sum(p)) && (sum(p) > 0)) {
-      p[ p == 1] <- 0.9999999999999999
-      p1 <- c(p[1], 1 - p[1])
-      p2 <- c(p[2], 1 - p[2])
-
-      jdiv <- (p1[1] * .log(p1[1]/p2[1], logbase = logbase) +
-                   p1[2] * .log(p1[2]/p2[2], logbase = logbase) +
-                   p2[1] * .log(p2[1]/p1[1], logbase = logbase) +
-                   p2[2] * .log(p2[2]/p1[2], logbase = logbase))/2
-   }
-   return(jdiv)
+    if (any(p > 1) | any(p < 0)) 
+        stop("*** Vector p has values out of the range [0, 1]")
+    jdiv <- 0
+    if (!is.na(sum(p)) && (sum(p) > 0)) {
+        p[p == 1] <- 1
+        p1 <- c(p[1], 1 - p[1])
+        p2 <- c(p[2], 1 - p[2])
+        
+        jdiv <- (p1[1] * .log(p1[1]/p2[1], logbase = logbase) + 
+            p1[2] * .log(p1[2]/p2[2], logbase = logbase) + 
+            p2[1] * .log(p2[1]/p1[1], logbase = logbase) + 
+            p2[2] * .log(p2[2]/p1[2], logbase = logbase))/2
+    }
+    return(jdiv)
 }
 
 
-## --- Auxiliary function  ------
+## --- Auxiliary function ------
 .log <- function(p, logbase = 2) {
-   logb <- function(p) {
-      n <- length(p)
-      logP <- integer(n)
-      idx <- (p > 0 & p != Inf)
-      logP[idx] <- log(p[idx], base = logbase)
-      return(logP)
-   }
-   return(logb(p))
+    logb <- function(p) {
+        n <- length(p)
+        logP <- integer(n)
+        idx <- (p > 0 & p != Inf)
+        logP[idx] <- log(p[idx], base = logbase)
+        return(logP)
+    }
+    return(logb(p))
 }
 

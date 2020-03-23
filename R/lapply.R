@@ -13,7 +13,7 @@
 #' @examples
 #' # Create a list
 #' x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
-#' class(x) <- "nice"
+#' class(x) <- 'nice'
 #'
 #' # compute the list mean for each list element using 'base::lapply'
 #' class(lapply(x, mean))
@@ -22,17 +22,19 @@
 #' class(lapply(x, mean, keep.attr = TRUE))
 #' @keywords internal
 #' @export
-lapply <- function(x, FUN, ...) UseMethod("lapply", x)
+lapply <- function(x, FUN, ...) UseMethod("lapply", 
+    x)
 
 #' @name lapply.default
 #' @rdname lapply
 #' @export
-lapply.default <- function(x, FUN, keep.attr = FALSE, ...) {
-  if (keep.attr) {
-       cl <- class(x)
-       nm <- names(x)
-       x <- base::lapply(x, FUN, ...)
-       x <- structure(x, class = cl, names = nm)
-  } else x <- base::lapply(x, FUN, ...)
-  return(x)
+lapply.default <- function(x, FUN, keep.attr = FALSE, 
+    ...) {
+    if (keep.attr) {
+        cl <- class(x)
+        nm <- names(x)
+        x <- base::lapply(x, FUN, ...)
+        x <- structure(x, class = cl, names = nm)
+    } else x <- base::lapply(x, FUN, ...)
+    return(x)
 }

@@ -12,8 +12,8 @@
 #' treatment, three classification models are provided: 1) logistic, 2) Linear
 #' Discriminant Analysis (LDA) and 3) Quadratic Discriminant Analysis (QDA). In
 #' particular, four predictor variables can be used: Hellinger divergence
-#' "hdiv", total variation "TV", probability of potential DMP "wprob" and DMP
-#' genomic coordinated "pos". Principal component analysis (PCA) is used to
+#' 'hdiv', total variation 'TV', probability of potential DMP 'wprob' and DMP
+#' genomic coordinated 'pos'. Principal component analysis (PCA) is used to
 #' convert a set of observations of possibly correlated predictor variables into
 #' a set of values of linearly uncorrelated variables (principal components,
 #' PCs). The PCs are used as new, uncorrelated predictor variables for LDA, QDA,
@@ -33,39 +33,39 @@
 #' @param treatment.names Names/IDs of the treatment samples, which must be
 #'     included in the variable LR.
 #' @param column a logical vector for column names for the predictor variables
-#'     to be used: Hellinger divergence "hdiv", total variation "TV", TV
-#'     estimated with Bayesian correction of methylation levels "bay.TV",
-#'     probability of potential DMP "wprob", and the relative cytosine site
-#'     position "pos" in respect to the chromosome where it is located. The
+#'     to be used: Hellinger divergence 'hdiv', total variation 'TV', TV
+#'     estimated with Bayesian correction of methylation levels 'bay.TV',
+#'     probability of potential DMP 'wprob', and the relative cytosine site
+#'     position 'pos' in respect to the chromosome where it is located. The
 #'     relative position is estimated as (x - x.min)/(x.max - x), where x.min
 #'     and x.max are the maximum and minimum for the corresponding chromosome,
-#'     respectively. If "wprob = TRUE", then Logarithm base-10 of "wprob" will
-#'     be used as predictor in place of "wprob".
-#' @param classifier Classification model to use. Option "logistic" applies a
-#'     logistic regression model; option "lda" applies a Linear Discriminant
-#'     Analysis (LDA); "qda" applies a Quadratic Discriminant Analysis (QDA),
-#'     "pca.logistic" applies logistic regression model using the Principal
+#'     respectively. If 'wprob = TRUE', then Logarithm base-10 of 'wprob' will
+#'     be used as predictor in place of 'wprob'.
+#' @param classifier Classification model to use. Option 'logistic' applies a
+#'     logistic regression model; option 'lda' applies a Linear Discriminant
+#'     Analysis (LDA); 'qda' applies a Quadratic Discriminant Analysis (QDA),
+#'     'pca.logistic' applies logistic regression model using the Principal
 #'     Component (PCs) estimated with Principal Component Analysis (PCA) as
-#'     predictor variables. pca.lda" applies LDA using PCs as predictor
-#'     variables, and the option "pca.qda" applies a Quadratic Discriminant
+#'     predictor variables. pca.lda' applies LDA using PCs as predictor
+#'     variables, and the option 'pca.qda' applies a Quadratic Discriminant
 #'     Analysis (QDA) using PCs as predictor variables.
 #' @param pval.col Column number for p-value used in the performance
 #'     analysis and estimation of the cutpoints. Default: NULL. If NULL it is
-#'     assumed that the column is named "wprob".
+#'     assumed that the column is named 'wprob'.
 #' @param n.pc Number of principal components (PCs) to use if the classifier is
 #'     not 'logistic'. In the current case, the maximun number of PCs is 4.
 #' @param center A logical value indicating whether the variables should be
 #'     shifted to be zero centered (same as in 'prcomp' {prcomp}). Only used if
-#'     classifier = "pcaLDA".
+#'     classifier = 'pcaLDA'.
 #' @param scale A logical value indicating whether the variables should be
 #'     scaled to have unit variance before the analysis takes place (same as in
-#'     'prcomp' {prcomp}). Only used if classifier = "pcaLDA".
+#'     'prcomp' {prcomp}). Only used if classifier = 'pcaLDA'.
 #' @param interaction Variable interactions to consider in a logistic
-#'     regression model. Any pairwise combination of the variable "hdiv", "TV",
-#'     "wprob", and "pos" can be provided. For example: "hdiv:TV", "wprob:pos",
-#'     "wprob:TV", etc.
-#' @param output Type of output to request: output = c("conf.mat", "mc.val",
-#'     "boot.all", "all"). See below.
+#'     regression model. Any pairwise combination of the variable 'hdiv', 'TV',
+#'     'wprob', and 'pos' can be provided. For example: 'hdiv:TV', 'wprob:pos',
+#'     'wprob:TV', etc.
+#' @param output Type of output to request: output = c('conf.mat', 'mc.val',
+#'     'boot.all', 'all'). See below.
 #' @param prop Proportion to split the dataset used in the logistic regression:
 #'     group versus divergence (at DMPs) into two subsets, training and
 #'     testing.
@@ -79,37 +79,36 @@
 #' @param seed Random seed used for random number generation.
 #' @param verbose if TRUE, prints the function log to stdout
 #'
-#' @return Setting output = "conf.mat" will perform a logistic regression group
+#' @return Setting output = 'conf.mat' will perform a logistic regression group
 #' versus divergence (at DMPs) to evaluate the discrimination between
 #' control-DMPs and treatment-DMPs. The evaluation of this classification is
 #' provided through the function 'confusionMatrix' from R package 'caret'.
-#' "mc.val" will perform a 'num.boot'-times Monte Carlo (bootstrap) validation
+#' 'mc.val' will perform a 'num.boot'-times Monte Carlo (bootstrap) validation
 #' and return a summary. By default function 'confusionMatrix' from R package
 #' caret' randomly splits the sample into two subsets, training and testing,
 #' according to the supplied proportion 'prop' (i.e., prop = 0.6). After
-#' selecting output = "mc.val", the function 'confusionMatrix' will be executed
+#' selecting output = 'mc.val', the function 'confusionMatrix' will be executed
 #' 'num.boot'-times, each time performing a different random split of the
-#' sample. "boot.all" same as "mc.val" plus a matrix with statistcs reported by
-#' 'confusionMatrix'. "all" return a list with all the mentioned outputs.
+#' sample. 'boot.all' same as 'mc.val' plus a matrix with statistcs reported by
+#' 'confusionMatrix'. 'all' return a list with all the mentioned outputs.
 #'
 #' @examples
-#' data(cutpoint, PS, package = "MethylIT")
+#' data(cutpoint, PS, package = 'MethylIT')
 #'
 #' ## DMPs are selected using the cupoints
 #' DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
-#'                    tv.cut = 0.68)
+#' tv.cut = 0.68)
 #'
-#' ## Classification of DMPs into two clases: DMPS from control and DMPs from
-#' ## treatment samples and evaluation of the classifier performance (for more
-#' ## details see ?evaluateDIMPclass).
+#' ## Classification of DMPs into two clases: DMPS from control and DMPs
+#' ## from treatment samples and evaluation of the classifier performance
+#' ## (for more details see ?evaluateDIMPclass).
 #' perf <- evaluateDIMPclass(LR = DMPs,
-#'                           column = c(hdiv = TRUE, TV = TRUE,
-#'                                      wprob = TRUE, pos = TRUE),
-#'                           classifier = "lda", n.pc = 4L,
-#'                           control.names =  c("C1", "C2", "C3"),
-#'                           treatment.names = c("T1", "T2", "T3"),
-#'                           center = TRUE, scale = TRUE,
-#'                           prop = 0.6)
+#'                         column = c(hdiv = TRUE, TV = TRUE,
+#'                                     wprob = TRUE, pos = TRUE),
+#'                         classifier = 'lda', n.pc = 4L,
+#'                         control.names =  c('C1', 'C2', 'C3'),
+#'                         treatment.names = c('T1', 'T2', 'T3'),
+#'                         center = TRUE, scale = TRUE, prop = 0.6)
 #'
 #' ## Model classification performance
 #' perf$Performance
@@ -120,240 +119,266 @@
 #' @importFrom MASS qda lda
 #' @export
 evaluateDIMPclass <- function(LR, control.names, treatment.names,
-                               column=c(hdiv=FALSE, TV=FALSE, bay.TV=FALSE,
-                                         wprob=FALSE, pos=FALSE),
-                               classifier=c("logistic", "pca.logistic", "lda",
-                                             "qda","pca.lda", "pca.qda"),
-                               pval.col=NULL,
-                               n.pc=1, center=FALSE, scale=FALSE,
-                               interaction=NULL, output="conf.mat",
-                               prop=0.6, num.boot=100, num.cores=1L,
-                               tasks=0L, seed=1234, verbose=FALSE) {
+    column = c(hdiv = FALSE, TV = FALSE, bay.TV = FALSE,
+        wprob = FALSE, pos = FALSE), classifier = c("logistic",
+        "pca.logistic", "lda", "qda", "pca.lda", "pca.qda"),
+    pval.col = NULL, n.pc = 1, center = FALSE, scale = FALSE,
+    interaction = NULL, output = "conf.mat", prop = 0.6,
+    num.boot = 100, num.cores = 1L, tasks = 0L, seed = 1234,
+    verbose = FALSE) {
 
-   classifier <- match.arg(classifier)
+    classifier <- match.arg(classifier)
 
-   # -------------------------- valid "pDMP" object--------------------------- #
-   validateClass(LR)
-   # ---------------------------------------------------=--------------------- #
-   if (sum(column) == 0)
-       stop(paste("*** At least one of columns with the predictor variables",
-               " 'hdiv', 'TV', 'bay.TV', 'wprob', or pos' must be provided"))
-   if ((classifier[1] != "logistic" ) && sum(column) < n.pc) {
-       stop(paste("* The number of predictor variables must be greater or ",
-               "equal to n.pc"))
-   }
-   set.seed(seed)
+    # -------------------------- valid 'pDMP'
+    # object--------------------------- #
+    validateClass(LR)
+    # ---------------------------------------------------=---------------------
+    # #
+    if (sum(column) == 0)
+        stop(paste("*** At least one of columns with the predictor variables",
+            " 'hdiv', 'TV', 'bay.TV', 'wprob', or pos' must be provided"))
+    if ((classifier[1] != "logistic") && sum(column) <
+        n.pc) {
+        stop(paste("* The number of predictor variables must be greater or ",
+            "equal to n.pc"))
+    }
+    set.seed(seed)
 
-   # -------------------------- Auxiliary functions -------------------------- #
-   position <- function(gr) {
-       chrs <- split(gr, seqnames(gr))
-       gr <- lapply(chrs, function(grc) {
-               x <- start(grc)
-               x.min <- min(x)
-               x.max <- max(x)
-               if (x.min == Inf) x.min = 0
-               if (x.max == -Inf) x.max = 1
-               delta <-  max(c(x.max - x, 1))
-               return((x - x.min) / (delta))})
-       return(unlist(gr))}
+    # ----------------------- Auxiliary functions -------------------------- #
+    position <- function(gr) {
+        chrs <- split(gr, seqnames(gr))
+        gr <- lapply(chrs, function(grc) {
+            x <- start(grc)
+            x.min <- min(x)
+            x.max <- max(x)
+            if (x.min == Inf)
+                x.min = 0
+            if (x.max == -Inf)
+                x.max = 1
+            delta <- max(c(x.max - x, 1))
+            return((x - x.min)/(delta))
+        })
+        return(unlist(gr))
+    }
 
-   DIV <- function(LR) {
-       ## This builds data frames from the list or ranges LR
-       ## to be used for ROC analysis
-       ## LR: list of sample GRanges
-       vn <- c("hdiv", "TV", "bay.TV", "wprob", "pos")
-       if (classifier[1] == "logistic") {
-           idx <- unlist(lapply(vn, function(s) sum(grepl(s, interaction)) > 0))
-           column[union(vn[column], vn[idx])] <- TRUE
-       }
+    DIV <- function(LR) {
+        ## This builds data frames from the list or ranges
+        ## LR to be used for ROC analysis LR: list of sample
+        ## GRanges
+        vn <- c("hdiv", "TV", "bay.TV", "wprob", "pos")
+        if (classifier[1] == "logistic") {
+            idx <- unlist(lapply(vn, function(s)
+                sum(grepl(s, interaction)) > 0))
+            column[union(vn[column], vn[idx])] <- TRUE
+        }
 
-       vn <- vn[column]
-       vn <- setdiff(vn, "pos")
-       sn <- names(LR)
-       dt <- data.frame()
-       for (k in seq_len(length(LR))) {
-           dc <- c()
-           x <- LR[[k]]
-           if (!is.null(pval.col)) x$wprob <- mcols(x[, pval.col])[, 1]
-           x <- x[ ,vn]
-           if (column["hdiv"]) dc <- cbind(dc, hdiv=x$hdiv)
-           if (column["TV"]) dc <- cbind(dc, TV=x$TV)
-           if (column["bay.TV"]) dc <- cbind(dc, bay.TV=x$bay.TV)
-           if (column["wprob"]) dc <- cbind(dc, logP=log10(x$wprob + 2.2e-308))
-           if (column["pos"] || sum(grepl("pos", interaction)) > 0) {
-               dc = cbind(dc, pos = position(x))
-           }
-           dt <- rbind(dt, data.frame(dc, treat = sn[k]))
-       }
-       return(dt)
-   }
+        vn <- vn[column]
+        vn <- setdiff(vn, "pos")
+        sn <- names(LR)
+        dt <- data.frame()
+        for (k in seq_len(length(LR))) {
+            dc <- c()
+            x <- LR[[k]]
+            if (!is.null(pval.col))
+                x$wprob <- mcols(x[, pval.col])[, 1]
+            x <- x[, vn]
+            if (column["hdiv"])
+                dc <- cbind(dc, hdiv = x$hdiv)
+            if (column["TV"])
+                dc <- cbind(dc, TV = x$TV)
+            if (column["bay.TV"])
+                dc <- cbind(dc, bay.TV = x$bay.TV)
+            if (column["wprob"])
+                dc <- cbind(dc, logP = log10(x$wprob + 2.2e-308))
+            if (column["pos"] || sum(grepl("pos", interaction)) > 0) {
+                dc = cbind(dc, pos = position(x))
+            }
+            dt <- rbind(dt, data.frame(dc, treat = sn[k]))
+        }
+        return(dt)
+    }
 
-   LogistR <- function(dt, formula, center = FALSE, scale = FALSE) {
-       ## This function performs a logistic regression
-       ## using 'glm'.
-       l <- levels(dt$treat)
-       dt$treat <- as.character(dt$treat)
-       dt$treat[dt$treat == l[1]] <- 0
-       dt$treat[dt$treat == l[2]] <- 1
-       dt$treat <- as.numeric(dt$treat)
-       nc <- ncol(dt)
-       ## Centering and scaling individuals
-       x <- scale(dt[,-ncol(dt)], center = center, scale = scale)
-       if (center) center <- as.numeric(attr(x,"scaled:center"))
-       if (scale) scale <- as.numeric(attr(x,"scaled:scale"))
-       dt[,-ncol(dt)] <- x; rm(x); gc()
-       model <- try(suppressWarnings(glm(formula, family=binomial(link='logit'),
-                               data=dt)),
-                    silent = TRUE)
-       if (!inherits(model, "try-error")) {
-           modeling <- list(modeling = model, center = center, scale = scale)
-           modeling <- structure(modeling, class = "LogisticR")
-           return(modeling)
-       }
-       else stop("The logistic model cannot be fitted")
-   }
+    LogistR <- function(dt, formula, center = FALSE,
+        scale = FALSE) {
+        ## This function performs a logistic regression
+        ## using 'glm'.
+        l <- levels(dt$treat)
+        dt$treat <- as.character(dt$treat)
+        dt$treat[dt$treat == l[1]] <- 0
+        dt$treat[dt$treat == l[2]] <- 1
+        dt$treat <- as.numeric(dt$treat)
+        nc <- ncol(dt)
+        ## Centering and scaling individuals
+        x <- scale(dt[, -ncol(dt)], center = center,
+            scale = scale)
+        if (center)
+            center <- as.numeric(attr(x, "scaled:center"))
+        if (scale)
+            scale <- as.numeric(attr(x, "scaled:scale"))
+        dt[, -ncol(dt)] <- x
+        rm(x)
+        gc()
+        model <- try(suppressWarnings(glm(formula,
+            family = binomial(link = "logit"), data = dt)),
+            silent = TRUE)
+        if (!inherits(model, "try-error")) {
+            modeling <- list(modeling = model, center = center, scale = scale)
+            modeling <- structure(modeling, class = "LogisticR")
+            return(modeling)
+        } else stop("The logistic model cannot be fitted")
+    }
 
-   predictLogistic <- function(object, newdata) {
-       ## Centering and scaling new individuals
-       newdata[,-ncol(newdata)] <- scale(newdata[,-ncol(newdata)],
-                                       center = object$center,
-                                       scale = object$scale)
-       object$modeling <- structure(object$modeling, class=c("glm", "lm"))
-       return(predict.glm(object = object$modeling, newdata = newdata,
-                           type = "response"))
-   }
+    predictLogistic <- function(object, newdata) {
+        ## Centering and scaling new individuals
+        newdata[, -ncol(newdata)] <- scale(newdata[, -ncol(newdata)],
+                                            center = object$center,
+                                            cale = object$scale)
+        object$modeling <- structure(object$modeling, class = c("glm", "lm"))
+        return(predict.glm(object = object$modeling, newdata = newdata,
+                            type = "response"))
+    }
 
-   # -----------------------------------------------------------------=------- #
-   ## =================== To build the regression formula =================== ##
-   vn <- c("hdiv", "TV", "bay.TV", "logP", "pos")
-   cols  <- c(hdiv=FALSE, TV=FALSE, bay.TV=FALSE, wprob=FALSE, pos=FALSE)
-   idx <- !is.element(names(cols), names(column))
-   column <- c(column, cols[idx])
-   column <- column[c("hdiv", "TV", "bay.TV", "wprob", "pos")]
+    # ------------------------------------------------------------------------
+    ## ================== To build the regression formula ================== ##
+    vn <- c("hdiv", "TV", "bay.TV", "logP", "pos")
+    cols <- c(hdiv = FALSE, TV = FALSE, bay.TV = FALSE,
+        wprob = FALSE, pos = FALSE)
+    idx <- !is.element(names(cols), names(column))
+    column <- c(column, cols[idx])
+    column <- column[c("hdiv", "TV", "bay.TV", "wprob", "pos")]
 
-   cn <- column; names(cn) <- c("hdiv", "TV", "bay.TV", "logP", "pos")
-   form <- as.character(outer(vn, vn, FUN=paste, sep = ":"))
-   form <- form[c(2:6, 8:12, 14:18, 20:24)]
-   inter <- c("hdiv:TV" = FALSE, "hdiv:logP" = FALSE, "hdiv:pos" = FALSE,
-               "hdiv:bay.TV" = FALSE,
-               "TV:hdiv" = FALSE, "TV:logP" = FALSE, "TV:pos" = FALSE,
-               "TV:bay.TV" = FALSE,
-               "bay.TV:hdiv" = FALSE, "bay.TV:logP" = FALSE,
-               "bay.TV:pos" = FALSE, "bay.TV:TV" = FALSE,
-               "logP:hdiv" = FALSE, "logP:TV" = FALSE, "logP:pos" = FALSE,
-               "logP:bay.TV" = FALSE,
-               "pos:hdiv" = FALSE, "pos:TV" = FALSE, "pos:logP" = FALSE,
-               "pos:bay.TV" = FALSE)
-   if (!is.null(interaction) && classifier[1] == "logistic") {
-       if (sum(grepl("wprob", interaction)) > 0) {
-           idx <- sub("wprob", "logP", interaction)
-           inter[idx] <- TRUE
-       } else inter[interaction] <- TRUE
-   }
+    cn <- column
+    names(cn) <- c("hdiv", "TV", "bay.TV", "logP", "pos")
+    form <- as.character(outer(vn, vn, FUN = paste,
+        sep = ":"))
+    form <- form[c(2:6, 8:12, 14:18, 20:24)]
+    inter <- c(`hdiv:TV` = FALSE, `hdiv:logP` = FALSE,
+        `hdiv:pos` = FALSE, `hdiv:bay.TV` = FALSE,
+        `TV:hdiv` = FALSE, `TV:logP` = FALSE, `TV:pos` = FALSE,
+        `TV:bay.TV` = FALSE, `bay.TV:hdiv` = FALSE,
+        `bay.TV:logP` = FALSE, `bay.TV:pos` = FALSE,
+        `bay.TV:TV` = FALSE, `logP:hdiv` = FALSE, `logP:TV` = FALSE,
+        `logP:pos` = FALSE, `logP:bay.TV` = FALSE,
+        `pos:hdiv` = FALSE, `pos:TV` = FALSE, `pos:logP` = FALSE,
+        `pos:bay.TV` = FALSE)
+    if (!is.null(interaction) && classifier[1] == "logistic") {
+        if (sum(grepl("wprob", interaction)) > 0) {
+            idx <- sub("wprob", "logP", interaction)
+            inter[idx] <- TRUE
+        } else inter[interaction] <- TRUE
+    }
 
-   if (sum(inter) > 0 && classifier[1] == "logistic") {
-       predictors <- paste(paste0(vn=vn[cn], collapse=" + "),
-                       paste0(form[inter], collapse=" + "), sep =" + ")
-       form <- paste0("treat ~ ", predictors)
-       formula <- as.formula(form)
-   } else {
-       form <- paste0("treat ~ ", paste(vn[cn], collapse=" + "))
-       formula <- as.formula(form)}
-   if (verbose) message("Model: ", form)
-   # ------------------------------------------------------------------------ #
-   ## ========================== data preprocessing ======================== ##
-   sn <- names(LR)
-   idx.ct <- match(control.names, sn)
-   if (any(is.na(idx.ct)))
-       stop("*** 'control.names' arguments do not match LR names")
-   idx.tt <- match(treatment.names, sn)
-   if (any(is.na(idx.tt)))
-       stop("*** 'treatment.names' arguments do not match LR names")
-   CT <- LR[idx.ct]
-   CT <- unlist(CT)
-   TT <- LR[idx.tt]
-   TT <- unlist(TT)
+    if (sum(inter) > 0 && classifier[1] == "logistic") {
+        predictors <- paste(paste0(vn = vn[cn], collapse = " + "),
+            paste0(form[inter], collapse = " + "),
+            sep = " + ")
+        form <- paste0("treat ~ ", predictors)
+        formula <- as.formula(form)
+    } else {
+        form <- paste0("treat ~ ", paste(vn[cn], collapse = " + "))
+        formula <- as.formula(form)
+    }
+    if (verbose)
+        message("Model: ", form)
+    # ------------------------------------------------------------------------
+    # # ======================= data preprocessing ======================== ##
+    sn <- names(LR)
+    idx.ct <- match(control.names, sn)
+    if (any(is.na(idx.ct)))
+        stop("*** 'control.names' arguments do not match LR names")
+    idx.tt <- match(treatment.names, sn)
+    if (any(is.na(idx.tt)))
+        stop("*** 'treatment.names' arguments do not match LR names")
+    CT <- LR[idx.ct]
+    CT <- unlist(CT)
+    TT <- LR[idx.tt]
+    TT <- unlist(TT)
 
-  ## =============================== Core function ========================== ##
-   conf.mat <- function(k) {
-       lct <- length(CT)
-       ltt <- length(TT)
-       lct <- sample.int(lct, size=(lct * prop))
-       ltt <- sample.int(ltt, size=(ltt * prop))
+    ## ============================= Core function ========================== ##
+    conf.mat <- function(k) {
+        lct <- length(CT)
+        ltt <- length(TT)
+        lct <- sample.int(lct, size = (lct * prop))
+        ltt <- sample.int(ltt, size = (ltt * prop))
 
-       trainingSet <- list()
-       testSet <- list()
-       trainingSet$CT <- CT[lct]
-       trainingSet$TT <- TT[ltt]
-       testSet$CT <- CT[-lct]
-       testSet$TT <- TT[-ltt]
+        trainingSet <- list()
+        testSet <- list()
+        trainingSet$CT <- CT[lct]
+        trainingSet$TT <- TT[ltt]
+        testSet$CT <- CT[-lct]
+        testSet$TT <- TT[-ltt]
 
-       trainingSet <- DIV(trainingSet)
-       testSet <- DIV(testSet)
-       model <- switch(classifier[1],
-                       logistic=LogistR(dt = trainingSet, formula=formula,
-                                       center = center, scale = scale),
-                       pca.logistic=pcaLogisticR(formula=formula,
-                                               data=trainingSet, n.pc=n.pc,
-                                               scale=scale, center=center,
-                                               max.pc=4),
-                       lda=lda(formula=formula, data=trainingSet,
-                               tol=1.0e-4),
-                       qda=qda(formula=formula, data=trainingSet,
-                               tol=1.0e-4),
-                       pca.lda=pcaLDA(formula=formula,
-                               data=trainingSet, n.pc=n.pc,
-                               max.pc=4, scale=scale,
-                               center=center),
-                       pca.qda=pcaQDA(formula=formula,
-                               data=trainingSet, n.pc=n.pc,
-                               max.pc=4, scale=scale,
-                               center=center))
-       PredTestSet <- switch(classifier[1],
-                       logistic = predictLogistic(object = model,
-                                                   newdata = testSet),
-                       lda = predict(model,
-                               newdata = testSet)$posterior[,"TT"],
-                       qda = predict(model,
-                               newdata = testSet)$posterior[,"TT"],
-                       pca.logistic = predict(model, newdata = testSet,
-                               type = "posterior"),
-                       pca.lda = predict(model, newdata=testSet[ ,vn[cn]],
-                               type = "posterior")[,"TT"],
-                       pca.qda = predict(model, newdata = testSet[ ,vn[cn]],
-                               type = "posterior")[ ,"TT"])
-       PredTestClass <- rep( "CT", length(PredTestSet))
-       PredTestClass[PredTestSet > 0.5] <- "TT"
-       PredTestClass <- factor(PredTestClass, levels = c("CT", "TT"))
-       if (length(levels(PredTestClass)) < 2 ) {
-           warning(paste0("Predictions only have one classification level, ",
-                   levels(PredTestClass),
-                   ", consider increasing the proportion to split the ",
-                   "dataset or to vary the number of predictor variables \n"))
-       }
-       testSet$treat <- factor(testSet$treat, levels = c("CT", "TT"))
-       conf.mat <- confusionMatrix(data=PredTestClass, reference=testSet$treat,
-                                   positive="TT")
-       m <- conf.mat$table
-       FDR <- m[2,1]/sum(m[2,])
-       if (inherits(model, "lda")) model <- structure(model, class = "ldaDMP")
-       if (inherits(model, "qda")) model <- structure(model, class = "qdaDMP")
-       return(list(Performance=conf.mat, FDR=FDR, model=model))
-   }
-  # -------------------------------------------------------------------------- #
+        trainingSet <- DIV(trainingSet)
+        testSet <- DIV(testSet)
+        model <- switch(classifier[1],
+                        logistic = LogistR(dt = trainingSet, formula = formula,
+                                            center = center, scale = scale),
+                        pca.logistic = pcaLogisticR(formula = formula,
+                                                    data = trainingSet,
+                                                    n.pc = n.pc, scale = scale,
+                                                    center = center,
+                                                    max.pc = 4),
+                        lda = lda(formula = formula, data = trainingSet,
+                                tol = 1e-04),
+                        qda = qda(formula = formula, data = trainingSet,
+                                    tol = 1e-04),
+                        pca.lda = pcaLDA(formula = formula, data = trainingSet,
+                                        n.pc = n.pc, max.pc = 4, scale = scale,
+                                        center = center),
+                        pca.qda = pcaQDA(formula = formula, data = trainingSet,
+                                        n.pc = n.pc, max.pc = 4, scale = scale,
+                                        center = center))
+        PredTestSet <- switch(classifier[1],
+                            logistic = predictLogistic(object = model,
+                                                        newdata = testSet),
+                            lda = predict(model,
+                                        newdata = testSet)$posterior[, "TT"],
+                            qda = predict(model,
+                                        newdata = testSet)$posterior[, "TT"],
+                            pca.logistic = predict(model,
+                                                newdata = testSet,
+                                                type = "posterior"),
+                            pca.lda = predict(model,
+                                            newdata = testSet[, vn[cn]],
+                                            type = "posterior")[, "TT"],
+                            pca.qda = predict(model, newdata = testSet[,vn[cn]],
+                                            type = "posterior")[, "TT"])
+        PredTestClass <- rep("CT", length(PredTestSet))
+        PredTestClass[PredTestSet > 0.5] <- "TT"
+        PredTestClass <- factor(PredTestClass, levels = c("CT","TT"))
+        if (length(levels(PredTestClass)) < 2) {
+            warning(paste0("Predictions only have one classification level, ",
+                levels(PredTestClass),
+                ", consider increasing the proportion to split the ",
+                "dataset or to vary the number of predictor variables \n"))
+        }
+        testSet$treat <- factor(testSet$treat, levels = c("CT", "TT"))
+        conf.mat <- confusionMatrix(data = PredTestClass,
+            reference = testSet$treat, positive = "TT")
+        m <- conf.mat$table
+        FDR <- m[2, 1]/sum(m[2, ])
+        if (inherits(model, "lda"))
+            model <- structure(model, class = "ldaDMP")
+        if (inherits(model, "qda"))
+            model <- structure(model, class = "qdaDMP")
+        return(list(Performance = conf.mat, FDR = FDR,
+            model = model))
+    }
+    # ---------------------------------------------------------------- #
 
-   if (output != "conf.mat") {
-       if (.Platform$OS.type == "unix") {
-           bpparam <- MulticoreParam(workers=num.cores, tasks=tasks)
-       } else bpparam <- SnowParam(workers=num.cores)
-       boots <- bplapply(seq_len(num.boot), function(k){
-               x <- conf.mat(k)$Performance
-               return(c(x$overall, x$byClass))}, BPPARAM=bpparam)
-       boots <- do.call(rbind,boots)
-   }
-   res <- switch(output, conf.mat=conf.mat(1), mc.val=summary(boots),
-               boot.all=list(stats=summary(boots), boots=boots),
-               all=list(con.mat=conf.mat(1), mc.val=summary(boots),
-                       boots=boots))
-   return(res)
+    if (output != "conf.mat") {
+        if (.Platform$OS.type == "unix") {
+            bpparam <- MulticoreParam(workers = num.cores, tasks = tasks)
+        } else bpparam <- SnowParam(workers = num.cores)
+        boots <- bplapply(seq_len(num.boot), function(k) {
+            x <- conf.mat(k)$Performance
+            return(c(x$overall, x$byClass))
+        }, BPPARAM = bpparam)
+        boots <- do.call(rbind, boots)
+    }
+    res <- switch(output, conf.mat = conf.mat(1), mc.val = summary(boots),
+        boot.all = list(stats = summary(boots), boots = boots),
+        all = list(con.mat = conf.mat(1), mc.val = summary(boots),
+                    boots = boots))
+    return(res)
 }

@@ -9,7 +9,7 @@ print methods.}
 }
 \arguments{
 \item{x}{Object from class \emph{glmDataSet} or from class
-\emph{"RangedGlmDataSet"}.}
+\emph{'RangedGlmDataSet'}.}
 
 \item{digits}{Number of significant digits to be used.}
 }

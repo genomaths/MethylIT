@@ -25,8 +25,8 @@ weibull3P(
 \item{sample.size}{size of the sample}
 
 \item{model}{Distribution model to fit, two-parameters and three-parameters
-Weibull model ("Weibull2P" or simply "2P" and "Weibull3P" or "3P).
-Default is "all" and the model with the best AIC criterion is reported.}
+Weibull model ('Weibull2P' or simply '2P' and 'Weibull3P' or '3P). Default
+is 'all' and the model with the best AIC criterion is reported.}
 
 \item{npoints}{number of points used in the fit}
 
@@ -38,19 +38,19 @@ relative offset convergence criterion. Default value: 1e-12,}
 
 \item{ftol}{non-negative numeric. Termination occurs when both the actual and
 predicted relative reductions in the sum of squares are at most ftol.
-Therefore, ftol measures the relative error desired in the sum of
-squares. Default value: 1e-12,}
+Therefore, ftol measures the relative error desired in the sum of squares.
+Default value: 1e-12,}
 
 \item{ptol}{non-negative numeric. Termination occurs when the relative error
-between two consecutive iterates is at most ptol. Therefore, ptol
-measures the relative error desired in the approximate solution. Default
-value: 1e-12,}
+between two consecutive iterates is at most ptol. Therefore, ptol measures
+the relative error desired in the approximate solution. Default value:
+1e-12,}
 
 \item{minFactor}{A positive numeric value specifying the minimum step-size
 factor allowed on any step in the iteration. The increment is calculated
-with a Gauss-Newton algorithm and successively halved until the residual
-sum of squares has been decreased or until the step-size factor has been
-reduced below this limit. Default value: 10^-6}
+with a Gauss-Newton algorithm and successively halved until the residual sum
+of squares has been decreased or until the step-size factor has been reduced
+below this limit. Default value: 10^-6}
 
 \item{nlms}{Logical. Whether to return the nonlinear model object
 \code{\link[minpack.lm]{nls.lm}}. Default is FALSE.}
@@ -71,8 +71,8 @@ variable x
 \details{
 The script algorithm first try to fit the two-parameter Weibull CDF
 (Weibull2P). If Weibull2P did not fit, then the algorithm will try to fit
-Weibull3P. The Levenberg-Marquardt algorithm implemented in 'minpack.lm'
-R package is used to perform the nonlinear fit. Cross-validations for the
+Weibull3P. The Levenberg-Marquardt algorithm implemented in 'minpack.lm' R
+package is used to perform the nonlinear fit. Cross-validations for the
 nonlinear regressions (R.Cross.val) were performed in each methylome as
 described in reference (1). In addition, Stein's formula for adjusted R
 squared (rho) was used as an estimator of the average cross-validation

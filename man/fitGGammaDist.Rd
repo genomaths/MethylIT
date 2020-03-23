@@ -77,7 +77,7 @@ variable x
 }
 \details{
 The script algorithm tries to fit the three-parameter GGamma CDF
-("GGamma3P") or the four-parameter GGamma ("GGamma4P") using a modification
+('GGamma3P') or the four-parameter GGamma ('GGamma4P') using a modification
 of Levenberg-Marquardt algorithm implemented in function 'nls.lm' from
 'minpack.lm' package that is used to perform the nonlinear fit.
 Cross-validations for the nonlinear regressions (R.Cross.val) were performed

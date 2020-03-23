@@ -74,7 +74,7 @@ variable x
 }
 \details{
 The algorithm tries to fit the two-parameter Gamma CDF
-("Gamma2P") or the three-parameter Gamma ("Gamma3P") using a modification of
+('Gamma2P') or the three-parameter Gamma ('Gamma3P') using a modification of
 Levenberg-Marquardt algorithm implemented in function 'nls.lm' from
 'minpack.lm' package that is used to perform the nonlinear fit.
 Cross-validations for the nonlinear regressions (R.Cross.val) were performed

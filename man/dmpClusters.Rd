@@ -44,7 +44,7 @@ where DMPs were reported in at least one of the samples.
 }
 \description{
 Given a 'pDMP' object carrying DMPs obtained in Methyl-IT
-downstream analysis, function \strong{\emph{"dmpClusters"}} build
+downstream analysis, function \strong{\emph{'dmpClusters'}} build
 clusters of DMPs, which can be further tested to identify differentially
 methylated regions (DMRs) with \code{\link{countTest2}} function.
 }
@@ -63,12 +63,12 @@ positions inside the cluster where DMPs were reported in at least one
 of the samples.
 }
 \examples{
-## Get a dataset of potential signals and the estimated cutpoint from the
-## package
+## Get a dataset of potential signals and the estimated cutpoint
+## from the package
 data(PS, cutpoint)
 
-## The estimated cutpoints are used to discriminate signals from the noise.
-## That is, DMPs are selected using the cupoints
+## The estimated cutpoints are used to discriminate signals from
+## the noise. That is, DMPs are selected using the cupoints
 dmps <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint)
 
 ## Build clusters of DMPs
@@ -81,27 +81,23 @@ nams <- names(dmps)
 dmps_at_clusters <- getDIMPatGenes(GR = dmps, GENES = x1,
                                     ignore.strand = TRUE)
 dmps_at_clusters <- uniqueGRanges(dmps_at_clusters, columns = 2L,
-                                    ignore.strand = TRUE, type = "equal",
-                                    verbose = FALSE)
+                                ignore.strand = TRUE, type = 'equal',
+                                verbose = FALSE)
 colnames(mcols(dmps_at_clusters)) <- nams
 
-colData <- data.frame(condition = factor(c("CT", "CT", "CT",
-                                           "TT", "TT", "TT"),
-                                         levels = c("CT", "TT")),
-                    nams,
-                    row.names = 2)
+colData <- data.frame(condition = factor(c('CT', 'CT', 'CT',
+                                        'TT', 'TT', 'TT'),
+                                        levels = c('CT', 'TT')),
+                    nams, row.names = 2)
 
 ## Build a RangedGlmDataSet object
 ds <- glmDataSet(GR = dmps_at_clusters, colData = colData)
 
 ## ================ Testing for DMRs ===========
-dmrs <- countTest2(DS = ds, num.cores = 4L,
-                   minCountPerIndv = 4,
-                   maxGrpCV = c(1, 1),
-                   Minlog2FC = 0.5,
-                   CountPerBp = 0.001,
-                   test = "LRT",
-                   verbose = TRUE)
+dmrs <- countTest2(DS = ds, num.cores = 4L, minCountPerIndv = 4,
+                maxGrpCV = c(1, 1), Minlog2FC = 0.5,
+                CountPerBp = 0.001, test = 'LRT',
+                verbose = TRUE)
 dmrs
 }
 \references{

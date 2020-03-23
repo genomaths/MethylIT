@@ -66,7 +66,7 @@ specifies the maximum difference in the starts, ends or both,
 respectively. For within, it is the maximum amount by which the subject
 may be wider than the query.}
 
-\item{select}{When select is "all" (the default), the results are returned as
+\item{select}{When select is 'all' (the default), the results are returned as
 a Hits object. Otherwise the returned value is an integer vector parallel
 to query (i.e. same length) containing the first, last, or arbitrary
 overlapping interval in subject, with NA indicating intervals that did
@@ -108,18 +108,18 @@ created  without metadata columns. Additionally, all metadata must be the
 same class, e.g. all numeric or all characters, or all factor
 }
 \examples{
-dfChr1 <- data.frame(chr = "chr1", start = 11:15, end = 11:15,
-                    strand = c("+","-","+","*","."), score = 1:5)
-dfChr2 <- data.frame(chr = "chr1", start = 11:15, end = 11:15,
-                    strand = c("+","-","+","*","."), score = 1:5)
-dfChr3 <- data.frame(chr = "chr1", start = 11:15, end = 11:15,
-                    strand = c("+","-","+","*","."), score = 1:5)
+dfChr1 <- data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+                    strand = c('+','-','+','*','.'), score = 1:5)
+dfChr2 <- data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+                    strand = c('+','-','+','*','.'), score = 1:5)
+dfChr3 <- data.frame(chr = 'chr1', start = 11:15, end = 11:15,
+                    strand = c('+','-','+','*','.'), score = 1:5)
 
 gr1 <- makeGRangesFromDataFrame(dfChr1, keep.extra.columns = TRUE)
 gr2 <- makeGRangesFromDataFrame(dfChr2, keep.extra.columns = TRUE)
 gr3 <- makeGRangesFromDataFrame(dfChr3, keep.extra.columns = TRUE)
 
-grList <- GRangesList("gr1" = gr1, "gr2" = gr2, "gr3" = gr3)
+grList <- GRangesList('gr1' = gr1, 'gr2' = gr2, 'gr3' = gr3)
 
 uniqueGRanges(grList)
 

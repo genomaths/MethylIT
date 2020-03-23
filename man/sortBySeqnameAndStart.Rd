@@ -16,7 +16,7 @@ GRanges object
 Sorts a GRanges object by seqname and start position
 }
 \examples{
-GR <- as(c("chr2:1-1", "chr1:1-1"), "GRanges")
+GR <- as(c('chr2:1-1', 'chr1:1-1'), 'GRanges')
 GR <- sortBySeqnameAndStart(GR)
 
 }

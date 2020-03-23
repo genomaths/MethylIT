@@ -5,7 +5,7 @@
 #'     'fitGGammaDist' to operate on list of GRanges.
 #' @details The algorithm prepares the information divergence variable
 #' to try fitting Weibull or generalized gamma distribution model to the data.
-#' If Weibull distribution is selected (default: "Weibull"), function
+#' If Weibull distribution is selected (default: 'Weibull'), function
 #' 'Weibull2P' first attempts fitting to the two-parameter Weibull CDF
 #' (Weibull2P). If Weibull2P did not fit, then the algorithm will try to fit
 #' Weibull3P. The Levenberg-Marquardt algorithm implemented in R package
@@ -15,9 +15,9 @@
 #' squared (rho) is used as an estimator of the average cross-validation
 #' predictive power (2).
 #'
-#' If "GGamma3P" is selected the call to function 'fitGGammaDist' permits the
-#' fitting to the three-parameter GGamma CDF ("GGamma3P"). The fit to the
-#' four-parameter GGamma ("GGamma4P") is also available. GGamma distribution are
+#' If 'GGamma3P' is selected the call to function 'fitGGammaDist' permits the
+#' fitting to the three-parameter GGamma CDF ('GGamma3P'). The fit to the
+#' four-parameter GGamma ('GGamma4P') is also available. GGamma distribution are
 #' fitted using a modification of Levenberg-Marquardt algorithm implemented in
 #' function 'nls.lm' from the 'minpack.lm' R package. Notice that the fit to
 #' GGamma distribution is computationally time consuming (see ?fitGGammaDist for
@@ -27,10 +27,11 @@
 #'     their meta-columns.
 #'@param column An integer number denoting the index of the GRanges column
 #'     where the information divergence is given. Default column = 1
-#' @param dist.name name of the distribution to fit: Weibull (default:
-#'     "Weibull"), gamma with three-parameter (Gamma3P), gamma with
-#'     two-parameter (Gamma2P), generalized gamma with three-parameter
-#'     ("GGamma3P") or four-parameter ("GGamma4P"), and Log-Normal (LogNorm).
+#' @param dist.name Name(s) of the distribution to fit. A single character
+#'     string or character vector naming the distribution(s): 'Weibull'
+#'     (default), gamma with three-parameter (Gamma3P), gamma with two-parameter
+#'     (Gamma2P), generalized gamma with three-parameter ('GGamma3P') or
+#'     four-parameter ('GGamma4P'), and Log-Normal (LogNorm).
 #' @param sample.size size of the sample
 #' @param location.par whether to consider the fitting to generalized gamma
 #'     distribution (GGamma) including the location parameter, i.e., a GGamma
@@ -41,11 +42,11 @@
 #'     is an information divergence that can be fitted to Weibull or to
 #'     Generalized Gamma distribution.
 #' @param npoints number of points used in the fit
-#' @param model Optional. Only when dist.name = "Weibull". A selection of the
+#' @param model Optional. Only when dist.name = 'Weibull'. A selection of the
 #'     distribution model, two-parameters and three-parameters Weibull model
-#'     ("2P" and "3P"). Default is "all" and the model with the best AIC
-#'     criterion is reported. Alternatively, just use dist.name = "Weibull2P" or
-#'     dist.name = "Weibull3P".
+#'     ('2P' and '3P'). Default is 'all' and the model with the best AIC
+#'     criterion is reported. Alternatively, just use dist.name = 'Weibull2P' or
+#'     dist.name = 'Weibull3P'.
 #' @param maxiter positive integer. Termination occurs when the number of
 #'     iterations reaches maxiter. Default value: 1024
 #' @param tol A positive numeric value specifying the tolerance level for the
@@ -97,114 +98,125 @@
 #' @examples
 #' ## Load a dataset with Hellinger Divergence of methylation levels on it.
 #' data(HD)
+#'
 #' ## The nonlinear fit based on three-parameter GGamma distribution
-#' nlms2 <- nonlinearFitDist(HD, npoints = 100, dist.name = "GGamma3P",
-#'                           verbose = FALSE)
+#' nlms2 <- nonlinearFitDist(HD, npoints = 100, dist.name = 'GGamma3P',
+#'                             verbose = FALSE)
+#'
 #' ## Weilbull distribution is a particular case of GGamma.
 #' nlms <- nonlinearFitDist(HD, npoints = 100, verbose = FALSE)
 #'
-#' ## The goodness-of-fit indicators AIC suggests that the best fitted model is
-#' ## obtained with GGamma distribution (in this example).
-#' res <- mapply(function(m1,m2) {
-#'   as.numeric(c(Weibull = m1$AIC[1], GGamma = m2$AIC[1]))
-#' }, nlms, nlms2)
-#' rownames(res) <-c("Weibull", "GGamma")
+#' ## The goodness-of-fit indicators AIC suggests that the best fitted model
+#' ## is obtained with GGamma distribution (in this example).
+#' res <- mapply(function(m1,m2) as.numeric(c(Weibull = m1$AIC[1],
+#'                                         GGamma = m2$AIC[1])),
+#'                 nlms, nlms2)
+#' rownames(res) <-c('Weibull', 'GGamma')
 #' res
 #'
 #' ## However, the Cross-validations correlation coefficient is saying that
-#' ## the Weibull distribution would be a little better probability predictor.
-#' res <- mapply(function(m1,m2) {
-#'   as.numeric(c(Weibull = m1$R.Cross.val[1], GGamma = m2$R.Cross.val[1]))
-#' }, nlms, nlms2)
-#' rownames(res) <-c("Weibull", "GGamma")
+#' ## the Weibull distribution would be a little better probability
+#' ## predictor.
+#' res <- mapply(function(m1,m2) as.numeric(c(Weibull = m1$R.Cross.val[1],
+#'                                         GGamma = m2$R.Cross.val[1])),
+#'                 nlms, nlms2)
+#' rownames(res) <-c('Weibull', 'GGamma')
 #' res
 #'
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom GenomicRanges GRanges GRangesList mcols
 #'
 #' @export
-nonlinearFitDist <- function(LR, column=9, dist.name="Weibull",
-                             sample.size=20, location.par=FALSE,
-                             absolute = FALSE, npoints=NULL, model = "all",
-                             maxiter = 1024, tol = 1e-12, ftol = 1e-12,
-                             ptol = 1e-12, minFactor = 10^-6, num.cores = NULL,
-                             tasks = 0L, maxfev = 1e+5, verbose = TRUE, ...) {
+nonlinearFitDist <- function(LR, column = 9, dist.name = "Weibull",
+    sample.size = 20, location.par = FALSE, absolute = FALSE,
+    npoints = NULL, model = "all", maxiter = 1024,
+    tol = 1e-12, ftol = 1e-12, ptol = 1e-12, minFactor = 10^-6,
+    num.cores = NULL, tasks = 0L, maxfev = 1e+05, verbose = TRUE,
+    ...) {
 
-   # ------------------------- valid "InfDiv" object ------------------------- #
-   validateClass(LR)
-   # ------------------------------------------------------------------------- #
+    # ------------------------- valid 'InfDiv' object
+    # ------------------------- #
+    validateClass(LR)
+    # -------------------------------------------------------------------------
+    # #
 
-   sn <- names(LR)
-   toFit <- function(k, sample.size, npoints, maxiter, tol, ftol,
-                   ptol, minFactor, verbose) {
-       if (verbose) message("* Processing sample #", k, " ", sn[k])
-       x <- LR[[k]]
-       x <- mcols(x[, column])[, 1]
-       if (absolute) x = abs(x)
-       x <- x[x > 0]
-       x <- switch(dist.name,
-                   LogNorm=fitLogNormDist(x, sample.size = sample.size,
-                                       npoints = npoints, maxiter = maxiter,
-                                       ftol = ftol, ptol = ptol,
-                                       verbose = verbose),
-                   Weibull=weibull3P(x, sample.size=sample.size,
-                                       model = model, npoints=npoints,
-                                       maxiter=maxiter, tol=tol, ftol=ftol,
-                                       ptol = ptol, minFactor = minFactor,
-                                       verbose=verbose, ...),
-                   Weibull2P=weibull3P(x, sample.size=sample.size,
-                                       model = "2P", npoints=npoints,
-                                       maxiter=maxiter, tol=tol, ftol=ftol,
-                                       ptol = ptol, minFactor = minFactor,
-                                       verbose=verbose, ...),
-                   Weibull3P=weibull3P(x, sample.size=sample.size,
-                                       model = "3P", npoints=npoints,
-                                       maxiter=maxiter, tol=tol, ftol=ftol,
-                                       ptol = ptol, minFactor = minFactor,
-                                       verbose=verbose, ...),
-                   Gamma2P=fitGammaDist(x, location.par=FALSE,
-                                       sample.size=sample.size, npoints=npoints,
-                                       maxiter=maxiter, ftol=ftol, ptol=ptol,
-                                       verbose=verbose, ...),
-                   Gamma3P=fitGammaDist(x, location.par=TRUE,
-                                       sample.size=sample.size, npoints=npoints,
-                                       maxiter=maxiter, ftol=ftol, ptol=ptol,
-                                       verbose=verbose, ...),
-                   GGamma3P=fitGGammaDist(x, location.par=FALSE,
-                                       sample.size=sample.size, npoints=npoints,
-                                       maxiter=maxiter, ftol=ftol, ptol=ptol,
-                                       verbose=verbose, ...),
-                   GGamma4P=fitGGammaDist(x, location.par=TRUE,
-                                       sample.size=sample.size, npoints=npoints,
-                                       maxiter=maxiter, ftol=ftol, ptol=ptol,
-                                       verbose=verbose, ...))
-       if (dist.name == "GGamma4P" && sum(is.na(x)) == 15 ) {
-           x <- fitGGammaDist(x, location.par=FALSE,
-                   sample.size=sample.size, npoints=npoints, maxiter=maxiter,
-                   ftol=ftol, ptol=ptol, verbose=verbose)
-       }
-       x <- structure(x, class=c("ProbDistr", "data.frame"))
-       return(x)
-   }
-   if (is.null(num.cores)) {
-       x <- lapply(seq_len(length(LR)), toFit, sample.size=sample.size,
-               npoints=npoints, maxiter=maxiter,
-               tol=tol, ftol=ftol, ptol=ptol, minFactor=minFactor,
-               verbose=verbose)
-   } else {
-       if (Sys.info()['sysname'] == "Linux") {
-         bpparam <- MulticoreParam(workers=num.cores, tasks=tasks)
-       } else {
-         bpparam <- SnowParam(workers = num.cores, type = "SOCK")
-       }
-       x <- bplapply(seq_len(length(LR)), toFit, sample.size=sample.size,
-                 npoints=npoints, maxiter=maxiter,
-                 tol=tol, ftol=ftol, ptol=ptol, minFactor=minFactor,
-                 verbose=verbose, BPPARAM=bpparam)
-   }
-   names(x) <- sn
-   x <- structure(x, class=c("ProbDistrList", "list"))
-   return(x)
+    sn <- names(LR)
+    toFit <- function(k, dist.name, sample.size, npoints,
+        maxiter, tol, ftol, ptol, minFactor, verbose) {
+        if (verbose)
+            message("* Processing sample #", k, " ",
+                sn[k])
+        x <- LR[[k]]
+        x <- mcols(x[, column])[, 1]
+        if (absolute)
+            x = abs(x)
+        x <- x[x > 0]
+        x <- switch(dist.name, LogNorm = fitLogNormDist(x,
+            sample.size = sample.size, npoints = npoints,
+            maxiter = maxiter, ftol = ftol, ptol = ptol,
+            verbose = verbose), Weibull = weibull3P(x,
+            sample.size = sample.size, model = model,
+            npoints = npoints, maxiter = maxiter, tol = tol,
+            ftol = ftol, ptol = ptol, minFactor = minFactor,
+            verbose = verbose, ...), Weibull2P = weibull3P(x,
+            sample.size = sample.size, model = "2P",
+            npoints = npoints, maxiter = maxiter, tol = tol,
+            ftol = ftol, ptol = ptol, minFactor = minFactor,
+            verbose = verbose, ...), Weibull3P = weibull3P(x,
+            sample.size = sample.size, model = "3P",
+            npoints = npoints, maxiter = maxiter, tol = tol,
+            ftol = ftol, ptol = ptol, minFactor = minFactor,
+            verbose = verbose, ...), Gamma2P = fitGammaDist(x,
+            location.par = FALSE, sample.size = sample.size,
+            npoints = npoints, maxiter = maxiter, ftol = ftol,
+            ptol = ptol, verbose = verbose, ...), Gamma3P = fitGammaDist(x,
+            location.par = TRUE, sample.size = sample.size,
+            npoints = npoints, maxiter = maxiter, ftol = ftol,
+            ptol = ptol, verbose = verbose, ...), GGamma3P = fitGGammaDist(x,
+            location.par = FALSE, sample.size = sample.size,
+            npoints = npoints, maxiter = maxiter, ftol = ftol,
+            ptol = ptol, verbose = verbose, ...), GGamma4P = fitGGammaDist(x,
+            location.par = TRUE, sample.size = sample.size,
+            npoints = npoints, maxiter = maxiter, ftol = ftol,
+            ptol = ptol, verbose = verbose, ...))
+        if (dist.name == "GGamma4P" && sum(is.na(x)) ==
+            15) {
+            x <- fitGGammaDist(x, location.par = FALSE,
+                sample.size = sample.size, npoints = npoints,
+                maxiter = maxiter, ftol = ftol, ptol = ptol,
+                verbose = verbose)
+        }
+        x <- structure(x, class = c("ProbDistr", "data.frame"))
+        return(x)
+    }
+
+    if (length(dist.name) == 1 && length(LR) > 1)
+        dist.name <- rep(dist.name, length(LR))
+    if (is.null(num.cores)) {
+        x <- mapply(toFit, seq_along(LR), dist.name,
+            MoreArgs = list(sample.size = sample.size,
+                npoints = npoints, maxiter = maxiter,
+                tol = tol, ftol = ftol, ptol = ptol,
+                minFactor = minFactor, verbose = verbose),
+            SIMPLIFY = FALSE)
+    } else {
+        if (Sys.info()["sysname"] == "Linux") {
+            bpparam <- MulticoreParam(workers = num.cores,
+                tasks = tasks)
+        } else {
+            bpparam <- SnowParam(workers = num.cores,
+                type = "SOCK")
+        }
+        x <- bpmapply(toFit, seq_along(LR), dist.name,
+            MoreArgs = list(sample.size = sample.size,
+                npoints = npoints, maxiter = maxiter,
+                tol = tol, ftol = ftol, ptol = ptol,
+                minFactor = minFactor, verbose = verbose),
+            SIMPLIFY = FALSE, BPPARAM = bpparam)
+    }
+    names(x) <- sn
+    x <- structure(x, class = c("ProbDistrList", "list"))
+    return(x)
 }
 
 

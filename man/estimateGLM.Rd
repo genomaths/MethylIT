@@ -13,24 +13,24 @@
 \code{\link[MethylIT]{glmDataSet}} object.}
 
 \item{baseMV}{Mean and variance of group counts. If
-baseMean >= baseVar*MVrate, then the nonlinear fit to "Poisson" and
-"QuasiPoisson" models are performed, otherwise only the nonlinear fit to
-"Neg.Binomial" and "Neg.Binomial with weights" models are performed}
+baseMean >= baseVar*MVrate, then the nonlinear fit to 'Poisson' and
+'QuasiPoisson' models are performed, otherwise only the nonlinear fit to
+'Neg.Binomial' and 'Neg.Binomial with weights' models are performed}
 
 \item{w}{group weights used in glm procedure}
 
 \item{MVrate}{Minimum Mean/Variance rate.}
 
-\item{test}{A character string matching one of "Wald" or "LRT". If test =
-"Wald", then the p-value of the Wald test for the coefficient of the
+\item{test}{A character string matching one of 'Wald' or 'LRT'. If test =
+'Wald', then the p-value of the Wald test for the coefficient of the
 independent variable (\emph{treatment group}) will be reported.
-If test = "LRT", then the p-value from a likelihood ratio test given by
+If test = 'LRT', then the p-value from a likelihood ratio test given by
 \code{\link[stats]{anova}} function from \emph{stats} packages will be
 the reported p-value for the group comparison when the best fitted model
 is the negative binomial. As suggested for \code{\link[stats]{glm}}, if
 best fitted model is Poisson or quasi-Poisson, then the best test is
 'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
-the corresponding suitable test will be applied when test = "LRT".}
+the corresponding suitable test will be applied when test = 'LRT'.}
 }
 \value{
 GLM model of the group comparison for the given genomic region
@@ -42,7 +42,7 @@ would need to call it directly only in very special cases.
 Perform Poisson and Negative Binomial regression analysis to
 compare the counts from different groups, treatment and control x:
 vector of counts groups: factor labeling the members from each group
-Evaluated models are "Poisson", "Quasipoisson", "Neg.Binomial.W", and
-"Neg.Binomial"
+Evaluated models are 'Poisson', 'Quasipoisson', 'Neg.Binomial.W', and
+'Neg.Binomial'
 }
 \keyword{internal}

@@ -37,23 +37,23 @@ Decompress 'gzip' files.
 }
 \details{
 Download supplemental files from a specified GEO dataset. This
-function is originally provided in the Bioconductor package 'GEOquery'.
-The original function download all the supplemental files for a given GEO
-accession number. Herein small detail is added to permit only the
-download of the specified files and from several GEO accession numbers
-with only one call to the function.
+function is originally provided in the Bioconductor package 'GEOquery'. The
+original function download all the supplemental files for a given GEO
+accession number. Herein small detail is added to permit only the download
+of the specified files and from several GEO accession numbers with only one
+call to the function.
 }
 \examples{
-## Download supplementary files from GEO data set and store "fullpath/name"
+## Download supplementary files from GEO data set and store fullpath/name
 ## in variable filename. The parameter 'pattern' permits us to download only
 ## the specified filesCG, in this case, CG and CHG methylation contexts.
 
-filenames <- getGEOSuppFiles(GEO = "GSM881757",
-                pattern = "G_cytosine.txt.gz")
+filenames <- getGEOSuppFiles(GEO = 'GSM881757',
+                pattern = 'G_cytosine.txt.gz')
 
 file.remove(filenames) ## Remove the downloaded file
 
 }
 \author{
-Original author: Sean Davis \href{mailto:sdavis2@mail.nih.gov}{sdavis2@mail.nih.gov}
+Original author: Sean Davis \email{sdavis2@mail.nih.gov}
 }

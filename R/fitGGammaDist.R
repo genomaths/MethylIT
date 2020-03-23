@@ -4,7 +4,7 @@
 #' @description This function performs the nonlinear fit of GGamma CDF of a
 #'     variable x
 #' @details The script algorithm tries to fit the three-parameter GGamma CDF
-#' ("GGamma3P") or the four-parameter GGamma ("GGamma4P") using a modification
+#' ('GGamma3P') or the four-parameter GGamma ('GGamma4P') using a modification
 #' of Levenberg-Marquardt algorithm implemented in function 'nls.lm' from
 #' 'minpack.lm' package that is used to perform the nonlinear fit.
 #' Cross-validations for the nonlinear regressions (R.Cross.val) were performed
@@ -79,256 +79,280 @@
 #' @importFrom minpack.lm nlsLM nls.lm nls.lm.control
 #' @export
 fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
-                          sample.size=20, npoints=NULL, maxiter=1024,
-                          ftol=1e-12, ptol=1e-12, maxfev = 1e+5,
-                          nlms = FALSE, verbose=TRUE, ...) {
-  ind <- which(x > 0)
-  if (length(ind) > sample.size) {
-       x <- x[ind]
-       Fy <- ecdf(x)
-  } else stop("*** Sample size is lower than the set minimun size: ",
-              sample.size)
+    sample.size = 20, npoints = NULL, maxiter = 1024,
+    ftol = 1e-12, ptol = 1e-12, maxfev = 1e+05, nlms = FALSE,
+    verbose = TRUE, ...) {
+    ind <- which(x > 0)
+    if (length(ind) > sample.size) {
+        x <- x[ind]
+        Fy <- ecdf(x)
+    } else stop("*** Sample size is lower than the set minimun size: ",
+        sample.size)
 
-   if (location.par) {
-       formula <- as.formula("Y ~ pggamma(X, alpha, scale, mu, psi)")
-       getPreds <- function(par, q) pggamma(q, alpha = par[1], scale = par[2],
-                                         mu = par[3], psi = par[4])
-   } else {
-      formula <- as.formula("Y ~ pggamma(X, alpha, scale, mu = 0, psi)")
-      getPreds <- function(par, q) pggamma(q, alpha = par[1], scale = par[2],
-                                         psi = par[3])
-   }
+    if (location.par) {
+        formula <- as.formula("Y ~ pggamma(X, alpha, scale, mu, psi)")
+        getPreds <- function(par, q) pggamma(q, alpha = par[1],
+            scale = par[2], mu = par[3], psi = par[4])
+    } else {
+        formula <- as.formula("Y ~ pggamma(X, alpha, scale, mu = 0, psi)")
+        getPreds <- function(par, q) pggamma(q, alpha = par[1],
+            scale = par[2], psi = par[3])
+    }
 
-   optFun <- function(par, probfun, quantiles, prob, eval = FALSE) {
-       START <- as.list(par)
-       START$q <- quantiles
-       EVAL <- try(do.call(probfun, START), silent = TRUE)
-       if (inherits(EVAL, "try-error")) return(NA)
-       EVAL[is.nan(EVAL)] <- 0
-       RSS <- (prob - EVAL) ^ 2
-       if (eval) {
-           return(EVAL)
-       } else return(RSS)
-   }
+    optFun <- function(par, probfun, quantiles, prob,
+        eval = FALSE) {
+        START <- as.list(par)
+        START$q <- quantiles
+        EVAL <- try(do.call(probfun, START), silent = TRUE)
+        if (inherits(EVAL, "try-error"))
+            return(NA)
+        EVAL[is.nan(EVAL)] <- 0
+        RSS <- (prob - EVAL)^2
+        if (eval) {
+            return(EVAL)
+        } else return(RSS)
+    }
 
-   N <- length(x)
-   if (N > 10 ^ 6) npoints = 999999
+    N <- length(x)
+    if (N > 10^6)
+        npoints = 999999
 
-   if (!is.null(npoints) && npoints < N) {
-       DENS <- hist(x, breaks = npoints, plot = FALSE)
-       X <- DENS$mids
-       Y <- Fy(X)
-       probFun <- pggamma
-       N <- length(X)
+    if (!is.null(npoints) && npoints < N) {
+        DENS <- hist(x, breaks = npoints, plot = FALSE)
+        X <- DENS$mids
+        Y <- Fy(X)
+        probFun <- pggamma
+        N <- length(X)
 
-       if (verbose && location.par) {
-           message(paste0("*** Trying nonlinear fit to a generalized 4P Gamma ",
-                       "distribution model (summarized data: ",
-                       npoints," values)..."))
-       }
-       if (verbose && !location.par) {
-           message(paste0("*** Trying nonlinear fit to a generalized 3P Gamma ",
-                       "distribution model (summarized data: ", npoints,
-                       " values)..."))
-       }
-   } else {
-       if (verbose && location.par) {
-           message(paste0("*** Trying nonlinear fit to a generalized 4P Gamma ",
-                       "distribution model ", npoints," values..."))
-       }
-       if (verbose && !location.par) {
-           message(paste0("*** Trying nonlinear fit to a generalized 3P Gamma ",
-                     "distribution model ", npoints," values..."))
-       }
-   }
+        if (verbose && location.par) {
+            message(paste0("*** Trying nonlinear fit to a generalized 4P ",
+                "Gamma distribution model (summarized data: ",
+                npoints, " values)..."))
+        }
+        if (verbose && !location.par) {
+            message(paste0("*** Trying nonlinear fit to a generalized 3P ",
+                "Gamma distribution model (summarized data: ",
+                npoints, " values)..."))
+        }
+    } else {
+        if (verbose && location.par) {
+            message(paste0("*** Trying nonlinear fit to a generalized 4P ",
+                "Gamma distribution model ", npoints, " values..."))
+        }
+        if (verbose && !location.par) {
+            message(paste0("*** Trying nonlinear fit to a generalized 3P ",
+                "Gamma distribution model ", npoints, " values..."))
+        }
+    }
 
-   if (is.null(npoints)) {
-       X = x
-       Y = Fy(X)
-       probFun <- pggamma
-   }
+    if (is.null(npoints)) {
+        X = x
+        Y = Fy(X)
+        probFun <- pggamma
+    }
 
-   ## =============== starting parameter values =========== #
-   if (missing(parameter.values)) {
-       MEAN <- mean(X, na.rm = TRUE)
-       VAR <- var(X, na.rm = TRUE)
-       MIN <- min( X, na.rm = TRUE)
+    ## =============== starting parameter values =========== #
+    if (missing(parameter.values)) {
+        MEAN <- mean(X, na.rm = TRUE)
+        VAR <- var(X, na.rm = TRUE)
+        MIN <- min(X, na.rm = TRUE)
 
-       psi <- MEAN^2/VAR
-       scale <-  VAR/MEAN
-       alpha <- 1
-       if (location.par) {
-           mu <- MIN
-           starts <- c(alpha = alpha, scale = scale, mu = mu[1], psi = psi)
-       } else starts <- c(alpha = alpha, scale = scale, psi = psi)
-   } else {
-       alpha <- parameter.values$alpha
-       scale <- parameter.values$scale
-       psi <- parameter.values$psi
-       if (location.par) {
-           mu <- parameter.values$mu
-           starts <- c(alpha = alpha, scale = scale, mu = mu, psi = psi)
-       } else starts <- c(alpha = alpha, scale = scale, psi = psi)
-   }
+        psi <- MEAN^2/VAR
+        scale <- VAR/MEAN
+        alpha <- 1
+        if (location.par) {
+            mu <- MIN
+            starts <- c(alpha = alpha, scale = scale,
+                mu = mu[1], psi = psi)
+        } else starts <- c(alpha = alpha, scale = scale,
+            psi = psi)
+    } else {
+        alpha <- parameter.values$alpha
+        scale <- parameter.values$scale
+        psi <- parameter.values$psi
+        if (location.par) {
+            mu <- parameter.values$mu
+            starts <- c(alpha = alpha, scale = scale,
+                mu = mu, psi = psi)
+        } else starts <- c(alpha = alpha, scale = scale,
+            psi = psi)
+    }
 
-   ## ============ END starting parameter values ========== #
+    ## ============ END starting parameter values ========== #
 
-   ## ==================== Fitting models ================= #
-   FIT <- try(nls.lm(par = starts, fn = optFun, probfun = probFun,
-                   quantiles = X, prob = Y,
-                   control = nls.lm.control(maxiter = maxiter, ftol = ftol,
-                                           maxfev = maxfev, ptol = 1e-12)),
-               silent = TRUE)
-   if (inherits( FIT, "try-error") && location.par) {
-       starts <- c(alpha = alpha, scale = scale, psi = 1)
-       FIT <- try(nls.lm(par = starts, fn = optFun, probfun = probFun,
-                       quantiles = X, prob = Y,
-                       control = nls.lm.control(maxiter = maxiter, ftol = ftol,
-                                               maxfev = maxfev, ptol = 1e-12)),
-                   silent = TRUE)
-   }
-   if (inherits( FIT, "try-error") && location.par && probFun != dggamma) {
-       DENS <- hist(x, breaks = npoints, plot = FALSE, ...)
-       X <- DENS$mids
-       Y <- DENS$density
-       probFun <- dggamma
-       FIT <- try(nls.lm(par = starts, fn = optFun, probfun = probFun,
-                       quantiles = X, prob = Y,
-                       control = nls.lm.control(maxiter = maxiter, ftol = ftol,
-                                               maxfev = maxfev, ptol = 1e-12)),
-                   silent = TRUE)
-   }
-   if (inherits( FIT, "try-error") && !location.par && probFun != dggamma) {
-       starts <- c(alpha = alpha, scale = scale, psi = 1)
-       DENS <- hist(x, breaks = npoints, plot = FALSE, ...)
-       X <- DENS$mids
-       Y <- DENS$density
-       probFun <- dggamma
-       FIT <- try(nls.lm(par = starts, fn = optFun, probfun = probFun,
-                       quantiles = X, prob = Y,
-                       control = nls.lm.control(maxiter = maxiter, ftol = ftol,
-                                               maxfev = maxfev, ptol = 1e-12)),
-                   silent = TRUE)
-   }
+    ## ==================== Fitting models ================= #
+    FIT <- try(nls.lm(par = starts, fn = optFun, probfun = probFun,
+        quantiles = X, prob = Y, control = nls.lm.control(maxiter = maxiter,
+            ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
+        silent = TRUE)
+    if (inherits(FIT, "try-error") && location.par) {
+        starts <- c(alpha = alpha, scale = scale, psi = 1)
+        FIT <- try(nls.lm(par = starts, fn = optFun,
+            probfun = probFun, quantiles = X, prob = Y,
+            control = nls.lm.control(maxiter = maxiter,
+                ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
+            silent = TRUE)
+    }
+    if (inherits(FIT, "try-error") && location.par &&
+        probFun != dggamma) {
+        DENS <- hist(x, breaks = npoints, plot = FALSE,
+            ...)
+        X <- DENS$mids
+        Y <- DENS$density
+        probFun <- dggamma
+        FIT <- try(nls.lm(par = starts, fn = optFun,
+            probfun = probFun, quantiles = X, prob = Y,
+            control = nls.lm.control(maxiter = maxiter,
+                ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
+            silent = TRUE)
+    }
+    if (inherits(FIT, "try-error") && !location.par &&
+        probFun != dggamma) {
+        starts <- c(alpha = alpha, scale = scale, psi = 1)
+        DENS <- hist(x, breaks = npoints, plot = FALSE,
+            ...)
+        X <- DENS$mids
+        Y <- DENS$density
+        probFun <- dggamma
+        FIT <- try(nls.lm(par = starts, fn = optFun,
+            probfun = probFun, quantiles = X, prob = Y,
+            control = nls.lm.control(maxiter = maxiter,
+                ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
+            silent = TRUE)
+    }
 
-   if (!inherits( FIT, "try-error" )) {
-       ## **** R squares ****
-       Adj.R.Square <- (1 - (deviance(FIT) / ((N - length(coef(FIT))) *
-                                             var(Y, use="everything"))))
-       Adj.R.Square <- ifelse(is.na(Adj.R.Square) || Adj.R.Square < 0,
-                           0, Adj.R.Square)
+    if (!inherits(FIT, "try-error")) {
+        ## **** R squares ****
+        Adj.R.Square <- (1 - (deviance(FIT)/((N - length(coef(FIT))) *
+            var(Y, use = "everything"))))
+        Adj.R.Square <- ifelse(is.na(Adj.R.Square) ||
+            Adj.R.Square < 0, 0, Adj.R.Square)
 
-       ## Stein adjusted R square
-       if (length(coef(FIT)) > 3)
-             rho <- ((N - 1)/(N - 5)) * ((N - 2)/(N - 6)) * ((N + 1)/N)
-       else rho <- ((N - 1)/(N - 4)) * ((N - 2)/(N - 5)) * ((N + 1)/N)
-       rho <- 1 - rho * (1 - Adj.R.Square)
-       rho = ifelse( is.na( rho ) | rho < 0, 0, rho )
+        ## Stein adjusted R square
+        if (length(coef(FIT)) > 3)
+            rho <- ((N - 1)/(N - 5)) * ((N - 2)/(N - 6)) *
+                    ((N + 1)/N) else rho <- ((N - 1)/(N - 4)) *
+                    ((N - 2)/(N - 5)) * ((N + 1)/N)
+        rho <- 1 - rho * (1 - Adj.R.Square)
+        rho = ifelse(is.na(rho) | rho < 0, 0, rho)
 
-       ##--- Crossvalidation standard model for Nonlinear regression: x versus r
-       if (verbose) {
-           cat(paste("*** Performing nonlinear regression model ",
-                   "crossvalidation...\n" ))
-       }
-       set.seed(123)
+        ##--Crossvalidation standard model for Nonlinear regression: x versus r
+        if (verbose) {
+            cat(paste("*** Performing nonlinear regression model ",
+                "crossvalidation...\n"))
+        }
+        set.seed(123)
 
-       cros.ind.1 <- sample.int(N, size=round(N / 2))
-       cros.ind.2 <- setdiff(seq_len(N), cros.ind.1)
-       starts1 <- as.list(coef(FIT))
+        cros.ind.1 <- sample.int(N, size = round(N/2))
+        cros.ind.2 <- setdiff(seq_len(N), cros.ind.1)
+        starts1 <- as.list(coef(FIT))
 
-       FIT1 <- try(nls.lm(par=starts1, fn=optFun, probfun=probFun,
-                           quantiles=X[ cros.ind.1 ], prob=Y[cros.ind.1],
-                           control=nls.lm.control(maxiter=maxiter, ftol=ftol,
-                                               maxfev = maxfev, ptol = ptol)),
-                   silent = TRUE)
+        FIT1 <- try(nls.lm(par = starts1, fn = optFun,
+            probfun = probFun, quantiles = X[cros.ind.1],
+            prob = Y[cros.ind.1], control = nls.lm.control(maxiter = maxiter,
+                ftol = ftol, maxfev = maxfev, ptol = ptol)),
+            silent = TRUE)
 
-       if (inherits( FIT1, "try-error")) {
-           FIT1 <- try(nls.lm(par=starts, fn=optFun, probfun=probFun,
-                           quantiles=X[ cros.ind.1 ], prob=Y[cros.ind.1],
-                           control=nls.lm.control(maxiter=maxiter, ftol=ftol,
-                                               maxfev = maxfev, ptol = ptol)),
-                   silent = TRUE)
-       }
+        if (inherits(FIT1, "try-error")) {
+            FIT1 <- try(nls.lm(par = starts, fn = optFun,
+                            probfun = probFun, quantiles = X[cros.ind.1],
+                            prob = Y[cros.ind.1],
+                            control = nls.lm.control(maxiter = maxiter,
+                                                    ftol = ftol,
+                                                    maxfev = maxfev,
+                                                    ptol = ptol)),
+                        silent = TRUE)
+        }
 
-       FIT2 <- try(nls.lm(par=starts1, fn=optFun, probfun=probFun,
-                       quantiles=X[cros.ind.2], prob=Y[cros.ind.2],
-                       control=nls.lm.control(maxiter=maxiter, ftol = ftol,
-                                               maxfev = maxfev, ptol = ptol)),
-                   silent=TRUE)
+        FIT2 <- try(nls.lm(par = starts1, fn = optFun,
+                        probfun = probFun, quantiles = X[cros.ind.2],
+                        prob = Y[cros.ind.2],
+                        control = nls.lm.control(maxiter = maxiter,
+                                                ftol = ftol,
+                                                maxfev = maxfev, ptol = ptol)),
+                    silent = TRUE)
 
-       if (inherits( FIT2, "try-error")) {
-           FIT2 <- try(nls.lm(par=starts, fn=optFun, probfun=probFun,
-                           quantiles=X[ cros.ind.2 ], prob = Y[cros.ind.2],
-                           control=nls.lm.control(maxiter = maxiter, ftol=ftol,
-                                               maxfev = maxfev, ptol = ptol)),
-                   silent = TRUE)
-       }
+        if (inherits(FIT2, "try-error")) {
+            FIT2 <- try(nls.lm(par = starts, fn = optFun,
+                            probfun = probFun, quantiles = X[cros.ind.2],
+                            prob = Y[cros.ind.2],
+                            control = nls.lm.control(maxiter = maxiter,
+                                                    ftol = ftol,
+                                                    maxfev = maxfev,
+                                                    ptol = ptol)),
+                        silent = TRUE)
+        }
 
-       if (inherits(FIT1, "try-error") || inherits(FIT2, "try-error"))
-                       R.cross.FIT <- 0
-       else {
-           ## ---- prediction using model 1 & 2 ----
-           n <- length(x)
-           Y <- Fy(x)
-           cros.ind.1 <- sample.int(n, size = round(n / 2))
-           cros.ind.2 <- setdiff(seq_len(n), cros.ind.1)
+        if (inherits(FIT1, "try-error") || inherits(FIT2, "try-error"))
+            R.cross.FIT <- 0
+        else {
+            ## ---- prediction using model 1 & 2 ----
+            n <- length(x)
+            Y <- Fy(x)
+            cros.ind.1 <- sample.int(n, size = round(n/2))
+            cros.ind.2 <- setdiff(seq_len(n), cros.ind.1)
 
-           p.FIT1 <- getPreds(coef(FIT1), x[cros.ind.2])
-           p.FIT2 <- getPreds(coef(FIT2), x[cros.ind.1])
+            p.FIT1 <- getPreds(coef(FIT1), x[cros.ind.2])
+            p.FIT2 <- getPreds(coef(FIT2), x[cros.ind.1])
 
-           if (!all(is.na(p.FIT1)) && !all(is.na(p.FIT2))) {
-               R.FIT1 <- cor(p.FIT1, Y[cros.ind.2], use="complete.obs")
-               R.FIT2 <- cor(p.FIT2, Y[cros.ind.1], use="complete.obs")
-               R.cross.FIT <- (length(p.FIT1) * R.FIT1 + length(p.FIT2)* R.FIT2)
-               R.cross.FIT <- R.cross.FIT/(length(p.FIT1) + length(p.FIT2))
-           } else R.cross.FIT <- 0
-       }
-       res <- Y - getPreds(coef(FIT), x)
-       options(stringsAsFactors = FALSE)
+            if (!all(is.na(p.FIT1)) && !all(is.na(p.FIT2))) {
+                R.FIT1 <- cor(p.FIT1, Y[cros.ind.2], use = "complete.obs")
+                R.FIT2 <- cor(p.FIT2, Y[cros.ind.1], use = "complete.obs")
+                R.cross.FIT <- (length(p.FIT1) * R.FIT1 +
+                                    length(p.FIT2) * R.FIT2)
+                R.cross.FIT <- R.cross.FIT/(length(p.FIT1) +
+                                                length(p.FIT2))
+            } else R.cross.FIT <- 0
+        }
+        res <- Y - getPreds(coef(FIT), x)
+        options(stringsAsFactors = FALSE)
 
-       if (length( coef(FIT)) > 3) {
-           COV = try(vcov(FIT), silent = TRUE)
-           if (inherits(COV, "try-error")) COV = matrix(NA, nrow = 4, ncol = 4)
+        if (length(coef(FIT)) > 3) {
+            COV = try(vcov(FIT), silent = TRUE)
+            if (inherits(COV, "try-error"))
+                COV = matrix(NA, nrow = 4, ncol = 4)
 
-           stats <- data.frame(summary(FIT)$coefficients,
-                           Adj.R.Square=c( Adj.R.Square, "", "", ""),
-                           rho=c(rho, "", "", ""),
-                           R.Cross.val=c(R.cross.FIT, "", "", ""),
-                           DEV=c(deviance(FIT), "", "", "" ),
-                           AIC=c(AICmodel(FIT, residuals=res, np=4), "", "",""),
-                           BIC=c(BICmodel(FIT, residuals=res, np=4), "","", ""),
-                           COV=COV, n=c(N, n, n, n),
-                           model = c("GGamma4P", "","", ""),
-                           stringsAsFactors = FALSE)
-       }
-       else {
-           COV = try(vcov(FIT), silent = TRUE)
-           if (inherits(COV, "try-error")) COV = matrix(NA, nrow = 3, ncol = 3)
-           stats <- data.frame(summary(FIT)$coefficients,
-                           Adj.R.Square=c(Adj.R.Square, "", ""),
-                           rho=c(rho, "", ""),
-                           R.Cross.val=c(R.cross.FIT, "", ""),
-                           DEV=c(deviance(FIT), "", ""),
-                           AIC=c(AICmodel(FIT, residuals=res, np=3), "", ""),
-                           BIC=c(BICmodel(FIT, residuals=res, np=3), "", ""),
-                           COV=COV,
-                           COV.mu=c(NA, NA, NA),
-                           n=c(N, n, n),
-                           model = c("GGamma3P","", ""),
-                           stringsAsFactors = FALSE)
-       }
-   } else {
-       warning(paste("Data did not fit to the model.",
-                   "Returning empty coefficient table."))
-       stats <- data.frame(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
-                        NA, NA, NA, NA)
-   }
+            stats <- data.frame(summary(FIT)$coefficients,
+                                Adj.R.Square = c(Adj.R.Square, "", "", ""),
+                                rho = c(rho, "", "", ""),
+                                R.Cross.val = c(R.cross.FIT, "", "", ""),
+                                DEV = c(deviance(FIT), "", "", ""),
+                                AIC = c(AICmodel(FIT, residuals = res, np = 4),
+                                        "", "", ""),
+                                BIC = c(BICmodel(FIT, residuals = res, np = 4),
+                                        "", "", ""),
+                                COV = COV, n = c(N, n, n, n),
+                                model = c("GGamma4P", "", "", ""),
+                                stringsAsFactors = FALSE)
+        } else {
+            COV = try(vcov(FIT), silent = TRUE)
+            if (inherits(COV, "try-error")) COV = matrix(NA, nrow = 3, ncol = 3)
+            stats <- data.frame(summary(FIT)$coefficients,
+                                Adj.R.Square = c(Adj.R.Square, "", ""),
+                                rho = c(rho, "", ""),
+                                R.Cross.val = c(R.cross.FIT, "", ""),
+                                DEV = c(deviance(FIT), "", ""),
+                                AIC = c(AICmodel(FIT, residuals = res, np = 3),
+                                        "", ""),
+                                BIC = c(BICmodel(FIT, residuals = res, np = 3),
+                                        "", ""),
+                                COV = COV, COV.mu = c(NA, NA, NA),
+                                n = c(N, n, n), model = c("GGamma3P", "", ""),
+                                stringsAsFactors = FALSE)
+        }
+    } else {
+        warning(paste("Data did not fit to the model.",
+                    "Returning empty coefficient table."))
+        stats <- data.frame(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+                            NA, NA, NA, NA)
+    }
 
-   colnames(stats) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|))",
-                        "Adj.R.Square", "rho", "R.Cross.val", "DEV", "AIC",
-                        "BIC", "COV.alpha", "COV.scale", "COV.psi",
-                        "COV.mu", "N", "model")
-   if (nlms) stats <- list(stats, nlms = FIT)
-   return(stats)
+    colnames(stats) <- c("Estimate", "Std. Error",
+        "t value", "Pr(>|t|))", "Adj.R.Square", "rho",
+        "R.Cross.val", "DEV", "AIC", "BIC", "COV.alpha",
+        "COV.scale", "COV.psi", "COV.mu", "N", "model")
+    if (nlms)
+        stats <- list(stats, nlms = FIT)
+    return(stats)
 }
 

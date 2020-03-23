@@ -17,11 +17,11 @@ gofReport(
 )
 }
 \arguments{
-\item{HD}{An "InfDiv" object returned by function
+\item{HD}{An 'InfDiv' object returned by function
 \code{\link{estimateDivergence}}.}
 
 \item{model}{A character vector naming the models to fit. Default is
-model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"). See
+model = c('Weibull2P', 'Weibull3P', 'Gamma2P', 'Gamma3P'). See
 \code{\link{nonlinearFitDist}} for more options.}
 
 \item{column}{An integer number denoting the index of the GRanges column where
@@ -34,9 +34,9 @@ of methylation levels) is normally an output in the downstream MethylIT
 analysis. If 'absolute = TRUE', then TV is transformed into |TV|, which
 is an information divergence that can be fitted as well.}
 
-\item{output}{If output == "all", the table with the GoF statistics is
+\item{output}{If output == 'all', the table with the GoF statistics is
 returned in a list together with the best fitted model and the
-corresponding statistics. Default is "best.model"}
+corresponding statistics. Default is 'best.model'}
 
 \item{confl_model}{Logic. If TRUE, then the best model based on highest
 R.Cross.val is returned for those samples where the model(s) with lowest
@@ -51,7 +51,7 @@ at most how many child processes will be run simultaneously (see
 \item{...}{Further arguments to pass to \code{\link{nonlinearFitDist}}.}
 }
 \value{
-If 'output = "best.model"', a character vector with the name of the
+If 'output = 'best.model'', a character vector with the name of the
 best fitted model for each sample and model statistics, which can be used the
 next step to get the potential DMPs with function
 \code{\link{getPotentialDIMP}}. Otherwise, it will return a list with the
@@ -70,6 +70,12 @@ parameter value. For example,  scale = 0.0000000001 in 'GGamma3P' or in
 'Weibull2P' models. This last situation can result from the numerical
 algorithm used in the parameter estimation. The numerical algorithms for
 nonlinear fit estimation are not perfect!
+
+For distribution models that include a location parameter ('Weibull3P',
+'Gamma3P', and 'GGamma4P') there is an additional important constraint, which
+cannot be evaluated with 'AIC' or 'R.Cross.val': \eqn{\mu > 0}. That is, the
+information divergences are strictly positive magnitudes, therefore, any best
+model in terms of AIC with values \eqn{\mu < 0} are meaningless and rejected.
 }
 \description{
 In Methyl-IT,  the signal detection step requires for the
@@ -109,14 +115,17 @@ can ultimately lead to a post-hoc decision on which the best model is.
 \examples{
 ## Loading information divergence dataset
 data(HD)
+
 ## Subsetting object HD (for the sake of runnig a faster example)
 hd <- lapply(HD, function(x) x[seq_len(100)], keep.attr = TRUE)
+
 ## The GoF report
 dt <- gofReport(hd)
 
 ## To get the potential DMPs
 ps_dmp <- getPotentialDIMP(LR = hd, nlms = dt$nlms, div.col = 9L,
                             dist.name = dt$bestModel)
+
 }
 \references{
 \enumerate{

@@ -9,8 +9,8 @@
 #'
 #' @importFrom genefilter rowVars
 #' @keywords internal
-.getBaseMeansAndVariances <- function(counts, sizeFactors ) {
-   data.frame(baseMean=rowMeans(t(t(counts)/sizeFactors)),
-               baseVar=rowVars(t(t(counts)/sizeFactors)))
+.getBaseMeansAndVariances <- function(counts, sizeFactors) {
+    data.frame(baseMean = rowMeans(t(t(counts)/sizeFactors)), 
+        baseVar = rowVars(t(t(counts)/sizeFactors)))
 }
 

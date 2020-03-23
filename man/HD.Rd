@@ -4,7 +4,8 @@
 \name{HD}
 \alias{HD}
 \title{Simulated dataset of Hellinger divergences used in the examples}
-\format{HD is an object from class "InfDiv" carrying in the meta-columns the
+\format{
+HD is an object from class 'InfDiv' carrying in the meta-columns the
 following variables:
 \describe{
 \item{p1}{methylation level from the reference sample}
@@ -13,7 +14,8 @@ following variables:
 methylation levels)}
 \item{hdiv}{Hellinger divergence}
 }\preformatted{'HD' was obtained with function \code{\link{estimateDivergence}}.
-}}
+}
+}
 \usage{
 HD
 }

@@ -1,7 +1,6 @@
 destination: ~/methylit/
 url: https://genomaths.github.io/methylit/
 
-
 navbar:
   structure:
     left:

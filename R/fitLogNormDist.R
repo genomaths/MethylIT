@@ -70,160 +70,176 @@
 #' @export
 
 fitLogNormDist <- function(x, probability.x, parameter.values,
-                           summarized.data=FALSE, sample.size=20, npoints=NULL,
-                           maxiter=1024, ftol=1e-12, ptol=1e-12, maxfev = 1e+5,
-                           verbose=TRUE) {
-   ind <- which(x > 0)
-   if (length(ind) > sample.size) {
-       x <- x[ind]
-       if (missing(probability.x)) Fy <- ecdf(x)
-   } else stop("*** Sample size is lower than the set minimun size: ",
-               sample.size)
+    summarized.data = FALSE, sample.size = 20, npoints = NULL,
+    maxiter = 1024, ftol = 1e-12, ptol = 1e-12, maxfev = 1e+05,
+    verbose = TRUE) {
+    ind <- which(x > 0)
+    if (length(ind) > sample.size) {
+        x <- x[ind]
+        if (missing(probability.x))
+            Fy <- ecdf(x)
+    } else stop("*** Sample size is lower than the set minimun size: ",
+        sample.size)
 
-   getPreds <- function(par, q) plnorm(q, meanlog=par[1], sdlog=par[2])
+    getPreds <- function(par, q) plnorm(q, meanlog = par[1],
+        sdlog = par[2])
 
-   optFun <- function(par, probfun, quantiles, prob, eval = FALSE) {
-       START <- as.list(par)
-       START$q <- quantiles
-       EVAL <- try(do.call(probfun, START), silent = TRUE)
-       if (inherits(EVAL, "try-error")) return(NA)
-       EVAL[is.nan(EVAL)] <- 0
-       RSS <- (prob - EVAL) ^ 2
-       if (eval) {
-           return(EVAL)
-       } else return(RSS)
-   }
+    optFun <- function(par, probfun, quantiles, prob, eval = FALSE) {
+        START <- as.list(par)
+        START$q <- quantiles
+        EVAL <- try(do.call(probfun, START), silent = TRUE)
+        if (inherits(EVAL, "try-error"))
+            return(NA)
+        EVAL[is.nan(EVAL)] <- 0
+        RSS <- (prob - EVAL)^2
+        if (eval) {
+            return(EVAL)
+        } else return(RSS)
+    }
 
-   N <- length(x)
-   if (summarized.data && is.null(npoints)) {
-       npoints = min(10 ^ 6, N)
-   }
+    N <- length(x)
+    if (summarized.data && is.null(npoints)) {
+        npoints = min(10^6, N)
+    }
 
-   if (!is.null(npoints) && npoints < N) {
-       F0 <- estimateECDF(x, npoints = npoints)
-       X0 <- knots(F0)
-       pX0 <- F0(X0)
-       N <- length(X0)
+    if (!is.null(npoints) && npoints < N) {
+        F0 <- estimateECDF(x, npoints = npoints)
+        X0 <- knots(F0)
+        pX0 <- F0(X0)
+        N <- length(X0)
 
-       if (verbose && !is.null(npoints)) {
-           message(paste0("*** Trying nonlinear fit to a generalized 2P Gamma ",
-                       "distribution model (summarized data: ", npoints,
-                       " values)..."))
-       }
-   }
+        if (verbose && !is.null(npoints)) {
+            message(paste0("*** Trying nonlinear fit to a generalized 2P ",
+                "Gamma distribution model (summarized data: ",
+                npoints, " values)..."))
+        }
+    }
 
-   if (summarized.data) {X = X0; pX = pX0} else {X = x; pX = Fy(x)}
+    if (summarized.data) {
+        X = X0
+        pX = pX0
+    } else {
+        X = x
+        pX = Fy(x)
+    }
 
-   ## =============== starting parameter values =========== #
-   if (missing(parameter.values)) {
-       starts <- c(meanlog = mean( log1p( X ), na.rm = TRUE ),
-                   sdlog = sd(log1p( X ), na.rm = TRUE ) )
-   } else starts <- parameter.values
-   ## ============ END starting parameter values ========== #
+    ## =============== starting parameter values
+    ## =========== #
+    if (missing(parameter.values)) {
+        starts <- c(meanlog = mean(log1p(X), na.rm = TRUE),
+            sdlog = sd(log1p(X), na.rm = TRUE))
+    } else starts <- parameter.values
+    ## ============ END starting parameter values
+    ## ========== #
 
-   ## ==================== Fitting models ================= #
-   if (verbose)
-       message(paste0("*** Trying nonlinear fit to a Log-Normal Dist.",
-                   "distribution model ..."))
-   FIT <- try(nls.lm(par = starts, fn = optFun, probfun = plnorm,
-                   quantiles = X, prob = pX,
-                   control = nls.lm.control(maxiter = maxiter, ftol = ftol,
-                                           maxfev = maxfev, ptol = 1e-12)),
-               silent = TRUE)
+    ## ==================== Fitting models
+    ## ================= #
+    if (verbose)
+        message(paste0("*** Trying nonlinear fit to a Log-Normal Dist.",
+            "distribution model ..."))
+    FIT <- try(nls.lm(par = starts, fn = optFun, probfun = plnorm,
+        quantiles = X, prob = pX, control = nls.lm.control(maxiter = maxiter,
+            ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
+        silent = TRUE)
 
-   if (!inherits( FIT, "try-error" )) {
-       ## **** R squares ****
-       Adj.R.Square <- (1 - (deviance(FIT) / ((N - length(coef(FIT))) *
-                                               var(pX, use="everything"))))
-       Adj.R.Square <- ifelse(is.na(Adj.R.Square) || Adj.R.Square < 0,
-                           0, Adj.R.Square)
+    if (!inherits(FIT, "try-error")) {
+        ## **** R squares ****
+        Adj.R.Square <- (1 - (deviance(FIT)/((N - length(coef(FIT))) *
+            var(pX, use = "everything"))))
+        Adj.R.Square <- ifelse(is.na(Adj.R.Square) ||
+            Adj.R.Square < 0, 0, Adj.R.Square)
 
-       ## Stein adjusted R square
-       rho = (1 - ((N - 2) / (N - 3)) * ((N + 1) / (N)) * (1 - Adj.R.Square))
-       rho = ifelse( is.na( rho ) | rho < 0, 0, rho )
+        ## Stein adjusted R square
+        rho = (1 - ((N - 2)/(N - 3)) * ((N + 1)/(N)) *
+            (1 - Adj.R.Square))
+        rho = ifelse(is.na(rho) | rho < 0, 0, rho)
 
-       ##--- Crossvalidation standard model for Nonlinear regression: x versus r
-       if (verbose) {
-           cat(paste("*** Performing nonlinear regression model ",
-                   "crossvalidation...\n" ))
-       }
-       set.seed(123)
+        ##- Crossvalidation standard model for Nonlinear regression: x versus r
+        if (verbose) {
+            cat(paste("*** Performing nonlinear regression model ",
+                "crossvalidation...\n"))
+        }
+        set.seed(123)
 
-       cros.ind.1 <- sample.int(N, size=round(N / 2))
-       cros.ind.2 <- setdiff(seq_len(N), cros.ind.1)
-       starts1 <- as.list(coef(FIT))
+        cros.ind.1 <- sample.int(N, size = round(N/2))
+        cros.ind.2 <- setdiff(seq_len(N), cros.ind.1)
+        starts1 <- as.list(coef(FIT))
 
-       FIT1 <- try(nls.lm(par = starts1, fn = optFun, probfun = plnorm,
-                         quantiles=X[ cros.ind.1 ], prob=pX[cros.ind.1],
-                         control=nls.lm.control(maxiter=maxiter, ftol=ftol,
-                                                 maxfev = maxfev, ptol = ptol)),
-                   silent = TRUE)
-       if (inherits(FIT1, "try-error")) {
-           FIT1 <- try(nls.lm(par=starts, fn=optFun, probfun=plnorm,
-                           quantiles=X[ cros.ind.1 ], prob=pX[cros.ind.1],
-                           control=nls.lm.control(maxiter=maxiter, ftol=ftol,
-                                               maxfev = maxfev, ptol = ptol)),
-                       silent = TRUE)
-       }
+        FIT1 <- try(nls.lm(par = starts1, fn = optFun,
+            probfun = plnorm, quantiles = X[cros.ind.1],
+            prob = pX[cros.ind.1], control = nls.lm.control(maxiter = maxiter,
+                ftol = ftol, maxfev = maxfev, ptol = ptol)),
+            silent = TRUE)
+        if (inherits(FIT1, "try-error")) {
+            FIT1 <- try(nls.lm(par = starts, fn = optFun,
+                probfun = plnorm, quantiles = X[cros.ind.1],
+                prob = pX[cros.ind.1],
+                control = nls.lm.control(maxiter = maxiter, ftol = ftol,
+                                        maxfev = maxfev, ptol = ptol)),
+                silent = TRUE)
+        }
 
-       FIT2 <- try(nls.lm(par=starts1, fn=optFun, probfun=plnorm,
-                         quantiles=X[ cros.ind.2 ], prob=pX[cros.ind.2],
-                         control=nls.lm.control(maxiter=maxiter, ftol=ftol,
-                                               maxfev = maxfev, ptol = ptol)),
-                   silent = TRUE)
-       if (inherits( FIT2, "try-error")) {
-           starts <- c(meanlog = mean( log1p( X ), na.rm = TRUE ),
-                       sdlog = sd(log1p( X ), na.rm = TRUE ) )
-           FIT2 <- try(nls.lm(par=starts, fn=optFun, probfun=plnorm,
-                           quantiles=X[ cros.ind.2 ], prob=pX[cros.ind.2],
-                           control=nls.lm.control(maxiter=maxiter, ftol=ftol,
-                                               maxfev = maxfev, ptol = ptol)),
-                       silent = TRUE)
-       }
+        FIT2 <- try(nls.lm(par = starts1, fn = optFun,
+            probfun = plnorm, quantiles = X[cros.ind.2],
+            prob = pX[cros.ind.2], control = nls.lm.control(maxiter = maxiter,
+                ftol = ftol, maxfev = maxfev, ptol = ptol)),
+            silent = TRUE)
+        if (inherits(FIT2, "try-error")) {
+            starts <- c(meanlog = mean(log1p(X), na.rm = TRUE),
+                sdlog = sd(log1p(X), na.rm = TRUE))
+            FIT2 <- try(nls.lm(par = starts, fn = optFun,
+                probfun = plnorm, quantiles = X[cros.ind.2],
+                prob = pX[cros.ind.2],
+                control = nls.lm.control(maxiter = maxiter, ftol = ftol,
+                                        maxfev = maxfev, ptol = ptol)),
+                silent = TRUE)
+        }
 
-       if (inherits(FIT1, "try-error") && inherits(FIT2, "try-error"))
-           R.cross.FIT <- 0
-       else {
-           if (summarized.data) {
-               n <- length(x)
-               pX <- Fy(x)
-               cros.ind.1 <- sample.int(n, size = round(n / 2))
-               cros.ind.2 <- setdiff(seq_len(n), cros.ind.1)
-           }
-           n <- length(x)
+        if (inherits(FIT1, "try-error") && inherits(FIT2,
+            "try-error"))
+            R.cross.FIT <- 0 else {
+            if (summarized.data) {
+                n <- length(x)
+                pX <- Fy(x)
+                cros.ind.1 <- sample.int(n, size = round(n/2))
+                cros.ind.2 <- setdiff(seq_len(n), cros.ind.1)
+            }
+            n <- length(x)
 
-           ## prediction using model 1
-           p.FIT1 <- getPreds(coef(FIT1), x[cros.ind.2])
-           R.FIT1 <- cor(p.FIT1, pX[cros.ind.2], use="complete.obs")
-           ## prediction using model 2
-           p.FIT2 <- getPreds(coef(FIT2), x[cros.ind.1])
-           R.FIT2 <- cor(p.FIT2, pX[cros.ind.1], use="complete.obs")
+            ## prediction using model 1
+            p.FIT1 <- getPreds(coef(FIT1), x[cros.ind.2])
+            R.FIT1 <- cor(p.FIT1, pX[cros.ind.2], use = "complete.obs")
+            ## prediction using model 2
+            p.FIT2 <- getPreds(coef(FIT2), x[cros.ind.1])
+            R.FIT2 <- cor(p.FIT2, pX[cros.ind.1], use = "complete.obs")
 
-           R.cross.FIT <- (length(p.FIT1) * R.FIT1 + length(p.FIT2) * R.FIT2) /
-                           (length(p.FIT1) + length(p.FIT2))
-       }
-       res <- pX - getPreds(coef(FIT), x)
+            R.cross.FIT <- (length(p.FIT1) * R.FIT1 +
+                length(p.FIT2) * R.FIT2)/(length(p.FIT1) +
+                length(p.FIT2))
+        }
+        res <- pX - getPreds(coef(FIT), x)
 
-       COV = try(vcov(FIT), silent = TRUE)
-       if (inherits(COV, "try-error")) COV = matrix(NA, nrow = 2, ncol = 2)
-       stats <- data.frame(summary(FIT)$coefficients,
-                           Adj.R.Square=c(Adj.R.Square, ""),
-                           rho=c(rho, ""),
-                           R.Cross.val=c(R.cross.FIT, ""),
-                           DEV=c(deviance(FIT), ""),
-                           AIC=c(AICmodel(FIT, residuals=res, np=3), ""),
-                           BIC=c(BICmodel(FIT, residuals=res, np=3), ""),
-                           COV=COV,
-                           n=c(N - 2, n - 2))
-   } else {
-       warning(paste("Data did not fit to the model.",
-                   "Returning empty coefficient table."))
-       stats <- data.frame(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
-   }
+        COV = try(vcov(FIT), silent = TRUE)
+        if (inherits(COV, "try-error"))
+            COV = matrix(NA, nrow = 2, ncol = 2)
+        stats <- data.frame(summary(FIT)$coefficients,
+            Adj.R.Square = c(Adj.R.Square, ""), rho = c(rho,
+                ""), R.Cross.val = c(R.cross.FIT, ""),
+            DEV = c(deviance(FIT), ""), AIC = c(AICmodel(FIT,
+                residuals = res, np = 3), ""), BIC = c(BICmodel(FIT,
+                residuals = res, np = 3), ""), COV = COV,
+            n = c(N - 2, n - 2))
+    } else {
+        warning(paste("Data did not fit to the model.",
+            "Returning empty coefficient table."))
+        stats <- data.frame(NA, NA, NA, NA, NA, NA,
+            NA, NA, NA, NA, NA, NA, NA)
+    }
 
-   colnames(stats) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|))",
-                       "Adj.R.Square", "rho", "R.Cross.val", "DEV", "AIC",
-                       "BIC", "COV.mean", "COV.sd", "df")
-   return(stats)
+    colnames(stats) <- c("Estimate", "Std. Error",
+        "t value", "Pr(>|t|))", "Adj.R.Square", "rho",
+        "R.Cross.val", "DEV", "AIC", "BIC", "COV.mean",
+        "COV.sd", "df")
+    return(stats)
 }
 
