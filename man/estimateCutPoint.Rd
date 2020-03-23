@@ -6,27 +6,27 @@
 from the control}
 \usage{
 estimateCutPoint(
-    LR,
-    control.names,
-    treatment.names,
-    simple = TRUE,
-    column = c(hdiv = TRUE, TV = TRUE, bay.TV = FALSE, wprob = TRUE, pos = TRUE),
-    classifier1 = c("logistic", "pca.logistic", "lda", "qda", "pca.lda", "pca.qda"),
-    classifier2 = NULL,
-    tv.cut = 0.25,
-    tv.col = NULL,
-    div.col = NULL,
-    clas.perf = FALSE,
-    post.cut = 0.5,
-    prop = 0.6,
-    n.pc = 1,
-    interaction = NULL,
-    cut.values = NULL,
-    stat = 1,
-    cutp_data = FALSE,
-    num.cores = 1L,
-    tasks = 0L,
-    ...
+  LR,
+  control.names,
+  treatment.names,
+  simple = TRUE,
+  column = c(hdiv = TRUE, TV = TRUE, bay.TV = FALSE, wprob = TRUE, pos = TRUE),
+  classifier1 = c("logistic", "pca.logistic", "lda", "qda", "pca.lda", "pca.qda"),
+  classifier2 = NULL,
+  tv.cut = 0.25,
+  tv.col = NULL,
+  div.col = NULL,
+  clas.perf = FALSE,
+  post.cut = 0.5,
+  prop = 0.6,
+  n.pc = 1,
+  interaction = NULL,
+  cut.values = NULL,
+  stat = 1,
+  cutp_data = FALSE,
+  num.cores = 1L,
+  tasks = 0L,
+  ...
 )
 }
 \arguments{
@@ -196,9 +196,9 @@ model can be used for predictions in further analyses with function
 \code{\link{predictDIMPclass}}.
 }
 \examples{
-## Get a dataset of potential signals and the estimated cutpoint from the
-## package and performs cutpoint estimation
-data(PS, package = 'MethylIT')
+## Get a dataset of potential signals and the estimates cutpoint
+## from the package and performs cutpoint estimation
+data(PS)
 cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
                             column = c(hdiv = TRUE, TV = TRUE,
                                         wprob = TRUE, pos = TRUE),

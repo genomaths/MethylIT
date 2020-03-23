@@ -45,49 +45,49 @@ vignette: >
 }
 
 .tocify-subheader .tocify-item {
-    font-size: 0.80em;
+    /* font-size: 0.80em; */ 
     padding-left: 25px;
     text-indent: 0;
 }
 
 .tocify-header .tocify-item {
-    font-size: 0.85em;
+    /* font-size: 0.85em; */ 
     padding-left: 20px;
     text-indent: 0;
 }
 
 body{ /* Normal  */
-    font-size: 18px;
+    /* font-size: 18px; */
     font-family: "Times New Roman", Times, serif;
     text-align: justify
 }
 td {  /* Table  */
-    font-size: 8px;
+    /* font-size: 8px; */
 }
 
 h1.title {
-    font-size: 38px;
+    /* font-size: 38px; */
     font-family: "Times New Roman", Times, serif;
     color: DarkRed;
     .subTitle {
-        font-size: 24px;
+        /* font-size: 24px; */
         font-family: "Times New Roman", Times, serif;
         color: DarkRed;
     }
 }
 
 h1 { /* Header 1 */
-    font-size: 28px;
+    /* font-size: 28px; */
     font-family: "Times New Roman", Times, serif;
     color: DarkBlue;
 }
 h2 { /* Header 2 */
-    font-size: 22px;
+    /* font-size: 22px; */
     color: DarkBlue;
     font-family: "Times New Roman", Times, serif;
 }
 h3 { /* Header 3 */
-    font-size: 18px;
+    /* font-size: 18px; */
     color: DarkBlue;
     font-family: "Times New Roman", Times, serif;
 }
