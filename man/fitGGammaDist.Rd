@@ -5,18 +5,18 @@
 \title{Nonlinear fit of Generalized Gamma CDF (GGamma)}
 \usage{
 fitGGammaDist(
-    x,
-    parameter.values,
-    location.par = FALSE,
-    sample.size = 20,
-    npoints = NULL,
-    maxiter = 1024,
-    ftol = 1e-12,
-    ptol = 1e-12,
-    maxfev = 1e+05,
-    nlms = FALSE,
-    verbose = TRUE,
-    ...
+  x,
+  parameter.values,
+  location.par = FALSE,
+  sample.size = 20,
+  npoints = NULL,
+  maxiter = 1024,
+  ftol = 1e-12,
+  ptol = 1e-12,
+  maxfev = 1e+05,
+  nlms = FALSE,
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{

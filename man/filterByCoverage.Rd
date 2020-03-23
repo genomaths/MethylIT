@@ -5,12 +5,12 @@
 \title{Filter methylation counts by coverage}
 \usage{
 filterByCoverage(
-    x,
-    min.coverage = 4,
-    max.coverage = Inf,
-    percentile = 0.999,
-    col.names = c(coverage = NULL, mC = NULL, uC = NULL),
-    verbose = TRUE
+  x,
+  min.coverage = 4,
+  max.coverage = Inf,
+  percentile = 0.999,
+  col.names = c(coverage = NULL, mC = NULL, uC = NULL),
+  verbose = TRUE
 )
 }
 \arguments{

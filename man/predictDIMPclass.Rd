@@ -5,11 +5,11 @@
 \title{Predict DIMP class}
 \usage{
 predictDIMPclass(
-    LR,
-    model,
-    conf.matrix = FALSE,
-    control.names = NULL,
-    treatment.names = NULL
+  LR,
+  model,
+  conf.matrix = FALSE,
+  control.names = NULL,
+  treatment.names = NULL
 )
 }
 \arguments{

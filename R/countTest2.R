@@ -72,17 +72,20 @@
 #' ## A GRanges object with the count matrix in the metacolumns is created
 #' countData <- matrix(sample.int(200, 500, replace = TRUE), ncol = 4)
 #' colnames(countData) <- c('A1','A2','B1','B2')
+#'
 #' start <- seq(1, 25e4, 2000)
 #' end <- start + 1000
 #' chr <- c(rep('chr1', 70), rep('chr2', 55))
 #' GR <- GRanges(seqnames = chr, IRanges(start = start, end = end))
 #' mcols(GR) <- countData
+#'
 #' ## Gene IDs
 #' names(GR) <- paste0('gene', 1:length(GR))
 #'
 #' ## An experiment design is set.
 #' colData <- data.frame(condition = factor(c('A','A','B','B')),
-#' c('A1','A2','B1','B2'), row.names = 2)
+#'                     c('A1','A2','B1','B2'), row.names = 2)
+#'
 #' ## A RangedGlmDataSet is created
 #' ds <- glmDataSet(GR = GR, colData = colData)
 #'

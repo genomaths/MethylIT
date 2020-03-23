@@ -1,53 +1,53 @@
 ---
 title: "Example of Methylome Analysis with MethylIT using Cancer Datasets"
 subtitle: <h1>A [Methyl-IT](https://github.com/genomaths/MethylIT) user guide. 
-            A guide for users</h>
-            author: |
-            | Robersy Sanchez$^1$
-            | rus547@psu.edu
-            |
-            | Sally Mackenzie$^{1,2}$
-            | sam795@psu.edu
-            |
-            | $^1$Department of Biology. 
-            | Pennsylvania State University, University Park, PA 16802
-            |
-            | $^2$Department of Plant Science. 
-            | Pennsylvania State University, University Park, PA 16802
-            date: "`r format(Sys.time(), '%d %B %Y')`"
+           A guide for users</h>
+author: |
+ | Robersy Sanchez$^1$
+ | rus547@psu.edu
+ |
+ | Sally Mackenzie$^{1,2}$
+ | sam795@psu.edu
+ |
+ | $^1$Department of Biology. 
+ | Pennsylvania State University, University Park, PA 16802
+ |
+ | $^2$Department of Plant Science. 
+ | Pennsylvania State University, University Park, PA 16802
+date: "`r format(Sys.time(), '%d %B %Y')`"
 fontsize: 11pt
 fontfamily: "serif"
 bibliography: bibliography.bib
 output:
-    rmarkdown::html_document: 
-        toc: true
-        toc_depth: 3
-        toc_float:
-        collapsed: false
-        smooth_scroll: false
-        number_sections: true
-        highlight: tango
-        theme: united
-        geometry: margin=1in
-        df_print: paged
-        mathjax: local
-        self_contained: false
-        keep_md: yes
+  rmarkdown::html_document: 
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    number_sections: true
+    highlight: tango
+    theme: united
+    geometry: margin=1in
+    df_print: paged
+    mathjax: local
+    self_contained: false
+    keep_md: yes
 vignette: >
   %\VignetteIndexEntry{Cancer Example}
   %\VignetteEngine{knitr::knitr}
   \usepackage[utf8]{inputenc}
   
 abstract: |
-    An example of methylation analysis with Methyl-IT, a novel methylome
-    analysis procedure based on a signal-detection and machine-learning
-    approach, is provided here. Methylation analysis involves a signal detection
-    problem, and the method was designed to discriminate methylation regulatory
-    signal from background noise induced by thermal fluctuations. Methyl-IT
-    enhances the resolution of genome methylation behavior to reveal
-    network-associated responses, offering resolution of gene pathway influences
-    not attainable with previous methods. Herein, an example of MethylIT
-    application to the analysis of breast cancer methylomes is presented.
+  An example of methylation analysis with Methyl-IT, a novel methylome analysis
+  procedure based on a signal-detection and machine-learning approach, is
+  provided here. Methylation analysis involves a signal detection problem, and
+  the method was designed to discriminate methylation regulatory signal from
+  background noise induced by thermal fluctuations. Methyl-IT enhances the
+  resolution of genome methylation behavior to reveal network-associated
+  responses, offering resolution of gene pathway influences not attainable with
+  previous methods. Herein, an example of MethylIT application to the analysis
+  of breast cancer methylomes is presented.
 ---
 
 
@@ -62,35 +62,35 @@ abstract: |
 }
 
 .tocify-subheader .tocify-item {
-    font-size: 0.80em;
-    padding-left: 25px;
-    text-indent: 0;
+  font-size: 0.80em;
+  padding-left: 25px;
+  text-indent: 0;
 }
 
 .tocify-header .tocify-item {
-    font-size: 0.85em;
-    padding-left: 20px;
-    text-indent: 0;
+  font-size: 0.85em;
+  padding-left: 20px;
+  text-indent: 0;
 }
 
 body{ /* Normal  */
       font-size: 18px;
       font-family: "Times New Roman", Times, serif;
       text-align: justify
-}
+  }
 td {  /* Table  */
-    font-size: 8px;
+  font-size: 8px;
 }
 
 h1.title {
-    font-size: 38px;
-    font-family: "Times New Roman", Times, serif;
-    color: DarkRed;
-    .subTitle {
-        font-size: 24px;
-        font-family: "Times New Roman", Times, serif;
-        color: DarkRed;
-    }
+  font-size: 38px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  .subTitle {
+  font-size: 24px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  }
 }
 
 h1 { /* Header 1 */
@@ -175,7 +175,7 @@ esc.files = getGEOSuppFiles(GEO = c("GSM2041690", "GSM2041691", "GSM2041692"),
                             verbose = FALSE)
 # Breast tissues (normal, cancer, metastasis)
 cancer.files = getGEOSuppFiles(GEO = c("GSM1279517", "GSM1279514",
-                                        "GSM1279513"), verbose = FALSE)
+                                       "GSM1279513"), verbose = FALSE)
 
 ```
 
@@ -218,9 +218,9 @@ LR = readCounts2GRangesList(filenames = cancer.files,
                             chromosome.names = "chr13", verbose = FALSE)
 ```
 
-In real data analysis, a bigger sample size must be used. For the purpose of
-this example, to illustrate the application of methylation analysis with
-Methyl-IT, we will just add an artificial normal sample.
+In real data analysis, a bigger sample size must be used. For the purpose of this
+example, to illustrate the application of methylation analysis with Methyl-IT,
+we will just add an artificial normal sample.
 
 ```{r virtual samples}
 LR$Breast_normal1 <- poolFromGRlist(c(ref[1], LR$Breast_normal,

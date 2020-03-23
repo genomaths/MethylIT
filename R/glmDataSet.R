@@ -126,8 +126,7 @@ glmDataSet <- function(GR = NULL, counts = NULL, colData = NULL) {
     return(x)
 }
 
-### ========================== Auxiliary function
-### ============================ #
+### ==================== Auxiliary function ========================== #
 
 
 #' @rdname glmDataSet

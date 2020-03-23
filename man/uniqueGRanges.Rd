@@ -5,20 +5,20 @@
 \title{Unique genomic ranges from a list of GRanges objects}
 \usage{
 uniqueGRanges(
-    ListOfGranges,
-    ncols = NULL,
-    columns = NULL,
-    chromosomes = NULL,
-    maxgap = -1L,
-    minoverlap = 1L,
-    missing = 0,
-    type = c("any", "start", "end", "within", "equal"),
-    select = c("all", "first", "last", "arbitrary"),
-    ignore.strand = FALSE,
-    keep.strand = !ignore.strand,
-    num.cores = 1,
-    tasks = 0L,
-    verbose = TRUE
+  ListOfGranges,
+  ncols = NULL,
+  columns = NULL,
+  chromosomes = NULL,
+  maxgap = -1L,
+  minoverlap = 1L,
+  missing = 0,
+  type = c("any", "start", "end", "within", "equal"),
+  select = c("all", "first", "last", "arbitrary"),
+  ignore.strand = FALSE,
+  keep.strand = !ignore.strand,
+  num.cores = 1,
+  tasks = 0L,
+  verbose = TRUE
 )
 }
 \arguments{

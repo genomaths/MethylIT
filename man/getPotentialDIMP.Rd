@@ -5,19 +5,19 @@
 \title{Potential methylation signal}
 \usage{
 getPotentialDIMP(
-    LR,
-    nlms = NULL,
-    div.col,
-    dist.name = "Weibull2P",
-    absolute = FALSE,
-    alpha = 0.05,
-    pval.col = NULL,
-    tv.col = NULL,
-    tv.cut = NULL,
-    min.coverage = NULL,
-    hdiv.col = NULL,
-    hdiv.cut = NULL,
-    pAdjustMethod = NULL
+  LR,
+  nlms = NULL,
+  div.col,
+  dist.name = "Weibull2P",
+  absolute = FALSE,
+  alpha = 0.05,
+  pval.col = NULL,
+  tv.col = NULL,
+  tv.cut = NULL,
+  min.coverage = NULL,
+  hdiv.col = NULL,
+  hdiv.cut = NULL,
+  pAdjustMethod = NULL
 )
 }
 \arguments{

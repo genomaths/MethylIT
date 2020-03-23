@@ -173,12 +173,13 @@
 #' ## The read count data are created
 #' num.samples <- 250
 #' x <- data.frame(chr = 'chr1', start = 1:num.samples,
-#' end = 1:num.samples,strand = '*',
-#' mC = rnbinom(size = num.samples, mu = 4,
-#' n = 500), uC = rnbinom(size = num.samples, mu = 4, n = 500))
+#'                 end = 1:num.samples,strand = '*',
+#'                 mC = rnbinom(size = num.samples, mu = 4, n = 500),
+#'                 uC = rnbinom(size = num.samples, mu = 4, n = 500))
 #'
 #' y <- data.frame(chr = 'chr1', start = 1:num.samples, end = 1:num.samples,
-#' strand = '*', mC = rnbinom(size = num.samples, mu = 4, n = 500),
+#'                 strand = '*', mC = rnbinom(size = num.samples,
+#'                 mu = 4, n = 500),
 #' uC = rnbinom(size = num.samples, mu = 4, n = 500))
 #'
 #' x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
@@ -186,9 +187,10 @@
 #' hd <- estimateDivergence(ref = x, indiv = list(y), JD = TRUE,
 #' verbose = FALSE)[[1]]
 #'
-#' ## Keep in mind that Hellinger and J divergences are, in general, correlated!
+#' ## Keep in mind that Hellinger and J divergences are, in general,
+#' ## correlated
 #' cor.test(x = as.numeric(hd$hdiv), y = as.numeric(hd$jdiv),
-#' method = 'kendall')
+#'         method = 'kendall')
 #'
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom GenomicRanges GRanges GRangesList

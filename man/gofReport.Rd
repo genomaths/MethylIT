@@ -5,15 +5,15 @@
 \title{Report the Best Fitted Probability Distribution Model}
 \usage{
 gofReport(
-    HD,
-    model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"),
-    column = 9,
-    absolute = FALSE,
-    output = c("best.model", "all"),
-    confl_model = FALSE,
-    num.cores = 1L,
-    verbose = FALSE,
-    ...
+  HD,
+  model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"),
+  column = 9,
+  absolute = FALSE,
+  output = c("best.model", "all"),
+  confl_model = FALSE,
+  num.cores = 1L,
+  verbose = FALSE,
+  ...
 )
 }
 \arguments{
@@ -115,8 +115,10 @@ can ultimately lead to a post-hoc decision on which the best model is.
 \examples{
 ## Loading information divergence dataset
 data(HD)
+
 ## Subsetting object HD (for the sake of runnig a faster example)
 hd <- lapply(HD, function(x) x[seq_len(100)], keep.attr = TRUE)
+
 ## The GoF report
 dt <- gofReport(hd)
 

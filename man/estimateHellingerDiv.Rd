@@ -22,10 +22,10 @@ Given a the methylation levels of two individual, the function
 computes the information divergence between methylation levels.
 }
 \details{
-Each methylation level \eqn{p_ij} for indiviadula \eqn{i} at
+The methylation level \eqn{p_ij} for an individual \eqn{i} at
 cytosine site \eqn{j} corresponds to a probability vector \eqn{p^ij = (p_ij,
 1 - p_ij)}. Then, the information divergence between methylation levels
-\eqn{p^1j} and \eqn{p^2j} from indivudals 1 and 2 at site \eqn{j} is the
+\eqn{p^1j} and \eqn{p^2j} from individuals 1 and 2 at site \eqn{j} is the
 divergence between the vectors \eqn{p^1j = (p_1j, 1 - p_1j)} and \eqn{p^2j =
 (p_2j, 1 - p_2j)}. If the vector of coverage is supplied, then the
 information divergence is estimated according to the formula:

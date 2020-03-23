@@ -5,23 +5,23 @@
 \title{Information Divergences of Methylation Levels}
 \usage{
 estimateDivergence(
-    ref,
-    indiv,
-    Bayesian = FALSE,
-    columns = NULL,
-    min.coverage = 4,
-    min.meth = 4,
-    min.umeth = 0,
-    min.sitecov = 4,
-    high.coverage = NULL,
-    percentile = 0.999,
-    JD = FALSE,
-    num.cores = 1L,
-    tasks = 0L,
-    meth.level = FALSE,
-    logbase = 2,
-    verbose = TRUE,
-    ...
+  ref,
+  indiv,
+  Bayesian = FALSE,
+  columns = NULL,
+  min.coverage = 4,
+  min.meth = 4,
+  min.umeth = 0,
+  min.sitecov = 4,
+  high.coverage = NULL,
+  percentile = 0.999,
+  JD = FALSE,
+  num.cores = 1L,
+  tasks = 0L,
+  meth.level = FALSE,
+  logbase = 2,
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
@@ -206,12 +206,13 @@ called by 'estimateDivergence').
 ## The read count data are created
 num.samples <- 250
 x <- data.frame(chr = 'chr1', start = 1:num.samples,
-end = 1:num.samples,strand = '*',
-mC = rnbinom(size = num.samples, mu = 4,
-n = 500), uC = rnbinom(size = num.samples, mu = 4, n = 500))
+                end = 1:num.samples,strand = '*',
+                mC = rnbinom(size = num.samples, mu = 4, n = 500),
+                uC = rnbinom(size = num.samples, mu = 4, n = 500))
 
 y <- data.frame(chr = 'chr1', start = 1:num.samples, end = 1:num.samples,
-strand = '*', mC = rnbinom(size = num.samples, mu = 4, n = 500),
+                strand = '*', mC = rnbinom(size = num.samples,
+                mu = 4, n = 500),
 uC = rnbinom(size = num.samples, mu = 4, n = 500))
 
 x <- makeGRangesFromDataFrame(x, keep.extra.columns = TRUE)
@@ -219,9 +220,10 @@ y <- makeGRangesFromDataFrame(y, keep.extra.columns = TRUE)
 hd <- estimateDivergence(ref = x, indiv = list(y), JD = TRUE,
 verbose = FALSE)[[1]]
 
-## Keep in mind that Hellinger and J divergences are, in general, correlated!
+## Keep in mind that Hellinger and J divergences are, in general,
+## correlated
 cor.test(x = as.numeric(hd$hdiv), y = as.numeric(hd$jdiv),
-method = 'kendall')
+        method = 'kendall')
 
 }
 \references{

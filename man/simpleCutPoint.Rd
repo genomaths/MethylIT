@@ -5,21 +5,21 @@
 \title{Simple Cutpoint estimation}
 \usage{
 simpleCutPoint(
-    LR,
-    control.names,
-    treatment.names,
-    column,
-    div.col,
-    tv.col = NULL,
-    tv.cut,
-    clas.perf,
-    classifier,
-    n.pc,
-    prop,
-    cutp_data = FALSE,
-    num.cores,
-    tasks,
-    ...
+  LR,
+  control.names,
+  treatment.names,
+  column,
+  div.col,
+  tv.col = NULL,
+  tv.cut,
+  clas.perf,
+  classifier,
+  n.pc,
+  prop,
+  cutp_data = FALSE,
+  num.cores,
+  tasks,
+  ...
 )
 }
 \arguments{
@@ -44,7 +44,7 @@ Youden Index.
 This function is called by function \code{\link{estimateCutPoint}}.
 }
 \examples{
-data(PS, package = 'MethylIT')
+data(PS)
 
 cutpoint = simpleCutPoint(LR = PS,
                             column = c(hdiv = TRUE, TV = TRUE,
@@ -54,6 +54,6 @@ cutpoint = simpleCutPoint(LR = PS,
                             treatment.names = c('T1', 'T2', 'T3'),
                             tv.cut = 0.5, clas.perf = TRUE, prop = 0.6,
                             div.col = 9L)
-
+cutpoint$testSetPerformance
 }
 \keyword{internal}

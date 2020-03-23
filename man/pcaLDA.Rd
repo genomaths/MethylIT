@@ -7,22 +7,22 @@
 (PCA)}
 \usage{
 pcaLDA(
-    formula = NULL,
-    data = NULL,
-    grouping = NULL,
-    n.pc = 1,
-    scale = FALSE,
-    center = FALSE,
-    tol = 1e-04,
-    method = "moment",
-    max.pc = NULL
+  formula = NULL,
+  data = NULL,
+  grouping = NULL,
+  n.pc = 1,
+  scale = FALSE,
+  center = FALSE,
+  tol = 1e-04,
+  method = "moment",
+  max.pc = NULL
 )
 
 \method{predict}{pcaLDA}(
-    object,
-    newdata,
-    type = c("lda.pred", "class", "posterior", "scores", "pca.ind.coord", "all"),
-    ...
+  object,
+  newdata,
+  type = c("lda.pred", "class", "posterior", "scores", "pca.ind.coord", "all"),
+  ...
 )
 }
 \arguments{

@@ -22,7 +22,7 @@
 #'  full path of the resulting downloaded files and the records in the
 #'  data.frame the output of file.info for each downloaded file.
 #' @examples
-#' ## Download supplementary files from GEO data set and store 'fullpath/name'
+#' ## Download supplementary files from GEO data set and store fullpath/name
 #' ## in variable filename. The parameter 'pattern' permits us to download only
 #' ## the specified filesCG, in this case, CG and CHG methylation contexts.
 #'
@@ -37,7 +37,7 @@
 #'
 #' @export
 #'
-#' @author Original author: Sean Davis <sdavis2@mail.nih.gov>
+#' @author Original author: Sean Davis \email{sdavis2@mail.nih.gov}
 getGEOSuppFiles <- function(GEO, makeDirectory = FALSE,
     baseDir = getwd(), pattern = NULL, verbose = TRUE) {
 

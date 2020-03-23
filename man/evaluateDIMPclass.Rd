@@ -5,23 +5,23 @@
 \title{Evaluate DMPs Classification}
 \usage{
 evaluateDIMPclass(
-    LR,
-    control.names,
-    treatment.names,
-    column = c(hdiv = FALSE, TV = FALSE, bay.TV = FALSE, wprob = FALSE, pos = FALSE),
-    classifier = c("logistic", "pca.logistic", "lda", "qda", "pca.lda", "pca.qda"),
-    pval.col = NULL,
-    n.pc = 1,
-    center = FALSE,
-    scale = FALSE,
-    interaction = NULL,
-    output = "conf.mat",
-    prop = 0.6,
-    num.boot = 100,
-    num.cores = 1L,
-    tasks = 0L,
-    seed = 1234,
-    verbose = FALSE
+  LR,
+  control.names,
+  treatment.names,
+  column = c(hdiv = FALSE, TV = FALSE, bay.TV = FALSE, wprob = FALSE, pos = FALSE),
+  classifier = c("logistic", "pca.logistic", "lda", "qda", "pca.lda", "pca.qda"),
+  pval.col = NULL,
+  n.pc = 1,
+  center = FALSE,
+  scale = FALSE,
+  interaction = NULL,
+  output = "conf.mat",
+  prop = 0.6,
+  num.boot = 100,
+  num.cores = 1L,
+  tasks = 0L,
+  seed = 1234,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -142,14 +142,16 @@ data(cutpoint, PS, package = 'MethylIT')
 DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
 tv.cut = 0.68)
 
-## Classification of DMPs into two clases: DMPS from control and DMPs from
-## treatment samples and evaluation of the classifier performance (for more
-## details see ?evaluateDIMPclass).
+## Classification of DMPs into two clases: DMPS from control and DMPs
+## from treatment samples and evaluation of the classifier performance
+## (for more details see ?evaluateDIMPclass).
 perf <- evaluateDIMPclass(LR = DMPs,
-column = c(hdiv = TRUE, TV = TRUE, wprob = TRUE, pos = TRUE),
-classifier = 'lda', n.pc = 4L, control.names =  c('C1', 'C2', 'C3'),
-treatment.names = c('T1', 'T2', 'T3'), center = TRUE, scale = TRUE,
-prop = 0.6)
+                        column = c(hdiv = TRUE, TV = TRUE,
+                                    wprob = TRUE, pos = TRUE),
+                        classifier = 'lda', n.pc = 4L,
+                        control.names =  c('C1', 'C2', 'C3'),
+                        treatment.names = c('T1', 'T2', 'T3'),
+                        center = TRUE, scale = TRUE, prop = 0.6)
 
 ## Model classification performance
 perf$Performance

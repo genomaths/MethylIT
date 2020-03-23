@@ -5,13 +5,13 @@
 \title{Selection of DMPs}
 \usage{
 selectDIMP(
-    LR,
-    div.col = NULL,
-    pval.col = NULL,
-    absolute = FALSE,
-    cutpoint,
-    tv.col = NULL,
-    tv.cut = NULL
+  LR,
+  div.col = NULL,
+  pval.col = NULL,
+  absolute = FALSE,
+  cutpoint,
+  tv.col = NULL,
+  tv.cut = NULL
 )
 }
 \arguments{

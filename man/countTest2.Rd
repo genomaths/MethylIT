@@ -5,22 +5,22 @@
 \title{Regression Test for Count}
 \usage{
 countTest2(
-    DS,
-    num.cores = 1,
-    countFilter = TRUE,
-    CountPerBp = NULL,
-    minCountPerIndv = 3,
-    maxGrpCV = NULL,
-    FilterLog2FC = TRUE,
-    pAdjustMethod = "BH",
-    pvalCutOff = 0.05,
-    MVrate = 0.98,
-    Minlog2FC = 0.5,
-    test = c("Wald", "LRT"),
-    scaling = 1L,
-    tasks = 0L,
-    saveAll = FALSE,
-    verbose = TRUE
+  DS,
+  num.cores = 1,
+  countFilter = TRUE,
+  CountPerBp = NULL,
+  minCountPerIndv = 3,
+  maxGrpCV = NULL,
+  FilterLog2FC = TRUE,
+  pAdjustMethod = "BH",
+  pvalCutOff = 0.05,
+  MVrate = 0.98,
+  Minlog2FC = 0.5,
+  test = c("Wald", "LRT"),
+  scaling = 1L,
+  tasks = 0L,
+  saveAll = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -113,17 +113,20 @@ set.seed(133) # Set a seed
 ## A GRanges object with the count matrix in the metacolumns is created
 countData <- matrix(sample.int(200, 500, replace = TRUE), ncol = 4)
 colnames(countData) <- c('A1','A2','B1','B2')
+
 start <- seq(1, 25e4, 2000)
 end <- start + 1000
 chr <- c(rep('chr1', 70), rep('chr2', 55))
 GR <- GRanges(seqnames = chr, IRanges(start = start, end = end))
 mcols(GR) <- countData
+
 ## Gene IDs
 names(GR) <- paste0('gene', 1:length(GR))
 
 ## An experiment design is set.
 colData <- data.frame(condition = factor(c('A','A','B','B')),
-c('A1','A2','B1','B2'), row.names = 2)
+                    c('A1','A2','B1','B2'), row.names = 2)
+
 ## A RangedGlmDataSet is created
 ds <- glmDataSet(GR = GR, colData = colData)
 

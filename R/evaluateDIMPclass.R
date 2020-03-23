@@ -99,14 +99,16 @@
 #' DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
 #' tv.cut = 0.68)
 #'
-#' ## Classification of DMPs into two clases: DMPS from control and DMPs from
-#' ## treatment samples and evaluation of the classifier performance (for more
-#' ## details see ?evaluateDIMPclass).
+#' ## Classification of DMPs into two clases: DMPS from control and DMPs
+#' ## from treatment samples and evaluation of the classifier performance
+#' ## (for more details see ?evaluateDIMPclass).
 #' perf <- evaluateDIMPclass(LR = DMPs,
-#' column = c(hdiv = TRUE, TV = TRUE, wprob = TRUE, pos = TRUE),
-#' classifier = 'lda', n.pc = 4L, control.names =  c('C1', 'C2', 'C3'),
-#' treatment.names = c('T1', 'T2', 'T3'), center = TRUE, scale = TRUE,
-#' prop = 0.6)
+#'                         column = c(hdiv = TRUE, TV = TRUE,
+#'                                     wprob = TRUE, pos = TRUE),
+#'                         classifier = 'lda', n.pc = 4L,
+#'                         control.names =  c('C1', 'C2', 'C3'),
+#'                         treatment.names = c('T1', 'T2', 'T3'),
+#'                         center = TRUE, scale = TRUE, prop = 0.6)
 #'
 #' ## Model classification performance
 #' perf$Performance

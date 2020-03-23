@@ -55,37 +55,41 @@
 #' @author Robersy Sanchez (\url{https://genomaths.com}).
 #' @export
 #' @examples
-#' ## Get a dataset of potential signals and the estimated cutpoint from the
-#' ## package
+#' ## Get a dataset of potential signals and the estimated cutpoint
+#' ## from the package
 #' data(PS, cutpoint)
 #'
-#' ## The estimated cutpoints are used to discriminate signals from the noise.
-#' ## That is, DMPs are selected using the cupoints
+#' ## The estimated cutpoints are used to discriminate signals from
+#' ## the noise. That is, DMPs are selected using the cupoints
 #' dmps <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint)
 #'
 #' ## Build clusters of DMPs
 #' x1 = dmpClusters(GR = dmps, maxDist = 7, minNumDMPs = 6, num.cores=2L,
-#' verbose = FALSE)
+#'                 verbose = FALSE)
 #' x1
 #'
 #' ## ==== Setting up the experiment design to test for DMRs ===
 #' nams <- names(dmps)
 #' dmps_at_clusters <- getDIMPatGenes(GR = dmps, GENES = x1,
-#' ignore.strand = TRUE)
+#'                                     ignore.strand = TRUE)
 #' dmps_at_clusters <- uniqueGRanges(dmps_at_clusters, columns = 2L,
-#' ignore.strand = TRUE, type = 'equal', verbose = FALSE)
+#'                                 ignore.strand = TRUE, type = 'equal',
+#'                                 verbose = FALSE)
 #' colnames(mcols(dmps_at_clusters)) <- nams
 #'
 #' colData <- data.frame(condition = factor(c('CT', 'CT', 'CT',
-#' 'TT', 'TT', 'TT'),levels = c('CT', 'TT')), nams, row.names = 2)
+#'                                         'TT', 'TT', 'TT'),
+#'                                         levels = c('CT', 'TT')),
+#'                     nams, row.names = 2)
 #'
 #' ## Build a RangedGlmDataSet object
 #' ds <- glmDataSet(GR = dmps_at_clusters, colData = colData)
 #'
 #' ## ================ Testing for DMRs ===========
 #' dmrs <- countTest2(DS = ds, num.cores = 4L, minCountPerIndv = 4,
-#' maxGrpCV = c(1, 1), Minlog2FC = 0.5, CountPerBp = 0.001, test = 'LRT',
-#' verbose = TRUE)
+#'                 maxGrpCV = c(1, 1), Minlog2FC = 0.5,
+#'                 CountPerBp = 0.001, test = 'LRT',
+#'                 verbose = TRUE)
 #' dmrs
 dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
     chromosomes = NULL, num.cores = 1L, tasks = 0L,
@@ -139,8 +143,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
     return(cl[, "dmps"])
 }
 
-# ========================= Auxiliary signal
-# ================================= #
+# ========================= Auxiliary signal ========================= #
 meth_status <- function(gr, chromosomes = NULL, num.cores = 1L,
     tasks = 0L, verbose = TRUE) {
     ## Set parallel computation

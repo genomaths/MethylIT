@@ -6,10 +6,10 @@
 \title{Predict function for 'qdaDMP' method}
 \usage{
 \method{predict}{qdaDMP}(
-    object,
-    newdata,
-    type = c("all", "class", "posterior", "scores", "qda.pred"),
-    ...
+  object,
+  newdata,
+  type = c("all", "class", "posterior", "scores", "qda.pred"),
+  ...
 )
 }
 \arguments{

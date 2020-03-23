@@ -6,15 +6,15 @@
 counts}
 \usage{
 poolFromGRlist(
-    LR,
-    stat = c("mean", "median", "jackmean", "sum"),
-    num.cores = 1,
-    tasks = 0L,
-    prob = FALSE,
-    column = 1L,
-    jstat = c("sum", "mean", "median"),
-    verbose = TRUE,
-    ...
+  LR,
+  stat = c("mean", "median", "jackmean", "sum"),
+  num.cores = 1,
+  tasks = 0L,
+  prob = FALSE,
+  column = 1L,
+  jstat = c("sum", "mean", "median"),
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{

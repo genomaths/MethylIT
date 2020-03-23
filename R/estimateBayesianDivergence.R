@@ -89,31 +89,33 @@
 #' @author Robersy Sanchez (\url{https://genomaths.com})
 #' @examples
 #' ## The read count data are created
-#' gr <- data.frame(chr = 'chr1', start = 1:10,
-#' end = 1:10, strand = '*', mC1 = rnbinom(size = 10, mu = 4, n = 500),
-#' uC1 = rnbinom(size = 10, mu = 4, n = 500),
-#' mC2 = rnbinom(size = 10, mu = 4, n = 500),
-#' uC2 = rnbinom(size = 10, mu = 4, n = 500))
+#' gr <- data.frame(chr = 'chr1', start = 1:10, end = 1:10,
+#'                 strand = '*',
+#'                 mC1 = rnbinom(size = 10, mu = 4, n = 500),
+#'                 uC1 = rnbinom(size = 10, mu = 4, n = 500),
+#'                 mC2 = rnbinom(size = 10, mu = 4, n = 500),
+#'                 uC2 = rnbinom(size = 10, mu = 4, n = 500))
 #' gr <- makeGRangesFromDataFrame(gr, keep.extra.columns = TRUE)
 #'
 #' ## Estimation of the information divergences
 #' hd <- estimateBayesianDivergence(gr, JD = TRUE)
 #'
-#' ## Keep in mind that Hellinger and J divergences are, in general, correlated!
+#' ## Keep in mind that Hellinger and J divergences are, in general,
+#' ## correlated
 #' cor.test(x = as.numeric(hd$hdiv), y = as.numeric(hd$jdiv),
-#' method = 'kendall')
+#'         method = 'kendall')
 #'
 #' ## An example with methylation levels
 #' set.seed(123)
 #' sites = 10
-#' dat = data.frame(chr = 'chr1', start = 1:sites,
-#' end = 1:sites,strand = '*', m1 = runif(n = sites), m2 = runif(n = sites))
+#' dat = data.frame(chr = 'chr1', start = 1:sites, end = 1:sites,strand = '*',
+#'                 m1 = runif(n = sites), m2 = runif(n = sites))
 #'
 #' dat =  makeGRangesFromDataFrame(dat, keep.extra.columns = TRUE)
 #'
 #' ## Transforming the list of data frames into a GRanges object
 #' hd <- estimateBayesianDivergence(x = dat, columns = c(p1 = 1, p2 = 2),
-#' meth.level = TRUE, preserve.gr = TRUE)
+#'                                 meth.level = TRUE, preserve.gr = TRUE)
 #'
 #' @references
 #' \enumerate{

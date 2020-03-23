@@ -5,11 +5,11 @@
 \title{Get Supplemental Files from GEO}
 \usage{
 getGEOSuppFiles(
-    GEO,
-    makeDirectory = FALSE,
-    baseDir = getwd(),
-    pattern = NULL,
-    verbose = TRUE
+  GEO,
+  makeDirectory = FALSE,
+  baseDir = getwd(),
+  pattern = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -44,7 +44,7 @@ of the specified files and from several GEO accession numbers with only one
 call to the function.
 }
 \examples{
-## Download supplementary files from GEO data set and store 'fullpath/name'
+## Download supplementary files from GEO data set and store fullpath/name
 ## in variable filename. The parameter 'pattern' permits us to download only
 ## the specified filesCG, in this case, CG and CHG methylation contexts.
 
@@ -55,5 +55,5 @@ file.remove(filenames) ## Remove the downloaded file
 
 }
 \author{
-Original author: Sean Davis \href{mailto:sdavis2@mail.nih.gov}{sdavis2@mail.nih.gov}
+Original author: Sean Davis \email{sdavis2@mail.nih.gov}
 }

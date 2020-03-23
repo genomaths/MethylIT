@@ -13,10 +13,11 @@
 #' @return Specified in function \code{\link{estimateCutPoint}} for parameter
 #'  setting \emph{simple = TRUE}
 #' @importFrom caret confusionMatrix
+#' @importFrom stats addmargins
 #' @keywords internal
-#'
+#' @export
 #' @examples
-#' data(PS, package = 'MethylIT')
+#' data(PS)
 #'
 #' cutpoint = simpleCutPoint(LR = PS,
 #'                             column = c(hdiv = TRUE, TV = TRUE,
@@ -26,7 +27,7 @@
 #'                             treatment.names = c('T1', 'T2', 'T3'),
 #'                             tv.cut = 0.5, clas.perf = TRUE, prop = 0.6,
 #'                             div.col = 9L)
-#'
+#' cutpoint$testSetPerformance
 simpleCutPoint <- function(LR, control.names, treatment.names,
                         column, div.col, tv.col = NULL, tv.cut, clas.perf,
                         classifier, n.pc, prop, cutp_data = FALSE, num.cores,
@@ -39,8 +40,8 @@ simpleCutPoint <- function(LR, control.names, treatment.names,
     classes <- c(rep("CT", length(LR$ctrl)), rep("TT", length(LR$treat)))
     classes <- factor(classes, levels = c("CT", "TT"))
 
-    dt = infDiv(LR = LR, div.col = div.col)
-    cutp <- roc(dt)
+    dt <- .infDiv(LR = LR, div.col = div.col)
+    cutp <- .roc(dt = dt)
     cutpoint <- cutp$cutp
     predClasses <- mcols(unlist(LR)[, div.col])[, 1] > cutpoint
     predClasses[predClasses == TRUE] <- "TT"
@@ -104,7 +105,7 @@ simpleCutPoint <- function(LR, control.names, treatment.names,
 
 ### ================== Auxiliary functions ========================== #
 
-infDiv <- function(LR, div.col = NULL) {
+.infDiv <- function(LR, div.col = NULL) {
   ## This builds data frames from the list or ranges
   ## LR to be used for ROC analysis LR: list of sample
   ## GRanges
@@ -113,14 +114,14 @@ infDiv <- function(LR, div.col = NULL) {
 
   dt <- list(ctrl = data.frame(), treat = data.frame())
   dt$ctrl <- data.frame(idiv = abs(mcols(LR$ctrl[, div.col])[, 1]),
-                        treat = "ctrl")
+                        treat = "ctrl", stringsAsFactors = TRUE)
   dt$treat <- data.frame(idiv = abs(mcols(LR$treat[, div.col])[, 1]),
-                         treat = "treat")
+                         treat = "treat", stringsAsFactors = TRUE)
   return(dt)
 }
 
 ### Compute ROC data
-roc <- function(dt) {
+.roc <- function(dt) {
   ## This function build the ROC and estimate the
   ## Hellinger divergence cutoff point starting from
   ## which TRUE DMPs are found.  dt0 & dt1: data
@@ -129,6 +130,7 @@ roc <- function(dt) {
   ## printed
   dt <- do.call(rbind, dt)
   l <- levels(dt$treat)
+
   dt$status <- as.character(dt$treat)
   dt$status[dt$status == l[1]] <- 0
   dt$status[dt$status == l[2]] <- 1
@@ -141,8 +143,7 @@ roc <- function(dt) {
   m <- apply(m, 2, cumsum)
   sens <- (m[nr, 2] - m[, 2])/m[nr, 2]
   spec <- m[, 1]/m[nr, 1]
-  auc <- sum((sens[-1] + sens[-nr])/2 * abs(diff(1 -
-                                                   spec)))
+  auc <- sum((sens[-1] + sens[-nr])/2 * abs(diff(1 - spec)))
   # Youden Index
   idx <- which.max(sens[-1] + spec[-nr])
   return(list(cutp = as.numeric(names(idx)),

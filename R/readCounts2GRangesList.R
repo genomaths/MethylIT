@@ -41,7 +41,8 @@
 #' @return A list of GRanges objects
 #'
 #' @examples
-#' ## Create a cov file with it's file name including 'gz' (tarball extension)
+#' ## Create a cov file with it's file name including 'gz'
+#' ## 'gz' (tarball extension)
 #' filename <- './file.cov'
 #' gr1 <- data.frame(chr = c('chr1', 'chr1'), post = c(1,2),
 #'                 strand = c('+', '-'), ratio = c(0.9, 0.5),

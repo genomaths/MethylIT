@@ -98,24 +98,28 @@
 #' @examples
 #' ## Load a dataset with Hellinger Divergence of methylation levels on it.
 #' data(HD)
+#'
 #' ## The nonlinear fit based on three-parameter GGamma distribution
 #' nlms2 <- nonlinearFitDist(HD, npoints = 100, dist.name = 'GGamma3P',
-#' verbose = FALSE)
+#'                             verbose = FALSE)
+#'
 #' ## Weilbull distribution is a particular case of GGamma.
 #' nlms <- nonlinearFitDist(HD, npoints = 100, verbose = FALSE)
 #'
-#' ## The goodness-of-fit indicators AIC suggests that the best fitted model is
-#' ## obtained with GGamma distribution (in this example).
-#' res <- mapply(function(m1,m2)
-#' as.numeric(c(Weibull = m1$AIC[1], GGamma = m2$AIC[1])), nlms, nlms2)
+#' ## The goodness-of-fit indicators AIC suggests that the best fitted model
+#' ## is obtained with GGamma distribution (in this example).
+#' res <- mapply(function(m1,m2) as.numeric(c(Weibull = m1$AIC[1],
+#'                                         GGamma = m2$AIC[1])),
+#'                 nlms, nlms2)
 #' rownames(res) <-c('Weibull', 'GGamma')
 #' res
 #'
 #' ## However, the Cross-validations correlation coefficient is saying that
-#' ## the Weibull distribution would be a little better probability predictor.
-#' res <- mapply(function(m1,m2)
-#' as.numeric(c(Weibull = m1$R.Cross.val[1], GGamma = m2$R.Cross.val[1])),
-#' nlms, nlms2)
+#' ## the Weibull distribution would be a little better probability
+#' ## predictor.
+#' res <- mapply(function(m1,m2) as.numeric(c(Weibull = m1$R.Cross.val[1],
+#'                                         GGamma = m2$R.Cross.val[1])),
+#'                 nlms, nlms2)
 #' rownames(res) <-c('Weibull', 'GGamma')
 #' res
 #'

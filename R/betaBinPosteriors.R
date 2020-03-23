@@ -12,8 +12,8 @@
 #'
 #'In a Bayesian framework, methylated read counts are modeled by a beta-
 #'binomial distribution, which accounts for both, the biological and sampling
-#'variations [1-3]. In our case we adopted the Bayesian approach suggested in
-#'reference [3](Chapter 3). Naive distribution q (methylation levels). In a
+#'variations (1-3). In our case we adopted the Bayesian approach suggested in
+#'reference (3)(Chapter 3). Naive distribution q (methylation levels). In a
 #'Bayesian framework with uniform priors, the methylation level can be defined
 #'as: meth_level = ( mC + 1 )/( mC + uC + 2 ). However, the most natural
 #'statistical model for replicated BS-seq DNA methylation measurements is
@@ -40,12 +40,12 @@
 #' @references 1. Hebestreit K, Dugas M, Klein H-U (2013) Detection of
 #'     significantly differentially methylated regions in targeted bisulfite
 #'     sequencing data. Bioinformatics 29: 1647-1653. Available:
-#'     http://www.ncbi.nlm.nih.gov/pubmed/23658421. Accessed 4 February 2014.
+#'     http://www.ncbi.nlm.nih.gov/pubmed/23658421.
 #'     2. Robinson MD, Kahraman A, Law CW, Lindsay H, Nowicka M, et al. (2014)
 #'     Statistical methods for detecting differentially methylated loci and
 #'     regions. Front Genet 5: 324. Available:
-#'     https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4165320/ Accessed 26 August
-#'     2015. 3. Baldi P, Brunak S (2001) Bioinformatics: the machine learning
+#'     https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4165320/.
+#'     Baldi P, Brunak S (2001) Bioinformatics: the machine learning
 #'     approach. Second. Cambridge: MIT Press. 452 p.
 #' @keywords internal
 .betaBinPosteriors <- function(success, trials, a, b) {

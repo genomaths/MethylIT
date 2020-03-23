@@ -5,12 +5,12 @@
 \title{Predict function for logistic regression model from 'LogisticR' class}
 \usage{
 \method{predict}{LogisticR}(
-    object,
-    newdata = NULL,
-    type = c("all", "class", "posterior"),
-    num.cores = 1L,
-    tasks = 0L,
-    ...
+  object,
+  newdata = NULL,
+  type = c("all", "class", "posterior"),
+  num.cores = 1L,
+  tasks = 0L,
+  ...
 )
 }
 \arguments{

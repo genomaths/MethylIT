@@ -92,8 +92,10 @@
 #' @examples
 #' ## Loading information divergence dataset
 #' data(HD)
+#'
 #' ## Subsetting object HD (for the sake of runnig a faster example)
 #' hd <- lapply(HD, function(x) x[seq_len(100)], keep.attr = TRUE)
+#'
 #' ## The GoF report
 #' dt <- gofReport(hd)
 #'
@@ -170,7 +172,7 @@ gofReport <- function(HD,
     close(pb)
     if (length(HD) > 1)
         nlms <- unlist(nlms, recursive = FALSE) else {
-        nms <- sapply(nlms, function(x) names(x[1]))
+        nms <- vapply(nlms, function(x) names(x[1]))
         nlms <- lapply(nlms, function(x) x[[1]])
         names(nlms) <- nms
     }

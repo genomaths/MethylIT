@@ -7,22 +7,22 @@
 Analysis (PCA)}
 \usage{
 pcaQDA(
-    formula = NULL,
-    data = NULL,
-    grouping = NULL,
-    n.pc = 1,
-    scale = FALSE,
-    center = FALSE,
-    tol = 1e-04,
-    method = "moment",
-    max.pc = NULL
+  formula = NULL,
+  data = NULL,
+  grouping = NULL,
+  n.pc = 1,
+  scale = FALSE,
+  center = FALSE,
+  tol = 1e-04,
+  method = "moment",
+  max.pc = NULL
 )
 
 \method{predict}{pcaQDA}(
-    object,
-    newdata,
-    type = c("qda.pred", "class", "posterior", "pca.ind.coord", "all"),
-    ...
+  object,
+  newdata,
+  type = c("qda.pred", "class", "posterior", "pca.ind.coord", "all"),
+  ...
 )
 }
 \arguments{
