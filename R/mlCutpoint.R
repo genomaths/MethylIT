@@ -110,7 +110,7 @@ mlCutpoint <- function(LR, control.names, treatment.names,
     conf.matrix <- confusionMatrix(data = predClasses,
                                     reference = classes, positive = "TT")
 
-  STAT <- c("Accuracy", "Sensitivity", "Specificity",
+    STAT <- c("Accuracy", "Sensitivity", "Specificity",
             "Pos Pred Value", "Neg Pred Value",
             "Precision", "Recall", "F1", "Prevalence",
             "Detection Rate", "Detection Prevalence",
@@ -138,11 +138,11 @@ cutpoint_search <- function(LR, column, div.col, cuts, tv.col, tv.cut,
     overcut <- FALSE
     while (k < length(cuts) && !opt && !overcut) {
         dmps <- selectDIMP(
-                          LR,
-                          div.col = div.col,
-                          cutpoint = cuts[k],
-                          tv.col = tv.col,
-                          tv.cut = tv.cut
+                            LR,
+                            div.col = div.col,
+                            cutpoint = cuts[k],
+                            tv.col = tv.col,
+                            tv.cut = tv.cut
         )
 
         min.div <- min(mcols(dmps$treat[, div.col])[, 1], na.rm = TRUE)
@@ -163,8 +163,8 @@ cutpoint_search <- function(LR, column, div.col, cuts, tv.col, tv.cut,
             if (stat == 0) {
                 st0 <- conf.mat$Performance$overall[1]
                 if (st < st0) {
-                  st <- st0
-                  cutp <- max(cuts[k], min.div, na.rm = TRUE)
+                    st <- st0
+                    cutp <- max(cuts[k], min.div, na.rm = TRUE)
                 }
                 if (st == 1) opt <- TRUE
                 k <- k + 1

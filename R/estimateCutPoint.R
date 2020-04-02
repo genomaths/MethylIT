@@ -236,7 +236,7 @@ estimateCutPoint <- function(LR, control.names, treatment.names,
     if (sum(lcc) == 0) {
         LR <- LR[treatment.names]
         min.div <- min(unlist(lapply(LR, function(l)
-                           min(l@elementMetadata[, div.col], na.rm = TRUE))),
+                            min(l@elementMetadata[, div.col], na.rm = TRUE))),
                         na.rm = TRUE)
         min.div <- min.div[min.div > 0]
         text <- c("All the GRanges objects from your control are empty ",

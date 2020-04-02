@@ -211,7 +211,7 @@ gofReport <- function(HD,
         bestAIC <- unlist(mdl)
         mdl[issue] <- "Needs revision"
         mdl <- unlist(mdl)
-        warning("The best fitted model for sample(s) ",
+        warning("\n The best fitted model for sample(s) ",
             paste(sn[issue], collapse = ", "),
                 " require(s) for further analysis. \n",
             "The model with the lowest AIC must have the highest R.Cross.val")

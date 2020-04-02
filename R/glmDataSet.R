@@ -126,12 +126,13 @@ glmDataSet <- function(GR = NULL, counts = NULL, colData = NULL) {
     return(x)
 }
 
-### ==================== Auxiliary function ========================== #
+### ==================== Auxiliary functions ========================== #
 
 
-#' @rdname glmDataSet
-#' @title Printing object from \emph{glmDataSet} and \emph{'RangedGlmDataSet'}
-#'     classes by simple print methods.
+#' @rdname print.glmDataSet
+#' @aliases glmDataSet
+#' @title Printing object from \strong{\emph{glmDataSet}} and
+#' \strong{\emph{'RangedGlmDataSet'}} classes by simple print methods.
 #' @param x Object from class \emph{glmDataSet} or from class
 #'     \emph{'RangedGlmDataSet'}.
 #' @param digits Number of significant digits to be used.
@@ -150,7 +151,8 @@ print.glmDataSet <- function(x, digits = getOption("digits"),
     cat("\n")
 }
 
-#' @rdname glmDataSet
+#' @rdname print.glmDataSet
+#' @aliases print.RangedGlmDataSet
 #' @keywords internal
 #' @export
 print.RangedGlmDataSet <- function(x, digits = getOption("digits"),

@@ -79,7 +79,32 @@ cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
                           clas.perf = TRUE, prop = 0.6,
                           div.col = 9L)
 
-usethis::use_data(PS, HD, cutpoint, gof, overwrite = TRUE )
+
+## DMPs are selected using the cupoints
+dmps <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
+tv.cut = 0.68)
+
+## Classification of DMPs into two clases: DMPS from control and DMPs
+## from treatment samples and evaluation of the classifier performance
+## (for more details see ?evaluateDIMPclass).
+lda_perf <- evaluateDIMPclass(LR = dmps,
+                        column = c(hdiv = TRUE, TV = TRUE,
+                                    wprob = TRUE, pos = TRUE),
+                        classifier = 'lda', n.pc = 4L,
+                        control.names =  c('C1', 'C2', 'C3'),
+                        treatment.names = c('T1', 'T2', 'T3'),
+                        center = TRUE, scale = TRUE, prop = 0.6)
+
+qda_perf <- evaluateDIMPclass(LR = dmps,
+                              column = c(hdiv = TRUE, TV = TRUE,
+                                         wprob = TRUE, pos = TRUE),
+                              classifier = 'qda', n.pc = 4L,
+                              control.names =  c('C1', 'C2', 'C3'),
+                              treatment.names = c('T1', 'T2', 'T3'),
+                              center = TRUE, scale = TRUE, prop = 0.6)
+
+usethis::use_data(PS, HD, cutpoint, gof, dmps, lda_perf, qda_perf,
+                  overwrite = TRUE )
 
 
 

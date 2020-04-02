@@ -2,9 +2,9 @@
 #'
 #' @title Evaluate DMPs Classification
 #' @description For a given cutpoint (previously estimated with the function
-#'     estimateCutPoint), 'evaluateDIMPclass' will return the evaluation of the
-#'     classification of DMPs into two clases: DMPS from control and DMPs
-#'     from treatment samples.
+#' estimateCutPoint), 'evaluateDIMPclass' will return the evaluation of the
+#' classification of DMPs into two clases: DMPS from control and DMPs
+#' from treatment samples.
 #' @details  The regulatory methylation signal is also an output from a natural
 #' process that continuously takes place across the ontogenetic development of
 #' the organisms. So, we expect to see methylation signal on natural ordinary
@@ -381,4 +381,57 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
         all = list(con.mat = conf.mat(1), mc.val = summary(boots),
                     boots = boots))
     return(res)
+}
+
+
+### ==================== Auxiliary functions ========================== #
+
+#' @rdname print.mlDMP
+#' @title Printing object from \emph{ldaDMP} and \emph{qdaDMP} classes by
+#' simple print methods
+#' @description Objects from \emph{ldaDMP} and and \emph{qdaDMP} classes are
+#' yielded by function \emph{evaluateDIMPclass}. These objects carries the
+#' information of the corresponding machine-learning (ml) models used to
+#' classify DMPs.
+#' @details The definition of these classes makes less complex the downstream
+#' analyses.
+#' @param x Object from class \strong{\emph{ldaDMP}} or \strong{\emph{qdaDMP}}.
+#' @param digits Number of significant digits to be used.
+#' @keywords internal
+#' @export
+print.ldaDMP <- function(x, digits = getOption("digits")) {
+    if (!is.null(cl <- x$call)) {
+        names(cl)[2L] <- ""
+        cat("Call:\n")
+        dput(cl, control = NULL)
+    }
+    cat("\nPrior probabilities of groups:\n")
+    print(x$prior, digits)
+    cat("\nGroup means:\n")
+    print(x$means, digits)
+    cat("\nCoefficients of linear discriminants:\n")
+    print(x$scaling, digits)
+    svd <- x$svd
+    names(svd) <- dimnames(x$scaling)[[2L]]
+    if (length(svd) > 1L) {
+        cat("\nProportion of trace:\n")
+        print(round(svd^2/sum(svd^2), 4L), digits)
+    }
+    invisible(x)
+}
+
+#' @rdname print.mlDMP
+#' @keywords internal
+#' @export
+print.qdaDMP <- function(x, digits = getOption("digits")) {
+    if (!is.null(cl <- x$call)) {
+        names(cl)[2L] <- ""
+        cat("Call:\n")
+        dput(cl, control = NULL)
+    }
+    cat("\nPrior probabilities of groups:\n")
+    print(x$prior, digits)
+    cat("\nGroup means:\n")
+    print(x$means, digits)
+    invisible(x)
 }
