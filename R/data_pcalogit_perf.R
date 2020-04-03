@@ -1,0 +1,22 @@
+#' Classification logistic model for simulated dataset of DMPs used in examples
+#'
+#' This data/object carries the information about the classification performance
+#' of the combined models of Principal Components \emph{PCA} and logistic
+#' regression analyses on the set of \code{\link{dmps}}.
+#'
+#' @format \emph{pcalogit_perf} is an object from class \emph{"pcaLogisticR"},
+#' consisting of a list with the following elements:
+#' \describe{
+#'     \item{\strong{Performance}}{Classification performance of the
+#'     \emph{"pca.logistic"} model on the set of \code{\link{dmps}}}.
+#'     \item{\strong{FDR}}{False discovery rate estimated for the logistic
+#'     model on the set of \code{\link{dmps}}}
+#'     \item{\strong{model}}{The fitted \code{\link[stats]{glm}}
+#'     \emph{"logistic"} and the \emph{"PCA"} models. The \emph{"PCA"} is fitted
+#'     with \code{\link[stats]{prcomp}}} function.
+#' }
+#'
+#'\strong{\emph{pcalogit_perf}} is an object from \emph{"pcaLogisticR"} class,
+#'which was obtained applying \code{\link{evaluateDIMPclass}} function on the
+#'set of \code{\link{dmps}}.
+"pcalogit_perf"
