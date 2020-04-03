@@ -135,3 +135,6 @@ ds <- glmDataSet(GR = GR, colData = colData)
 countTest2(ds, num.cores = 1L, maxGrpCV = c(0.4, 0.4), verbose = FALSE)
 
 }
+\seealso{
+\code{\link{glmDataSet}}
+}

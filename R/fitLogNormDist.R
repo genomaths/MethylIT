@@ -223,12 +223,15 @@ fitLogNormDist <- function(x, probability.x, parameter.values,
         if (inherits(COV, "try-error"))
             COV = matrix(NA, nrow = 2, ncol = 2)
         stats <- data.frame(summary(FIT)$coefficients,
-            Adj.R.Square = c(Adj.R.Square, ""), rho = c(rho,
-                ""), R.Cross.val = c(R.cross.FIT, ""),
-            DEV = c(deviance(FIT), ""), AIC = c(AICmodel(FIT,
-                residuals = res, np = 3), ""), BIC = c(BICmodel(FIT,
-                residuals = res, np = 3), ""), COV = COV,
-            n = c(N - 2, n - 2))
+                            Adj.R.Square = c(Adj.R.Square, ""),
+                            rho = c(rho,""),
+                            R.Cross.val = c(R.cross.FIT, ""),
+                            DEV = c(deviance(FIT), ""),
+                            AIC = c(AICmodel(FIT, residuals = res, np = 3), ""),
+                            BIC = c(BICmodel(FIT, residuals = res, np = 3), ""),
+                            COV = COV,
+                            n = c(N - 2, n - 2),
+                            stringsAsFactors = FALSE)
     } else {
         warning(paste("Data did not fit to the model.",
             "Returning empty coefficient table."))

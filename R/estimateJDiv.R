@@ -69,17 +69,18 @@
 #'
 #' @export
 estimateJDiv <- function(p, logbase = 2) {
-    if (any(p > 1) | any(p < 0)) 
+    if (any(p > 1) | any(p < 0))
         stop("*** Vector p has values out of the range [0, 1]")
+
     jdiv <- 0
     if (!is.na(sum(p)) && (sum(p) > 0)) {
         p[p == 1] <- 1
         p1 <- c(p[1], 1 - p[1])
         p2 <- c(p[2], 1 - p[2])
-        
-        jdiv <- (p1[1] * .log(p1[1]/p2[1], logbase = logbase) + 
-            p1[2] * .log(p1[2]/p2[2], logbase = logbase) + 
-            p2[1] * .log(p2[1]/p1[1], logbase = logbase) + 
+
+        jdiv <- (p1[1] * .log(p1[1]/p2[1], logbase = logbase) +
+            p1[2] * .log(p1[2]/p2[2], logbase = logbase) +
+            p2[1] * .log(p2[1]/p1[1], logbase = logbase) +
             p2[2] * .log(p2[2]/p1[2], logbase = logbase))/2
     }
     return(jdiv)

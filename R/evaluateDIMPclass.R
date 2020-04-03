@@ -93,16 +93,13 @@
 #' 'confusionMatrix'. 'all' return a list with all the mentioned outputs.
 #'
 #' @examples
-#' data(cutpoint, PS, package = 'MethylIT')
-#'
-#' ## DMPs are selected using the cupoints
-#' DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
-#' tv.cut = 0.68)
+#' ## Get a data set of DMPs
+#' data(dmps, package = 'MethylIT')
 #'
 #' ## Classification of DMPs into two clases: DMPS from control and DMPs
 #' ## from treatment samples and evaluation of the classifier performance
 #' ## (for more details see ?evaluateDIMPclass).
-#' perf <- evaluateDIMPclass(LR = DMPs,
+#' perf <- evaluateDIMPclass(LR = dmps,
 #'                         column = c(hdiv = TRUE, TV = TRUE,
 #'                                     wprob = TRUE, pos = TRUE),
 #'                         classifier = 'lda', n.pc = 4L,
@@ -112,6 +109,7 @@
 #'
 #' ## Model classification performance
 #' perf$Performance
+#'
 #' @importFrom GenomicRanges GRanges GRangesList
 #' @importFrom caret confusionMatrix
 #' @importFrom stats binom.test mcnemar.test predict.glm binomial
@@ -232,7 +230,7 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
         ## Centering and scaling new individuals
         newdata[, -ncol(newdata)] <- scale(newdata[, -ncol(newdata)],
                                             center = object$center,
-                                            cale = object$scale)
+                                            scale = object$scale)
         object$modeling <- structure(object$modeling, class = c("glm", "lm"))
         return(predict.glm(object = object$modeling, newdata = newdata,
                             type = "response"))
@@ -387,6 +385,8 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
 ### ==================== Auxiliary functions ========================== #
 
 #' @rdname print.mlDMP
+#' @aliases print.mlDMP
+#' @aliases print.ldaDMP
 #' @title Printing object from \emph{ldaDMP} and \emph{qdaDMP} classes by
 #' simple print methods
 #' @description Objects from \emph{ldaDMP} and and \emph{qdaDMP} classes are
@@ -399,7 +399,7 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
 #' @param digits Number of significant digits to be used.
 #' @keywords internal
 #' @export
-print.ldaDMP <- function(x, digits = getOption("digits")) {
+print.ldaDMP <- function(x, digits = getOption("digits"), ...) {
     if (!is.null(cl <- x$call)) {
         names(cl)[2L] <- ""
         cat("Call:\n")
@@ -421,9 +421,11 @@ print.ldaDMP <- function(x, digits = getOption("digits")) {
 }
 
 #' @rdname print.mlDMP
+#' @aliases print.mlDMP
+#' @aliases print.qdaDMP
 #' @keywords internal
 #' @export
-print.qdaDMP <- function(x, digits = getOption("digits")) {
+print.qdaDMP <- function(x, digits = getOption("digits"), ...) {
     if (!is.null(cl <- x$call)) {
         names(cl)[2L] <- ""
         cat("Call:\n")

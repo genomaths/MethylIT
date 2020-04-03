@@ -45,4 +45,18 @@ vector of counts groups: factor labeling the members from each group
 Evaluated models are 'Poisson', 'Quasipoisson', 'Neg.Binomial.W', and
 'Neg.Binomial'
 }
+\examples{
+## Get "RangedGlmDataSet" object
+data(ds, package = "MethylIT")
+
+X <- ds$counts[69,]
+baseMeanAndVar <- data.frame(baseMean = mean(X),
+                             baseVar = var(X))
+
+MethylIT:::.estimateGLM(x = X, groups = ds$colData$condition,
+                        baseMV = baseMeanAndVar,
+                        w = c(1,1), MVrate = 0.95,
+                        test = "LRT")
+
+}
 \keyword{internal}

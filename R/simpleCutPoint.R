@@ -18,17 +18,18 @@
 #' @keywords internal
 #' @export
 #' @examples
-#' data(PS)
+#' ## Get a set of potential DMPS (PS)
+#' data(PS, package = 'MethylIT')
 #'
-#' cutpoint = simpleCutPoint(LR = PS, column = c(hdiv = TRUE, TV = TRUE,
-#'                           wprob = TRUE, pos = TRUE),
-#'                           classifier = 'qda', n.pc = 4,
-#'                           control.names = c('C1', 'C2', 'C3'),
-#'                           treatment.names = c('T1', 'T2', 'T3'),
-#'                           tv.cut = 0.5, clas.perf = TRUE, prop = 0.6,
-#'                           div.col = 9L)
+#' cutp <- simpleCutPoint(LR = PS, column = c(hdiv = TRUE, TV = TRUE,
+#'                                            wprob = TRUE, pos = TRUE),
+#'                        classifier = 'qda', n.pc = 4,
+#'                        control.names = c('C1', 'C2', 'C3'),
+#'                        treatment.names = c('T1', 'T2', 'T3'),
+#'                        tv.cut = 0.5, clas.perf = TRUE, prop = 0.6,
+#'                        div.col = 9L)
 #'
-#' cutpoint$testSetPerformance
+#' cutp
 #'
 simpleCutPoint <- function(LR, control.names, treatment.names,
                         column, div.col, tv.col = NULL, tv.cut, clas.perf,

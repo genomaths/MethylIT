@@ -2,13 +2,14 @@
 % Please edit documentation in R/evaluateDIMPclass.R
 \name{print.ldaDMP}
 \alias{print.ldaDMP}
+\alias{print.mlDMP}
 \alias{print.qdaDMP}
 \title{Printing object from \emph{ldaDMP} and \emph{qdaDMP} classes by
 simple print methods}
 \usage{
-\method{print}{ldaDMP}(x, digits = getOption("digits"))
+\method{print}{ldaDMP}(x, digits = getOption("digits"), ...)
 
-\method{print}{qdaDMP}(x, digits = getOption("digits"))
+\method{print}{qdaDMP}(x, digits = getOption("digits"), ...)
 }
 \arguments{
 \item{x}{Object from class \strong{\emph{ldaDMP}} or \strong{\emph{qdaDMP}}.}

@@ -4,9 +4,9 @@
 #' @description This function is used to build a object suitable to be used
 #'     with Methyl-IT \code{\link{countTest2}} function.
 #' @details Data set constructor for class glmDataSet also validate the object
-#' @param GR A GRanges object with the count matrix of DMPs in the metacolumns
-#'     (see \emph{'counts'}). If provided, then leave parameter
-#'     \emph{'counts = NULL'}.
+#' @param GR A \code{\link[GenomicRanges]{GRanges-class}} object with the count
+#' matrix of DMPs in the metacolumns (see \emph{'counts'}). If provided, then
+#' leave parameter \emph{'counts = NULL'}.
 #' @param counts Count matrix of DMPs with minimal dimensions 1 (row) x 4
 #'     (columns). Column names must corresponds to the rownames from parameter
 #'      'colData'.
@@ -41,7 +41,7 @@
 #' c('A1','A2','B1','B2'), row.names = 2)
 #'
 #' ## A RangedGlmDataSet is created
-#' ds <- glmDataSet(GR = GR, colData = colData)
+#' glmDataSet(GR = GR, colData = colData)
 #'
 glmDataSet <- function(GR = NULL, counts = NULL, colData = NULL) {
     if (is.null(GR) && is.null(counts)) {
@@ -130,7 +130,7 @@ glmDataSet <- function(GR = NULL, counts = NULL, colData = NULL) {
 
 
 #' @rdname print.glmDataSet
-#' @aliases glmDataSet
+#' @aliases print.glmDataSet
 #' @title Printing object from \strong{\emph{glmDataSet}} and
 #' \strong{\emph{'RangedGlmDataSet'}} classes by simple print methods.
 #' @param x Object from class \emph{glmDataSet} or from class
@@ -138,8 +138,7 @@ glmDataSet <- function(GR = NULL, counts = NULL, colData = NULL) {
 #' @param digits Number of significant digits to be used.
 #' @keywords internal
 #' @export
-print.glmDataSet <- function(x, digits = getOption("digits"),
-    ...) {
+print.glmDataSet <- function(x, digits = getOption("digits"), ...) {
     cm <- dim(counts)
     lvs <- levels(x$colData$condition)
     cat("glmDataSet with ", cm[1], " rows and ", cm[2],

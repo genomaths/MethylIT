@@ -100,33 +100,33 @@
 #' @importFrom IRanges width
 #' @importFrom stats var
 #' @importFrom methods is
-#'
+#' @seealso \code{\link{glmDataSet}}
 #' @export
 countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
-    CountPerBp = NULL, minCountPerIndv = 3, maxGrpCV = NULL,
-    FilterLog2FC = TRUE, pAdjustMethod = "BH", pvalCutOff = 0.05,
-    MVrate = 0.98, Minlog2FC = 0.5, test = c("Wald",
-        "LRT"), scaling = 1L, tasks = 0L, saveAll = FALSE,
-    verbose = TRUE) {
+                CountPerBp = NULL, minCountPerIndv = 3, maxGrpCV = NULL,
+                FilterLog2FC = TRUE, pAdjustMethod = "BH", pvalCutOff = 0.05,
+                MVrate = 0.98, Minlog2FC = 0.5, test = c("Wald", "LRT"),
+                scaling = 1L, tasks = 0L, saveAll = FALSE,
+                verbose = TRUE) {
 
     group <- DS$colData$condition
     lev <- DS$levels
     sample.names <- DS$sampleNames
     res <- GRanges()
+    test <- match.arg(test)
 
     # ======================= Filtering Block ============================= #
     if (countFilter) {
 
-        ## --------------------- Remove var == 0 positions
-        ## -------------------- #
+        ## ---------------- Remove var == 0 positions ------------------- #
         dc <- DS$counts
         vars <- apply(dc, 1, var)
         DS <- DS[which(vars > 0)]
 
-        # -------------------------- minCountPerIndv
-        # -------------------------- # Each gene must have
-        # more than 'minCountPerIndv' read-counts per
-        # individual in at least one group
+        ## ----------------------- minCountPerIndv -----------------------
+        ## Each gene must have
+        ## more than 'minCountPerIndv' read-counts per
+        ## individual in at least one group
         dc <- DS$counts
         g1 <- which(lev[1] == group)
         g2 <- which(lev[2] == group)
@@ -255,7 +255,7 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
                 tests <- rbind(tests, .estimateGLM(x = X[k,], groups = group,
                                                 baseMV = baseMeanAndVar[k,],
                                                 w = w[k, ], MVrate = MVrate,
-                                                test = test[1]))
+                                                test = test))
             }
         }
         if (num.cores > 1) {
@@ -269,7 +269,7 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
                                                     groups = group,
                                                     baseMV = baseMeanAndVar[k,],
                                                     w = w[k, ], MVrate = MVrate,
-                                                    test = test[1]),
+                                                    test = test),
                                 BPPARAM = bpparam)
             tests = do.call(rbind, tests)
         }

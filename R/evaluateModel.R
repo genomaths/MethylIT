@@ -27,8 +27,10 @@
             if (grepl("Negative", model$family$family))
                 model$family$family <- "negBin"
             stat <- model$family$family
-            statist <- switch(stat, quasipoisson = "F",
-                poisson = "Chisq", negBin = "LRT")
+            statist <- switch(stat,
+                            quasipoisson = "F",
+                            poisson = "Chisq",
+                            negBin = "LRT")
 
             anov <- try(suppressWarnings(anova(model,
                 test = statist)), silent = TRUE)
@@ -38,6 +40,7 @@
                 else coef.pval <- anov$`Pr(>F)`[2]
             } else coef.pval <- cfs[2, 4]
         } else coef.pval <- cfs[2, 4]
+
         if (model$family$family == "quasipoisson") {
             AICs <- .AICquasiPoisson(model)
         } else {

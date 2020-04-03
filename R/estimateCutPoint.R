@@ -153,14 +153,18 @@
 #' ## Get a dataset of potential signals and the estimates cutpoint
 #' ## from the package and performs cutpoint estimation
 #' data(PS)
-#' cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
-#'                             column = c(hdiv = TRUE, TV = TRUE,
-#'                                         wprob = TRUE, pos = TRUE),
-#'                             classifier1 = 'qda',
-#'                             control.names = c('C1', 'C2', 'C3'),
-#'                             treatment.names = c('T1', 'T2', 'T3'),
-#'                             tv.cut = 0.68, clas.perf = TRUE, prop = 0.6,
-#'                             div.col = 9L)
+#'
+#' cutp <- mlCutpoint(LR = PS,
+#'                    column = c(hdiv = TRUE, TV = TRUE,
+#'                               wprob = TRUE, pos = TRUE),
+#'                    classifier1 = 'qda', n.pc = 4,
+#'                    control.names = c('C1', 'C2', 'C3'),
+#'                    treatment.names = c('T1', 'T2', 'T3'),
+#'                    tv.cut = 0.68, prop = 0.6,
+#'                    cut.values = seq(114, 118, 1),
+#'                    div.col = 9L)
+#' cutp
+#'
 estimateCutPoint <- function(LR, control.names, treatment.names,
     simple = TRUE, column = c(hdiv = TRUE, TV = TRUE,
         bay.TV = FALSE, wprob = TRUE, pos = TRUE),

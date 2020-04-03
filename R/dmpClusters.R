@@ -63,6 +63,7 @@
 #' ## the noise. That is, DMPs are selected using the cupoints
 #' dmps <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint)
 #'
+#'\donttest{
 #' ## Build clusters of DMPs
 #' x1 = dmpClusters(GR = dmps, maxDist = 7, minNumDMPs = 6, num.cores=2L,
 #'                 verbose = FALSE)
@@ -91,6 +92,9 @@
 #'                 CountPerBp = 0.001, test = 'LRT',
 #'                 verbose = TRUE)
 #' dmrs
+#'}
+#'
+
 dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
     chromosomes = NULL, num.cores = 1L, tasks = 0L,
     verbose = TRUE, ...) {

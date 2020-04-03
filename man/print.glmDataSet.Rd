@@ -2,7 +2,6 @@
 % Please edit documentation in R/glmDataSet.R
 \name{print.glmDataSet}
 \alias{print.glmDataSet}
-\alias{glmDataSet}
 \alias{print.RangedGlmDataSet}
 \title{Printing object from \strong{\emph{glmDataSet}} and
 \strong{\emph{'RangedGlmDataSet'}} classes by simple print methods.}
