@@ -9,6 +9,10 @@
 ^\.git$
 ^MethylIT\.pdf$
 ^vignettes/_navbar\.yml$
+^vignettes/cancer_example\.Rmd$
+^vignettes/Methylation_analysis_with_Methyl-IT\.Rmd$
+^vignettes/GenExp_Methylation_association_hyper_down-regulated\.Rmd$
+^vignettes/Cutpoint_estimation_with_Methyl-IT\.Rmd$
 ^_pkgdown\.yml$
 ^pkgdown$
 ^data-raw$
