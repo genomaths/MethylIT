@@ -2,6 +2,10 @@
 * Current version 
 * Actively used in methylome analysis
 * In development
+   * 03-08-20:  
+         1) Two new vignette added:    
+              - Principal Components and Linear Discriminant Analyses with Methyl-IT   
+              - Association Between Gene Expression and Cytosine DNA Methylation at gene-body  
    * 03-23-20:  
          1) Update documentation and code style reformatted
 
