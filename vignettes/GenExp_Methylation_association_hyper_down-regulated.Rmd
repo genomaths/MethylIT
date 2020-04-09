@@ -1,0 +1,1219 @@
+---
+title: "Association Between Gene Expression and Cytosine DNA Methylation at gene-body"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+fontsize: 11pt
+fontfamily: "serif"
+bibliography: bibliography.bib
+output:
+    rmarkdown::html_vignette: 
+        toc: true
+        toc_depth: 3
+        number_sections: true
+        geometry: margin=0.8in
+        keep_md: yes
+
+abstract: |
+    This document is Supplementary Information for the manuscript: _"Segregation
+    of an MSH1 RNAi transgene produces heritable non-genetic memory in
+    association with methylome reprogramming"_ (currently in Press). Statistical
+    analysis supporting the association between gene expression and cytosine DNA
+    methylation at gene-body is provided.
+vignette: >
+    %\VignetteIndexEntry{Association Between Gene Expression and Cytosine DNA Methylation at gene-body}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}  
+
+---
+
+<style type="text/css">
+
+.list-group-item.active, .list-group-item.active:focus, 
+.list-group-item.active:hover {
+    z-index: 2;
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.80em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify-header .tocify-item {
+  font-size: 0.85em;
+  padding-left: 20px;
+  text-indent: 0;
+}
+
+body{ /* Normal  */
+      font-size: 18px;
+      font-family: "Times New Roman", Times, serif;
+      text-align: justify
+  }
+td {  /* Table  */
+  font-size: 8px;
+}
+
+h1.title {
+  font-size: 38px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  .subTitle {
+  font-size: 24px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  }
+}
+
+h1 { /* Header 1 */
+  font-size: 28px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+h3 { /* Header 3 */
+   font-size: 18px;
+   color: DarkBlue;
+   font-family: "Times New Roman", Times, serif;
+}
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+</style>
+
+# Background
+The classical statistical approach to analyze the association between two
+variables is based in correlation tests. However, small or zero correlation
+coefficient does not necessarily implies independence of the tested
+variables/processes and, consequently, does not implies the lack of
+association at all. There various steps involved in investigating the dependence
+between two random variables. The state of the art include the application of
+copula distributions. Herein, we provide study of the statistical dependence
+structure between gene expression and methylation in memory line. To uncover
+the association between gene expression and cytosine DNA methylation, first, the
+probability distributions of gene expression (in terms of logarithm of fold
+changes: logFC) and methylation divergences are estimated.
+
+Next, the joint probability distribution is estimated, expressed in term of
+copula distribution. All the analyses are performed in R and can be reproduced
+as presented here. The association is investigated with the  application of
+[copula
+distributions](https://en.wikipedia.org/wiki/Copula_(probability_theory)).
+
+# Required R packages
+With the exception of _usefr_ R package, all the packages are available in Bioconductor 
+and in CRAN repository. Package _usefr_ is available in GitHub at https://github.com/genomaths/usefr 
+You can install usefr package from GitHub typing the following command in the R console:
+
+```{r usefr, eval=FALSE}
+ devtools::install_git("https://github.com/genomaths/usefr.git")
+```
+
+```{r packages, message=FALSE}
+library( GenomicRanges )
+library( DESeq2 )
+library( ggplot2 )
+library( edgeR )
+library( usefr )
+library( plot3D )
+library( copula )
+library( coin )
+
+```
+
+
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
+```
+
+# Analysis for down-regulated genes
+## Data sets 
+
+Gene expression data sets were derived using the R package edgeR. All the genes
+with the minimal quality of gene expression differences are included in the
+analyses. That is, to evaluate the existence of an association between gene
+expression and cytosine methylation all the genes with meaningful expression and
+methylation values must be included, regardless they would be differentially
+methylated and/or differentially expressed or not.
+
+Gene expression data for Arabidopsis Memory first generation (G1)
+
+```{r meth_and_gene_exp_datasets, message=FALSE, results='hide'}
+## ===== Download methylation data from Github ========
+url <- paste0("github.com/genomaths/genomaths.github.io/raw/master/supp-inf/", 
+              "mm_nm_wt_transgen_meth_density_and_gene-exp_at_genes_06-01-19.",
+              "RData")
+temp <- tempfile(fileext = ".RData")
+download.file(url = url, destfile = temp)
+load(temp)
+file.remove(temp); rm(temp, url)
+
+```
+
+
+```{r gene_exp_data}
+## Gene expresion data set
+deg_mm1_wt1
+```
+
+Methylation dataset contains the densities of methylation levels from control (Col-0) and 
+Memory lines samples at DMP on gene-body regions. Densities were computed using function [getGRegionsStat](https://genomaths.github.io/MethylIT_utils_HTML_Manual/getGRegionsStat-methods.html)
+from the R package [MethylIT.utils](https://github.com/genomaths/MethylIT.utils).
+
+Methylation data for a memory G1 sample
+```{r M_1_105}
+dmp_den_genes[, "M_1_105"]
+
+```
+
+## Dataset for the first generation 
+The analysis will be performed with Memory line (M1) and
+wild type (WT1) control, both of them, MM1 and WT1, first generation G1.
+```{r first}
+idx <- na.omit(match(rownames(deg_mm1_wt1), names(dmp_den_genes)))
+dmp_den_m1 <- dmp_den_genes[idx, c("M_1_105", "M_1_168", "M_1_179", "M_1_27", "M_1_3")]
+dmp_den_wt1 <- dmp_den_genes[idx, c( "W_1_1", "W_1_3", "W_1_4", "W_1_5")]
+```
+
+The means of methylation levels densities are computed for each group
+```{r dens_means}
+mcols(dmp_den_wt1) <- rowMeans(as.matrix(mcols(dmp_den_wt1)))
+mcols(dmp_den_m1) <- rowMeans(as.matrix(mcols(dmp_den_m1)))
+```
+
+The absolute difference of the group density means of methylation levels between control 
+(Col-0) and Memory lines at gene-body regions (G1). 
+```{r dens_dif}
+dmp_den_wt1_mm1 <- dmp_den_m1
+mcols(dmp_den_wt1_mm1) <- as.matrix(mcols(dmp_den_m1)) - as.matrix(mcols(dmp_den_wt1))
+colnames(mcols(dmp_den_wt1_mm1)) <- "dmp_den"
+idx <- which(dmp_den_wt1_mm1$dmp_den > 0)
+dmp_den_wt1_mm1 <- dmp_den_wt1_mm1[idx]
+dmp_den_wt1_mm1
+```
+
+Final variables: |_group means density differences_| and $|logFC|$. For the sake
+of brevity and clarity, we shall call the first variable: _divergence of
+methylation densities_ or simply _methylation divergence_ ($MD$).
+```{r}
+.deg_mm1_wt1 <- deg_mm1_wt1[match(names(dmp_den_wt1_mm1), rownames(deg_mm1_wt1)), ]
+
+MD <- dmp_den_wt1_mm1$dmp_den # Methylation (|group mean density differences|)
+idx <- which(.deg_mm1_wt1$table$logFC < 0 ) # Down-regulated
+logFC <- abs(.deg_mm1_wt1$table$logFC[idx]) # Gene Expression (|logFC|)
+MD <- MD[idx]
+DataFrame(MD,logFC)
+```
+
+There are 13962 genes to be included in the downstream analysis. 
+
+## Distribution of the divergence of methylation level density at gene-body. MM1 vs WT1 
+
+Searching for the best fitted distribution functions by using R functions 
+[fitdistr](https://www.rdocumentation.org/packages/MASS/versions/7.3-51.4/topics/fitdistr)
+from [MASS](https://www.rdocumentation.org/packages/MASS/versions/7.3-50) R package and [fitCDF](https://genomaths.github.io/usefr_manual/fitCDF.html) from
+[usefr](https://github.com/genomaths/usefr) R package did not yield a suitable
+results. The best fitted model was found for a mixture distribution model obtained 
+with the function [fitMixDist ](https://genomaths.github.io/usefr_manual/fitMixDist.html)
+from [usefr](https://github.com/genomaths/usefr) R package.
+
+The best fitted model for $MD$, from comparison MM1 _vs_ WT1, was a mixture of Log-Normal and Weibull
+distributions.
+```{r meth_den_fit, warning=FALSE }
+x <- MD[ MD > 0] # Weibull distribution is defineed for MD > 0.
+
+meth_FIT <- fitMixDist(X = x, args = list(lnorm = c(meanlog = 2.3, sdlog = 0.7),
+                                     weibull = c(shape = 0.5, scale = 2)),
+                  dens = TRUE, npoints = 900)
+summary(meth_FIT$fit)
+cat("\n Mixture proportions (phi):", meth_FIT$phi)
+```
+
+The graphic for histogram and density distribution curves: 
+```{r graphic_meth}
+par(mar = c(4, 4, 2, 1), font.lab=2, font=2,font.axis=2,family="serif" , lwd = 1.2, cex = 1.4)
+hist(x, 240, freq = FALSE, las = 1, #ylim = c(0, 0.021), cex = 1,
+     panel.first={points(0, 0, pch=16, cex=1e6, col="grey95")
+       grid(col="white", lty = 1)}, main = text,
+     cex.main = 0.9, xlim = c(0, 5), family = "serif",
+     col = "cyan1", border = "deepskyblue", xaxt ="n", yaxt = "n", ann = FALSE)
+axis(1, padj = -1, las = 1, lwd = 0.8, tck = -0.02)
+axis(2, hadj = 0.7, las = 1, lwd = 0.8, tck = -0.02)
+mtext(side = 1, text = "Divergence of methylation level density at gene-body",
+      line = 1.6, cex = 1.4, font = 3)
+mtext(side = 2, text = "Density distribution", line = 2.1, cex = 1.4, font = 3)
+mtext("(Log-Normal & Weibull Mixture Dists.)", cex = 1.4, font = 3)
+x1 <- seq(0, 10, by = 0.01)
+lines(x1, dmixtdistr(x1, phi = meth_FIT$phi, arg = meth_FIT$args), col = "blue")
+
+```
+
+
+## Distribution of the $|logFC|$. MM1 vs WT1 
+
+The best fitted model for the $|logFC|$, from comparison MM1 _vs_ WT1, was a
+mixture of Gamma and Weibull distributions. Function
+[fitMixDist](https://genomaths.github.io/usefr_manual/fitMixDist.html) calls the
+mixture function models set up in function
+[mixtdistr](https://genomaths.github.io/usefr_manual/mixtdistr.html)
+
+```{r logFC_fit, warning=FALSE}
+x <- logFC[ logFC > 0 ]
+
+gexp_FIT <- fitMixDist(X = x, args = list(gamma = c(shape = 2, scale = 0.41),
+                                          weibull = c(shape = 2, scale = 0.4)),
+                       dens = TRUE, npoints = 900)
+summary(gexp_FIT$fit)
+cat("\n Mixture proportions (phi):", gexp_FIT$phi)
+```
+
+The graphic for histogram and density distribution curves: 
+```{r logFC_grh}
+par(mar = c(3, 3, 2, 1), font.lab=2, font=2,font.axis=2,family="serif", lwd = 1.2, cex = 1.4)
+hist(x, 200, freq = FALSE, las = 1, #ylim = c(0, 0.021), cex = 1,
+     panel.first={points(0, 0, pch=16, cex=1e6, col="grey95")
+       grid(col="white", lty = 1)}, main = text, 
+     cex.main = 0.9, xlim = c(0, 4), family = "serif",
+     col = "cyan1", border = "deepskyblue", xaxt ="n", yaxt = "n", ann = FALSE)
+axis(1, padj = -1.5, las = 1, lwd = 0.5, tck = -0.02)
+axis(2, hadj = 0.4, las = 1, lwd = 0.5, tck = -0.02)
+mtext(side = 1, text = expression(italic(abs(logFC))),
+      line = 1.3, cex = 1.4, font = 3)
+mtext(side = 2, text = "Density distribution", line = 1.6, cex = 1.4, font = 3)
+mtext("(Gamma & Weibull Mixture Dists.)", cex = 1.4, font = 3)
+x1 <- seq(0, 10, by = 0.01)
+lines(x1, dmixtdistr(x1, phi = gexp_FIT$phi, arg = gexp_FIT$args), col = "blue")
+```
+
+
+## Joint distribution of $MD$ and $|logFC|$ expressed in terms of Copula distribution.
+
+There various steps involved in investigating the dependence between two random variables.
+The state of the art in this subject include the application of copula distribtuions.
+
+Sklar's theorem ([@Sklar1959; @Sklar1973]) named after Abe Sklar, provides the 
+theoretical foundation for 
+the application of copulas. Sklar's theorem states that every multivariate 
+cumulative distribution function (CDF):
+
+$$H(x_1, ..., x_d)=Pr(X_1 \leq x_1, ..., X_d \leq x_d)$$ 
+
+of any $d-tuple$ of continuous random variables $(X_1, ..., X_d)$ can be 
+expressed in terms of its marginals CDFs: 
+$F_i(x_i)=Pr(X_i \leq x_i)$ a copula $C$:
+
+$$H(x_1, ..., x_d)=C(F_1(x_1), ..., F_d(x_d))$$
+While Sklar showed that $C$ and $F_i$ are uniquely determined when H is known, a valid
+model for $(X_1, ..., X_d)$ arises from the last equation whenever the "ingredients"
+are chosen from given parametric families of distribtuion ([@Christian2007]):
+$$F \in (F_\delta), C \in (C_\alpha)$$
+Current literature on copula theory provides abundant information on models and copula families. 
+Here, for the particular case of bi-dimensional copula defined for $MD$ and $|logFC|$, we have
+chosen Farlie–Gumbel–Morgenstern family of copulas, which are defined for,
+each $\theta \in [-1, 1]$ by: 
+$$C_\alpha(u, v)=uv+\alpha uv(1-u)(1-v)$$ 
+$u,v \in [0,1]$. The correlation coefficient $\rho$ is linked to $\alpha$ by the relationship: $\rho=\frac{\alpha}{3}$,
+which ranges from $-\frac{1}{3}$ to $\frac{1}{3}$, where $u=F(x)$, $v=G(y)$, with marginal CDFs: $F(x)$ and $G(y)$.
+
+### Fitting Farlie–Gumbel–Morgenstern copulas with $MD$ and $|logFC|$ marginal CDFs
+
+The first step requires for provide the parameters values, previously estimated, of the marginal distributions, which
+were given throughout the function [mixtdistr](https://genomaths.github.io/usefr_manual/mixtdistr.html). The
+the specific parameter values are retrieved from the previous nonlinear fit obtained for the marginal CDFs:
+```{r cop_fit_par}
+margins = c("mixtdistr", "mixtdistr")
+parMargins = list(
+  list(phi = meth_FIT$phi, arg = meth_FIT$args),
+  list(phi = gexp_FIT$phi, arg = gexp_FIT$args))
+```
+
+The parameter estimation and goodness-of-fit (GOF) test take advantages of the tools
+available in the R package [copula](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1).
+Both, parameter estimation and GOF, can be accomplished with function 
+[bicopulaGOF](https://genomaths.github.io/usefr_manual/bicopulaGOF.html) from the
+R package [usefr](https://github.com/genomaths/usefr).
+
+```{r cop_fit, message = FALSE, warning=FALSE, comment=FALSE}
+fgm_cop <- bicopulaGOF(x = MD, y = logFC, copula = "fgmCopula", sample.size = 13000, 
+                       margins = margins, paramMargins = parMargins, nboots = 10, 
+                       approach = "chisq", breaks = 30, num.cores = 6L, seed = 123,
+                       verbose = FALSE)
+```
+
+The null hypothesis that the data follows FGM copula distribution is not rejected.
+```{r res}
+fgm_cop$gof
+```
+
+
+All the information needed about the fitted FGM copula is found in the object
+_fgm_cop$copula_, which is a [mvdc](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1/topics/mvdc-class)
+object from [copula](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1)
+package with several slots. In particular, the specific information about FGM copula is found in:
+
+```{r fgm_fitted}
+fgm_cop$copula@copula
+```
+
+### P-P plot. Graphical Diagnostics of GOF
+The P-P plot is build with function [ppCplot](https://genomaths.github.io/usefr_manual/ppCplot.html)
+from the R package [usefr](https://github.com/genomaths/usefr). If the GOF is good enough, then it 
+is expected that points in the graphics are closed to the diagonal (red) straight line. Details on
+how the computation is performed are provided in the help for function. [ppCplot](https://genomaths.github.io/usefr_manual/ppCplot.html).
+
+```{r ppPlot}
+g <- ppCplot(X = MD, Y = logFC, copula = fgm_cop$copula, npoints = 500, col = "blue", cex = 0.5)
+```
+
+
+Information on the data and copula used to yield the graphic are stored in the
+output variable _"g"_. For example, the empirical and theoretical probabilities used
+to built the graphic can be retrieved from the data frame: _"g$data"_:
+
+```{r g_data}
+DataFrame(g$data)
+```
+
+### Three-dimensional copula density plot
+
+The domain region $(X, Y)$ is defined and function [dMvdc](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1/topics/Mvdc)
+is used to compute the density $z$ in the grid $[X,Y] \times [X,Y]$ using the 
+previous FMG fitted copula.
+```{r domain}
+X = seq(0, 1.5, length = 100)
+Y = seq(0, 1.5, length = 100)
+sp_rho <- round(rho(fgm_cop$copula@copula),3) # Spearman's rho: -0.171
+
+
+z <- outer(X, Y, function(x,y) dMvdc(cbind(x,y),fgm_cop$copula)) * 4
+phi = 20; theta = 45
+
+zf <- function(x,y) dMvdc(cbind(x,y),fgm_cop$copula) * 3.2
+
+cat("Spearman's rho = ", sp_rho)
+
+```
+
+An auxiliary function to draw the panels 
+```{r panels}
+panelfirst <- function(pmat) {
+  par(mfrow = c(1, 1),mar=c(4,7,0, 1), font=2,lwd = 0.01, cex =1, family = "serif")
+  YZ <- trans3D(x = rep(0, ncol(z)), Y, z[18,], pmat = pmat)
+
+  scatter2D(YZ$x, YZ$y, colvar = z[18,], lwd = 1, 
+            type = "l", add = TRUE, colkey = FALSE)
+
+  XZ <- trans3D(x = X, y = rep(max(Y), nrow(z)),
+                z = z[, 12], pmat = pmat)
+
+  scatter2D(XZ$x, XZ$y, colvar = z[, 12], lwd = 1, 
+            type = "l", add = TRUE, colkey = FALSE)
+  
+}
+```
+
+The graphical settings depend on the final printing destiny and on the dataset.
+```{r 3d_cop, message=FALSE, message=FALSE}
+par(mfrow = c(1, 1),mar=c(4,7,0, 1), font=2,lwd = 0.1, cex =1, family = "serif")
+persp3D(X, Y, z, lwd = 0.01, image = TRUE,
+        xlab = "", ylab = "", zlab = "", family = "serif",
+        box = T, panel.first = panelfirst, bty = "u",
+        col.panel = "steelblue", col.grid = "black", lwd.grid = 0.5,
+        contour = list(col = "black", side = "zmin", lwd = 0.4),
+        ticktype = "detailed", clab = "", expand = 0.7, d = 2,
+        phi = phi, theta = theta, resfac = 2.5, cex.lab = 1, lwd = 0.005,
+        xlim = c(0, 1.5), zlim = c(-5, 6), font=2, cex.axis = 1.2,
+        colkey = list(length = 0.7, width = 0.6, col.ticks = "black", lwd = 0.01,
+                      font=2, shift = 0, dist = 0, lwd.ticks = 0.01,  cex.clab = 1.2,
+                      cex.axis = 1, line = -0.8))
+text(0.38,-0.48, srt = 34, labels = expression(paste("|", italic(log[2]), italic(FC), "|")),
+     xpd = TRUE,font = 2, cex = 1.2)
+text(-0.3,-0.44, srt = -28, labels = expression(paste(italic("MD"))),
+     xpd = TRUE, font=2, cex = 1.2)
+text(-0.3,-0.6, srt = 0, labels = expression(paste("Spearman' s ", italic(rho), ": ", -0.17)),
+     xpd = TRUE, font = 1, cex = 1)
+```
+
+
+The marginal distribtuions are drawn in the $XZ$ and $YZ$ vertical planes.
+Consistent with the Spearman' s $\rho=-0.17$, for a fixed value of  $|log_2FC|$, 
+(a line parallel to $MD$ axis) the joint probability density distribution 
+function $f(X \leq MD, Y \leq |log_2FC|)$ decreases with the increment of $MD$.
+That is, the probability to observe DEGs with values, say between 0.1 and 0.5,  
+$0.1 \leq |log_2FC| \leq 0.5$, is greater for $0.1 \eq MD \leq 0.5$ than for 
+$0.5 < MD \leq 1$.
+
+### Two-dimentional copula density plot, Contour plot
+The 2D-dimensional plot permits to see in more detail the projection of the 
+density surface on the $XY$ plane and contour lines.
+
+```{r contour, echo=FALSE}
+X = seq(-0, 2, length = 300)
+Y = seq(-0, 2, length = 300)
+z <- outer(X, Y, function(x,y) dMvdc(cbind(x,y),fgm_cop$copula)) * 3.2
+
+par(family = "serif", font  = 2, bty="n", mar = c(4, 4, 2, 1.1))
+image2D(z = z, x = X, y = Y, colvar = z,  col = NULL, NAcol = "white", breaks = NULL,
+        border = NA, facets = TRUE, xlab = "", ylab = "", ylim = c(-0.1, 1.3),
+        xlim = c(0, 2), xaxt ="n", yaxt = "n", ann = FALSE,
+        resfac = 1, clab = NULL, ticktype = "detailed",
+        colkey = list(length = 0.9, width = 0.7, col.ticks = "black", lwd = 0.01,
+                      font=2, shift = 0.02, dist = 0, lwd.ticks = 0.1,  cex.clab = 1.2,
+                      cex.axis = 1, line = -0.8, tcl = -1),
+        lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+        theta = 0, rasterImage = FALSE,
+        add = FALSE, plot = TRUE)
+contour(x = X, y = Y, z = z, add = TRUE, ylab = "logFC", nlevels = 11, bty = "n",
+        xlim = c(-0.05, 3), ylim = c(-0.05, 1.5), xaxt ="n", yaxt = "n", ann = FALSE,
+        lwd = 0.4, labcex = 0.9, vfont = c("serif", "bold"))
+axis(1, padj = -1.2, las = 1, lwd = 0.5, tck = -0.02, line = -0.6)
+axis(2, hadj = 0.4, las = 1, lwd = 0.5, tck = -0.02, line = 0.6)
+mtext(side = 1, text = expression(paste(italic("MD"))),
+      line = 1.3, cex = 1.4, font = 3)
+mtext(side = 2, text = expression(italic(abs(logFC))), line = 2.5, cex = 1.4, font = 3)
+abline(v = 0.1, col = "black", lty = "dashed")
+abline(v = 0.5, col = "black", lty = "dashed")
+abline(v = 1, col = "black", lty = "dashed")
+abline(h = 0.1, col = "black", lty = "dashed")
+abline(h = 0.5, col = "black", lty = "dashed")
+abline(h = 1, col = "black", lty = "dashed")
+```
+
+It is not difficult to see that for a fixed value of $MD$ (a line parallel to $|log_2FC|$ axis) 
+the joint probability density distribution function $f(X \leq MD, Y \leq |log_2FC|)$ 
+(color gradient from red to blue) decreasses with the increment of $|log_2FC|$. 
+That is, the probability to observe $MD$ values, say between 0.1 and 0.5
+(see the squared region below) $0.1 \leq MD \leq 0.5$, is greater for 
+$0.1 \leq |log_2FC| \leq 0.5$ than for $0.5 < |log_2FC| \leq 1$.
+
+In summary, gene expression and methylation processes (2kb upstream gene TSS
+regions) are not independent in memory line first generation. There exist an
+stochastic deterministic dependence between $|log_2FC|$ and $MD$ that can be
+expressed in terms joint probability distribution, which leads to an inverse
+relationship between the conditioned expected values $|log_2FC|$ given $MD$, and
+vice versa. This association is, however, weaker than the association found
+for gene expression and methylation at gene body.
+
+## Asymptotic linear-by-linear association test
+The above 3D and 2D density plots and results suggest that most of the genes 
+have low $|logFC|$ and low $MD$, and the number of genes decrease for middle
+levels of $|logFC|$ and $MD$. This observation leads to the application of a
+linear-by-linear association test.
+
+The linear-by-linear test (LLT) is used to test a linear association among
+variables in a contingency table with ordered categories (@Agresti2007). The
+null hypothesis for the linear-by-linear test is that there is no association
+among the variables in the table.
+
+It is obvious from the 2D density plots that a relationship for $MD$ < 0.08 
+is not meaningful. In particular, both variables, $|logFC|$ and $MD$, are at the 
+level of technical noise. The percentage of the genes at noise level are:
+```{r noise}
+round(100 * sum(MD < 0.08)/length(MD), 2)
+```
+Hence,  the genes considered in the downstream analysis are:
+```{r filtering}
+idx <- which(MD > 0.08)
+md  <- MD[ idx]
+logfc  <- logFC[ idx ]
+dt <- data.frame(md = md , logfc = logfc)
+nrow(dt)
+```
+
+### Discretization of $MD$ and $|logFC|$
+
+To apply the LLT the values of $|logFC|$ and $MD$ must be discretized into 
+ordinal values. A K-means discretization approach is applied with following 
+auxiliary function
+
+```{r kmeanf}
+# ------------------- Auxiliary function for discretization ------------------ #
+Kmean.discretization <- function(x, categories, algorithm = "Hartigan-Wong",
+                                 iter.max = 10^6, column = 1L) {
+  centers <- kmeans(x, centers = categories, algorithm = algorithm,
+                    iter.max = iter.max)$centers
+  # order the centers
+  centers <- sort(centers)
+  cl <- stats::kmeans(stats::na.omit(x), centers = centers,
+                      algorithm = algorithm, iter.max = iter.max )
+  return( data.frame(x, cluster = cl$cluster) )
+}
+```
+
+
+### Discretization for $MD$
+```{r disc_md}
+cl = Kmean.discretization(md, categories = 3, algorithm = "MacQueen" )
+cl_summary <- sapply(1:3, function(k) summary(cl$x[cl$cluster == k]))
+colnames(cl_summary) <- c("low", "middle", "high")
+cl_summary
+```
+
+Cutpoint are now applied:
+```{r md_cut}
+cutpoint1 <- min(cl_summary[,2])
+cutpoint2 <- min(cl_summary[,3])
+
+dt$md_level <- rep("High")
+dt$md_level[ dt$md < cutpoint2 ] <- "Middle"
+dt$md_level[ dt$md < cutpoint1   ] <- "Low"
+dt$md_level <- factor(dt$md_level, levels = c("Low", "Middle", "High"))
+```
+
+### Discretization for $|logFC|$
+
+```{r disc_logfc}
+cl = Kmean.discretization(logfc, categories = 3, algorithm = "MacQueen" )
+cl_summary <- sapply(1:3, function(k) summary(cl$x[cl$cluster == k]))
+colnames(cl_summary) <- c("eLow", "eMiddle", "eHigh")
+cl_summary
+```
+
+```{r}
+cutpoint1 <- min(cl_summary[,2])
+cutpoint2 <- min(cl_summary[,3])
+
+dt$logfc_level <- rep("eHigh")
+dt$logfc_level[ dt$logfc < cutpoint2 ] <- "eMiddle"
+dt$logfc_level[ dt$logfc < cutpoint1   ] <- "eLow"
+
+dt$logfc_level <- factor(dt$logfc_level, levels = c("eLow", "eMiddle", "eHigh"))
+
+```
+
+
+### The contingency table and its graphic visualization
+
+In the current case, the contingency table suggests an obvious relationship between
+$|logFC|$  and $MD$.
+```{r contbl}
+m <- as.matrix( base::table( dt$logfc_level, dt$md_level) )
+m
+```
+
+The [spineplot](https://www.rdocumentation.org/packages/graphics/versions/3.6.0/topics/spineplot)
+of this contingency table (table(x = logfc_level, y = md_level)) help to visualize the
+existent relationship between $|logFC|$ and $MD$.
+
+```{r spineplot, fig.height=6, fig.width=8}
+par( mar = c(5, 7, 4, 4), family = "Serif", font = 2, cex = 0.8, las = 1, lwd = 0.2 )
+tb <- spineplot(m, col = c( "blue", "dodgerblue","deepskyblue" ),
+                xlab = "", ylab = "")
+mtext(side = 1, text = expression(italic(abs(logFC))), 
+      line = 2.5, cex = 1, font = 3)
+mtext(side = 2, text = expression(paste(italic("MD"))),
+      line = 4, cex = 1, font = 3)
+abline(a = 0.0, b = 0.72, col = "white", lty = "dashed", lwd = 1)
+```
+
+A dashed line was added to emphasize the direction of linear trend. From _"Low"_ to 
+_"high"_ there seems to be a linear relationship between pairwise proportion of
+$|logFC|$ and $MD$.
+
+Conceptually, the _spineplot_ is a plot of the conditional probability $P(y|x)$
+against $P(x)$. Since the joint probability distribution of these variable is
+described by a FGM copula, a linear relationship between $P(y|x)$ against $P(x)$
+must be expected, which is a property of FGM copula [@Balakrishna2009].
+
+### Testing association between $|logFC|$ and $MD$
+Here, we use the LLT test implemented in function  [lbl_test](https://www.rdocumentation.org/packages/coin/versions/1.3-0/topics/ContingencyTests)
+from the R package _coin_. Two test variants are available: 1) permutation test 
+and asymptotic test. 
+
+The asymptotic LLT test:
+```{r allt}
+lbl_test( m )
+```
+
+
+The permutation LLT test:
+```{r pllt}
+lbl_test( m, distribution = "approximate", B = 10000, alternative = "less" )
+```
+The null hypothesis of no association among the variables in the table is
+rejected. In the current case the p-value < 1e-04 and, hence, we do not 
+have enough evidence to support the null hypothesis.
+
+## Generalized linear model (GLM)
+
+The variable $MD$ was split into three levels, "0": "Low" ($0 < MD \leq 0.5$),
+"1": "Middle" ($0.5 < MD \leq 1$), and "2": "High" ($1 < MD $)
+
+
+```{r glm_dt_3}
+meth_cut <- 1
+
+xy <- cbind(MD, logFC)
+idx <- which(logFC > 0.5)
+xy <- data.frame(xy[idx, ])
+xy$md <- 0
+xy$md[xy$MD > meth_cut] <- 1
+```
+
+The glm support the decrease of $-logFC$ with th increment of $MD$. The model
+coefficients are higly statistically significant.
+```{r glm}
+gm <- glm(formula = logFC ~ md, data=xy, family = Gamma(link = "identity"))
+summary( gm )
+```
+
+The ANOVA test confirm the negative trend given by the coefficient of MD 
+(highly statisticallly significant).
+```{r anova_gamma}
+anova(gm, test = "LRT")
+
+```
+
+
+### Boxplot
+The boxplot suggest a clear trend of $-logFC$ decreasing with increment of MD
+levels. Notice that the _notchs_ from the boxes do not overlap, which implies
+that the differences between medians from three groups ("Low", "Middle", and
+"High") are statistically significant. So, the GLM results can be visualized.
+
+```{r boxplot_2, fig.width=9, fig.height=6}
+
+par(bty = "n", family = "serif", font = 2, cex = 1, lwd = 0.1, mar = c(4, 5, 2, 1.1))
+boxplot(logFC ~ md, data = xy, ylim = c(0.4, 2.5), xaxt ="n",  yaxt = "n", ann = FALSE)
+rect(0.5, 0.4, 3.5, 5, col = "grey94", lty = 0, lwd = 1)
+grid(0, 5, col = "white", lwd = 2, lty = 1)
+boxplot(logFC ~ md, data = xy, ylim = c(0.4, 2.5), notch = TRUE, xaxt ="n",
+        yaxt = "n", ann = FALSE, pch = 20, medcol = "darkblue", whisklwd = 1, staplelwd = 1,
+        col = c("deepskyblue", "dodgerblue"), outcol = "red", add  = TRUE)
+axis(1, padj = 0.1, at = 1:2, lwd = 0.5, tck = -0.02, line = -0.6, cex.axis = 1.3, 
+     labels = c("Low", "High"))
+axis(2, hadj = 1, las = 1, lwd = 0.5, tck = -0.02, line = -1, cex.axis = 1.4)
+mtext(side = 1, text = expression(paste(italic("MD"))),
+      line = 2.2, cex = 1.4, font = 3)
+mtext(side = 2, text = expression(italic(-logFC)), line = 2.1, cex = 1.4, font = 3)
+text(x = 1.5, y = 2.2, "***", pos = 3, cex = 1.2 )
+
+```
+
+# Analysis for up-regulated genes
+## Data set (II)
+
+```{r}
+.deg_mm1_wt1 <- deg_mm1_wt1[match(names(dmp_den_wt1_mm1), rownames(deg_mm1_wt1)), ]
+
+MD <- dmp_den_wt1_mm1$dmp_den # Methylation (|group mean density differences|)
+idx <- which(.deg_mm1_wt1$table$logFC > 0 ) # Up-regulated
+logFC <- .deg_mm1_wt1$table$logFC[idx] # Gene Expression (|logFC|)
+MD <- MD[idx]
+DataFrame(MD,logFC)
+```
+
+There are 6060 genes with $MD > 0$ and $logFC > 0$ to be included in the 
+downstream analysis. 
+
+## Distribution of the divergence of methylation level density at gene-body. MM1 vs WT1 (II)
+
+The best fitted model for $MD$, from comparison MM1 _vs_ WT1, was a mixture of
+Log-Normal and Weibull distributions.
+```{r meth_den_fit_2, warning=FALSE }
+
+meth_FIT <- fitMixDist(X = MD, args = list(lnorm = c(meanlog = 2.3, sdlog = 0.7),
+                                     weibull = c(shape = 0.5, scale = 2)),
+                  dens = TRUE, npoints = 900)
+summary(meth_FIT$fit)
+cat("\n Mixture proportions (phi):", meth_FIT$phi)
+```
+
+The graphic for histogram and density distribution curves: 
+```{r graphic_meth_2, fig.height=6, fig.width=8}
+par(mar = c(4, 4, 2, 1), font.lab=2, font=2,font.axis=2,family="serif" , lwd = 1.2, cex = 1.4)
+hist(MD, 90, freq = FALSE, las = 1, #ylim = c(0, 0.021), cex = 1,
+     panel.first={points(0, 0, pch=16, cex=1e6, col="grey95")
+       grid(col="white", lty = 1)}, main = text,
+     cex.main = 0.9, xlim = c(0, 5), family = "serif",
+     col = "cyan1", border = "deepskyblue", xaxt ="n", yaxt = "n", ann = FALSE)
+axis(1, padj = -1, las = 1, lwd = 0.8, tck = -0.02)
+axis(2, hadj = 0.7, las = 1, lwd = 0.8, tck = -0.02)
+mtext(side = 1, text = "Divergence of methylation level density at gene-body",
+      line = 1.6, cex = 1.4, font = 3)
+mtext(side = 2, text = "Density distribution", line = 2.1, cex = 1.4, font = 3)
+mtext("(Log-Normal & Weibull Mixture Dists.)", cex = 1.4, font = 3)
+x1 <- seq(0, 10, by = 0.01)
+lines(x1, dmixtdistr(x1, phi = meth_FIT$phi, arg = meth_FIT$args), col = "blue")
+
+```
+
+
+## Distribution of the $|logFC|$. MM1 vs WT1 (II)
+
+The best fitted model for the $|logFC|$, from comparison MM1 _vs_ WT1, was a
+mixture of Gamma and Weibull distributions. Function
+[fitMixDist](https://genomaths.github.io/usefr_manual/fitMixDist.html) calls the
+mixture function models set up in function
+[mixtdistr](https://genomaths.github.io/usefr_manual/mixtdistr.html)
+
+```{r logFC_fit_2, warning=FALSE}
+gexp_FIT <- fitMixDist(X = logFC, args = list(gamma = c(shape = 2, scale = 0.41),
+                                          weibull = c(shape = 2, scale = 0.4)),
+                       dens = TRUE, npoints = 900)
+summary(gexp_FIT$fit)
+cat("\n Mixture proportions (phi):", gexp_FIT$phi)
+```
+
+The graphic for histogram and density distribution curves: 
+```{r logFC_grh_2, fig.height=6, fig.width=8}
+par(mar = c(3, 3, 2, 1), font.lab=2, font=2,font.axis=2,family="serif", lwd = 1.2, cex = 1.4)
+hist(logFC, 120, freq = FALSE, las = 1, #ylim = c(0, 0.021), cex = 1,
+     panel.first={points(0, 0, pch=16, cex=1e6, col="grey95")
+       grid(col="white", lty = 1)}, main = text, 
+     cex.main = 0.9, xlim = c(0, 4), family = "serif",
+     col = "cyan1", border = "deepskyblue", xaxt ="n", yaxt = "n", ann = FALSE)
+axis(1, padj = -1.5, las = 1, lwd = 0.5, tck = -0.02)
+axis(2, hadj = 0.4, las = 1, lwd = 0.5, tck = -0.02)
+mtext(side = 1, text = expression(italic(abs(logFC))),
+      line = 1.3, cex = 1.4, font = 3)
+mtext(side = 2, text = "Density distribution", line = 1.6, cex = 1.4, font = 3)
+mtext("(Gamma & Weibull Mixture Dists.)", cex = 1.4, font = 3)
+x1 <- seq(0, 10, by = 0.01)
+lines(x1, dmixtdistr(x1, phi = gexp_FIT$phi, arg = gexp_FIT$args), col = "blue")
+```
+
+
+## Joint distribution of $MD$ and $|logFC|$ expressed in terms of Copula distribution (II)
+### Fitting Farlie–Gumbel–Morgenstern copulas with $MD$ and $|logFC|$ marginal CDFs (II)
+
+The first step requires for provide the parameters values, previously estimated,
+of the marginal distributions, which were given troughout the function
+[mixtdistr](https://genomaths.github.io/usefr_manual/mixtdistr.html). The
+specific parameter values are retrieved from the previous nonlinear fit obtained
+for the marginal CDFs:
+```{r cop_fit_par_2}
+margins = c("mixtdistr", "mixtdistr")
+parMargins = list(
+  list(phi = meth_FIT$phi, arg = meth_FIT$args),
+  list(phi = gexp_FIT$phi, arg = gexp_FIT$args))
+```
+
+The parameter estimation and goodness-of-fit (GOF) test take adventages of the
+tools availables in the R package
+[copula](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1).
+Both, parameter estimation and GOF, can be accomplished with function
+[bicopulaGOF](https://genomaths.github.io/usefr_manual/bicopulaGOF.html) from
+the R package [usefr](https://github.com/genomaths/usefr).
+
+```{r cop_fit_2, message = FALSE, warning=FALSE, comment=FALSE}
+fgm_cop <- bicopulaGOF(x = MD, y = logFC, copula = "fgmCopula", sample.size = 5999, 
+                       margins = margins, paramMargins = parMargins, nboots = 10, 
+                       approach = "chisq", breaks = 30, num.cores = 6L, seed = 123,
+                       verbose = FALSE)
+```
+
+The null hypothesis that the data follows FGM copula distribution is not rejected.
+```{r res_2}
+fgm_cop$gof
+```
+
+
+All the information needed about the fitted FGM copula is found in the object
+_fgm_cop$copula_, which is a
+[mvdc](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1/topics/mvdc-class)
+object from
+[copula](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1)
+package with several slots. In particular, the specific information about FGM
+copula is found in:
+
+```{r fgm_fitted_2}
+fgm_cop$copula@copula
+```
+
+### P-P plot. Graphical Diagnostics of GOF (II)
+The P-P plot is build with function
+[ppCplot](https://genomaths.github.io/usefr_manual/ppCplot.html) from the R
+package [usefr](https://github.com/genomaths/usefr). If the GOF is good enough,
+then it is expected that points in the graphics are closed to the diagonal (red)
+straight line. Details on how the computation is performed are provided in the
+help for function.
+[ppCplot](https://genomaths.github.io/usefr_manual/ppCplot.html).
+
+```{r ppPlot_2, fig.height=6, fig.width=8}
+g <- ppCplot(X = MD, Y = logFC, copula = fgm_cop$copula, npoints = 500, col = "blue", cex = 0.5)
+```
+
+
+Information on the data and copula used to yield the graphic are stored in the
+output variable _"g"_. For example, the empirical and theoretical probabilities used
+to built the graphic can be retrieved from the data frame: _"g$data"_:
+
+```{r g_data_2}
+DataFrame(g$data)
+```
+
+### Three-dimentional copula density plot (II)
+
+The domain region $(X, Y)$ is defined and function [dMvdc](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1/topics/Mvdc)
+is used to compute the density $z$ in the grid $[X,Y] \times [X,Y]$ using the 
+previous FMG fitted copula.
+```{r domain_2}
+X = seq(0, 1.5, length = 100)
+Y = seq(0, 1.8, length = 100)
+sp_rho <- round(rho(fgm_cop$copula@copula),3) # Spearman' s rho: -0.171
+
+z <- outer(X, Y, function(x,y) dMvdc(cbind(x,y),fgm_cop$copula)) * 4
+phi = 15; theta = 45
+sp_rho
+```
+
+An auxiliary function to draw the panels 
+```{r panels_2}
+panelfirst <- function(pmat) {
+  par(mfrow = c(1, 1),mar=c(4,7,0, 1), font=2,lwd = 0.01, cex =1, family = "serif")
+  YZ <- trans3D(x = rep(0, ncol(z)), Y, z[18,], pmat = pmat)
+
+  scatter2D(YZ$x, YZ$y, colvar = z[18,], lwd = 1, 
+            type = "l", add = TRUE, colkey = FALSE)
+
+  XZ <- trans3D(x = X, y = rep(max(Y), nrow(z)),
+                z = z[, 12], pmat = pmat)
+
+  scatter2D(XZ$x, XZ$y, colvar = z[, 12], lwd = 1, 
+            type = "l", add = TRUE, colkey = FALSE)
+  
+}
+```
+
+The graphical settings depend on the final printing destiny and on the dataset.
+```{r 3d_cop_2, message=FALSE, message=FALSE, fig.height=8, fig.width=8}
+par(mfrow = c(1, 1),mar=c(4,7,0, 1), font=2,lwd = 0.1, cex =1, family = "serif")
+persp3D(X, Y, z, lwd = 0.01, image = TRUE,
+        xlab = "", ylab = "", zlab = "", family = "serif",
+        box = T, panel.first = panelfirst, bty = "u",
+        col.panel = "steelblue", col.grid = "black", lwd.grid = 0.5,
+        contour = list(col = "black", side = "zmin", lwd = 0.4),
+        ticktype = "detailed", clab = "", expand = 0.7, d = 2,
+        phi = phi, theta = theta, resfac = 2.5, cex.lab = 1, lwd = 0.005,
+        xlim = c(0, 1.5), zlim = c(-5, 9), font=2, cex.axis = 1.2,
+        colkey = list(length = 0.5, width = 0.6, col.ticks = "black", lwd = 0.01,
+                      font=2, shift = 0, dist = 0, lwd.ticks = 0.01,  cex.clab = 1.2,
+                      cex.axis = 1, line = -0.8))
+text(0.38,-0.4, srt = 38, labels = expression(paste("|", italic(log[2]), italic(FC), "|")),
+     xpd = TRUE,font = 2, cex = 1.2)
+text(-0.41,-0.39, srt = -20, labels = expression(paste(italic("MD"))),
+     xpd = TRUE, font=2, cex = 1.2)
+text(-0.36,-0.5, srt = 0, labels = expression(paste("Spearman' s ", italic(rho), ": ", -0.164)),
+     xpd = TRUE, font = 1, cex = 1)
+```
+
+
+The marginal distributions are drawn in the $XZ$ and $YZ$ vertical planes.
+Consistent with the Spearman' s $\rho=-0.164$, for a fixed value of  $|log_2FC|$, 
+(a line parallel to $MD$ axis) the joint probability density distribution 
+function $f(X \leq MD, Y \leq log_2FC)$ decreasses with the increment of $MD$.
+That is, the probability to observe DEGs with values, say between 0.1 and 0.5,  
+$0.1 \leq log_2FC \leq 0.5$, is greater for $0.1 \leq MD \leq 0.5$ than for 
+$0.5 < MD \leq 1$.
+
+### Two-dimensional copula density plot, Contour plot (II)
+The 2D-dimensional plot permits to see in more detail the projection of the 
+density surface on the $XY$ plane and contour lines.
+
+It is not dificult to see that for a fixed value of $MD$ (a line parallel to $|log_2FC|$ axis) 
+the joint probability density distribution function $f(X \leq MD, Y \leq |log_2FC|)$ 
+(color gradient from red to blue) decreasses with the increment of $|log_2FC|$. 
+That is, the probability to observe $MD$ values, say between 0.1 and 0.5
+(see the squared region below) $0.1 \leq MD \leq 0.5$, is greater for 
+$0.1 \leq |log_2FC| \leq 0.5$ than for $0.5 < |log_2FC| \leq 1$.
+
+```{r contour2_2, echo=FALSE, fig.height=6, fig.width=8}
+X = seq(-0, 2, length = 300)
+Y = seq(-0, 0.8, length = 300)
+z <- outer(X, Y, function(x,y) dMvdc(cbind(x,y),fgm_cop$copula)) * 3.2
+
+par(family = "serif", font  = 2, bty="n", mar = c(4, 4, 2, 1))
+image2D(z = z, x = X, y = Y, colvar = z,  col = NULL, NAcol = "white", breaks = NULL,
+        border = NA, facets = TRUE, xlab = "", ylab = "", ylim = c(0, 0.8),
+        xlim = c(0, 2), xaxt ="n", yaxt = "n", ann = FALSE,
+        resfac = 1, clab = NULL, ticktype = "detailed",
+        colkey = list(length = 0.9, width = 0.7, col.ticks = "black", lwd = 0.01,
+                      font=2, shift = 0.02, dist = 0, lwd.ticks = 0.1,  cex.clab = 1.2,
+                      cex.axis = 1, line = -0.8, tcl = -1),
+        lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+        theta = 0, rasterImage = FALSE,
+        add = FALSE, plot = TRUE)
+contour(x = X, y = Y, z = z, add = TRUE, ylab = "logFC", nlevels = 10, bty = "n",
+        xlim = c(-0.05, 3), ylim = c(-0.05, 0.8), xaxt ="n", yaxt = "n", ann = FALSE,
+        lwd = 0.4, labcex = 0.9, vfont = c("serif", "bold"), method = "simple")
+axis(1, padj = -1.2, las = 1, lwd = 0.5, tck = -0.02, line = 0.6)
+axis(2, hadj = 0.4, las = 1, lwd = 0.5, tck = -0.02, line = 0.6)
+mtext(side = 1, text = expression(paste(italic("MD"))),
+      line = 2, cex = 1.4, font = 3)
+mtext(side = 2, text = expression(italic(logFC)), line = 2, cex = 1.4, font = 3)
+abline(v = 0.1, col = "black", lty = "dashed", lwd = 0.9)
+abline(v = 0.5, col = "black", lty = "dashed", lwd = 0.9)
+abline(v = 1, col = "black", lty = "dashed", lwd = 0.9)
+abline(h = 0.1, col = "black", lty = "dashed", lwd = 0.9)
+abline(h = 0.5, col = "black", lty = "dashed", lwd = 0.9)
+abline(h = 1, col = "black", lty = "dashed", lwd = 0.9)
+```
+
+In summary, gene expression and methylation processes are not independent in
+memory line first generation. There exist an stochastic deterministic dependence
+between $|log_2FC|$ and $MD$ that can be expressed in terms joint probability
+distribution, which leads to an inverse relationship between the conditioned
+expected values $|log_2FC|$ given $MD$, and vice versa.
+
+
+## Asymptotic linear-by-linear association test (II)
+
+As in the previous case (above), tt is obvious from the 2D density plots that
+for $MD$ < 0.08 the any relationship is not meaninful. In particular, both
+variables, $logFC$ and $MD$, are at the level of technical noise. The percentage
+of the genes at noise level are:
+```{r noise_2}
+round(100 * sum(MD < 0.08)/length(MD), 2)
+```
+
+The genes for the downstream analysis are:
+```{r filtering_2}
+idx <- which(MD > 0.08)
+md  <- MD[ idx]
+logfc  <- logFC[ idx ]
+dt <- data.frame(md = md , logfc = logfc)
+nrow(dt)
+```
+
+### Discretization of $MD$ and $logFC$ (II)
+
+```{r kmeanf_2}
+# ------------------- Auxiliary function for discretization ------------------ #
+Kmean.discretization <- function(x, categories, algorithm = "Hartigan-Wong",
+                                 iter.max = 10^6, column = 1L) {
+  centers <- kmeans(x, centers = categories, algorithm = algorithm,
+                    iter.max = iter.max)$centers
+  # order the centers
+  centers <- sort(centers)
+  cl <- stats::kmeans(stats::na.omit(x), centers = centers,
+                      algorithm = algorithm, iter.max = iter.max )
+  return( data.frame(x, cluster = cl$cluster) )
+}
+```
+
+
+### Discretization for $MD$ (II)
+```{r disc_md_2}
+cl = Kmean.discretization(md, categories = 3, algorithm = "MacQueen" )
+cl_summary <- sapply(1:3, function(k) summary(cl$x[cl$cluster == k]))
+colnames(cl_summary) <- c("low", "middle", "high")
+cl_summary
+```
+
+Cutpoint are now applied:
+```{r md_cut_2}
+cutpoint1 <- min(cl_summary[,2])
+cutpoint2 <- min(cl_summary[,3])
+
+dt$md_level <- rep("High")
+dt$md_level[ dt$md < cutpoint2 ] <- "Middle"
+dt$md_level[ dt$md < cutpoint1   ] <- "Low"
+dt$md_level <- factor(dt$md_level, levels = c("Low", "Middle", "High"))
+```
+
+### Discretization for $logFC$ (II)
+
+```{r disc_logfc_2}
+cl = Kmean.discretization(logfc, categories = 3, algorithm = "MacQueen" )
+cl_summary <- sapply(1:3, function(k) summary(cl$x[cl$cluster == k]))
+colnames(cl_summary) <- c("eLow", "eMiddle", "eHigh")
+cl_summary
+```
+
+```{r}
+cutpoint1 <- min(cl_summary[,2])
+cutpoint2 <- min(cl_summary[,3])
+
+dt$logfc_level <- rep("eHigh")
+dt$logfc_level[ dt$logfc < cutpoint2 ] <- "eMiddle"
+dt$logfc_level[ dt$logfc < cutpoint1   ] <- "eLow"
+
+dt$logfc_level <- factor(dt$logfc_level, levels = c("eLow", "eMiddle", "eHigh"))
+
+```
+
+
+### The contingency table and its graphic visualization (II)
+
+In the current case, the contingency table suggests an obvious relationship between
+$|logFC|$  and $MD$.
+```{r contbl_2}
+m <- as.matrix( base::table( dt$logfc_level, dt$md_level) )
+m
+```
+
+
+The [spineplot](https://www.rdocumentation.org/packages/graphics/versions/3.6.0/topics/spineplot)
+of this contingency table (table(x = logfc_level, y = md_level)) help to visualize the
+existent relationship bewtween $|logFC|$ and $MD$.
+
+```{r spineplot_2}
+par( mar = c(5, 7, 4, 4), family = "Serif", font = 2, cex = 0.8, las = 1, lwd = 0.2 )
+tb <- spineplot(m, col = c( "blue", "dodgerblue","deepskyblue" ),
+                xlab = "", ylab = "")
+mtext(side = 1, text = expression(italic(logFC)), 
+      line = 2.5, cex = 1, font = 3)
+mtext(side = 2, text = expression(paste(italic("MD"))),
+      line = 4, cex = 1, font = 3)
+abline(a = 0.0, b = 0.72, col = "white", lty = "dashed", lwd = 1)
+```
+
+A dashed line was added to emphasize the direction of linear trend. From _"Low"_ to 
+_"high"_ there seems to be a linear relationship between pairwise proportion of
+$|logFC|$ and $MD$.
+
+Conceptually, the _spineplot_ is a plot of the conditional probability $P(y|x)$
+against $P(x)$. Since the joint probability distribution of these variable is
+described by a FGM copula, a linear relationship between $P(y|x)$ against $P(x)$
+must be expected, which is a property of FGM copula [@Balakrishna2009].
+
+### Testing association between $logFC$ and $MD$ (II)
+Here, we use the LLT test implemented in function  [lbl_test](https://www.rdocumentation.org/packages/coin/versions/1.3-0/topics/ContingencyTests)
+from the R package _coin_. Two test variants are available: 1) permutation test 
+and asymptotic test. 
+
+The asimptotic LLT test:
+```{r allt_2}
+lbl_test( m )
+```
+
+
+The permutation LLT test:
+```{r pllt_2}
+lbl_test( m, distribution = "approximate", B = 10000, alternative = "less" )
+```
+
+
+The null hypothesis of no association among the variables in the table is
+rejected. In the current case the $p-value < 1e-04$ and, hence, we do not 
+have enough evidence to support the null hypothesis.
+
+## Generalized linear model (GLM) (II)
+
+The variable $MD$ is split int three levels, 0:"Low" ($0 < MD \leq 0.5$),
+1:"Middle" ($0.5 < MD \leq 1$), and 2:"High" ($1 < MD $)
+```{r glm_dt_2}
+meth_cut1 <- 0.5
+meth_cut2 <- 1.2
+
+xy <- cbind(MD, logFC)
+idx <- which(logFC > 0.5)
+xy <- data.frame(xy[idx, ])
+xy$md <- 0
+xy$md[xy$MD > meth_cut1] <- 1
+xy$md[xy$MD > meth_cut2] <- 2
+```
+
+
+The glm support the decrease of $-logFC$ with th eincrement of $MD$. The model coefficients
+are higly statistically significant.
+```{r glm_2}
+gm <- glm(formula = logFC ~ md, data=xy, family = Gamma(link = "identity"))
+summary( gm )
+```
+
+The ANOVA test confirm the negative trend given by the coefficient of MD 
+(highly statistically significant).
+```{r anova_gamma_2}
+anova(gm, test = "LRT")
+
+```
+
+### GLM group I ("Low" $MD$) versus group II ("Middle" $MD$) (II)
+
+Only genes with $MD < 1$ are analyzed. That is, only two groups are considered:
+0:"Middle" ($0.5 < MD \leq 1$), and 1:"High" ($1 < MD $)
+
+```{r glm_3}
+dt <- xy[xy$MD < meth_cut2, ]
+dt$md <- 0
+dt$md[ dt$MD > meth_cut1   ] <- 1
+
+gm <- glm(formula = logFC ~ md, data = dt, family = Gamma(link = "identity"))
+summary( gm )
+
+cat("\n =============== The ANOVA test  =============== \n\n")
+anova(gm, test = "LRT")
+
+```
+
+### GLM group II ("Middle" $MD$) versus group III ("High" $MD$) (II)
+Only genes with $MD < 1$ are analyzed. That is, only two groups are considered:
+0:"Low" ($0 < MD \leq 0.5$), 1:"Middle" ($0.5 < MD \leq 1$).
+
+
+```{r glm_4}
+dt <- xy[xy$MD > meth_cut1, ]
+dt$md <- 0
+dt$md[ dt$MD > meth_cut2   ] <- 1
+
+gm <- glm(formula = logFC ~ md, data = dt, family = Gamma(link = "identity"))
+summary( gm )
+
+cat("\n =============== The ANOVA test  =============== \n\n")
+anova(gm, test = "LRT")
+
+```
+
+### Boxplot (II)
+The boxplot suggest a clear trend of $-logFC$ decreassing with increment of MD
+levels. Notice that the _notchs_ from the boxes do not overlap, which implies
+that the differences between medians from three groups ("Low", "Middle", and
+"High") are statistically significant. So, the GLM results can be visualized.
+
+```{r boxplot_3, fig.width=9, fig.height=6}
+par(bty = "n", family = "serif", font = 2, cex = 1, lwd = 0.1)
+boxplot(logFC ~ md, data = xy, ylim = c(0.4, 2.5), xaxt ="n",  yaxt = "n", ann = FALSE)
+rect(0.5, 0.4, 3.5, 5, col = "grey94", lty = 0, lwd = 1)
+grid(0, 5, col = "white", lwd = 2, lty = 1)
+boxplot(logFC ~ md, data = xy, ylim = c(0.4, 2.5), notch = TRUE, xaxt ="n",
+        yaxt = "n", ann = FALSE, pch = 20, medcol = "darkblue", whisklwd = 1, staplelwd = 1,
+        col = c("deepskyblue", "dodgerblue", "dodgerblue3" ), outcol = "red", add  = TRUE)
+axis(1, padj = -0.6, at = 1:3, lwd = 0.5, tck = -0.02, line = -0.6, cex.axis = 1.3, 
+     labels = c("Low", "Middle", "High"))
+axis(2, hadj = 0.6, las = 1, lwd = 0.5, tck = -0.02, line = -1, cex.axis = 1.3)
+mtext(side = 1, text = expression(paste(italic("MD"))),
+      line = 1.3, cex = 1.4, font = 3)
+mtext(side = 2, text = expression(italic(-logFC)), line = 1, cex = 1.4, font = 3)
+text(x = 1.5, y = 2.2, "**", pos = 3, cex = 1.2 )
+
+```
+
+# References
+
+<div id="refs"></div>
+
+
+# Session info {.unnumbered}
+
+Here is the output of `sessionInfo()` on the system on which this document was
+compiled running pandoc `r rmarkdown::pandoc_version()`:
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
