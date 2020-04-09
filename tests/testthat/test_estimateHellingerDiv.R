@@ -9,15 +9,9 @@ test_that("estimateHellingerDiv using p", {
   expect_equal(estimateHellingerDiv(p), 0)
 })
 
-test_that("estimateHellingerDiv using p < 1", {
-  #TODO: handle errors
-  TRUE
-})
-
 test_that("estimateHellingerDiv using n", {
    p <- c(0, 2)
    n <- c(100, 200)
-   estimateHellingerDiv(p = p, n = n)
-   #TODO: handle this error
-   TRUE
+   hd <- try(estimateHellingerDiv(p = p, n = n), silent = TRUE)
+   expect_true(inherits(hd, "try-error"))
 })

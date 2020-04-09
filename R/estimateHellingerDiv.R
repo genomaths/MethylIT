@@ -37,6 +37,9 @@
 #'
 #' @export
 estimateHellingerDiv <- function(p, n = NULL) {
+    if (any(p > 1) | any(p < 0))
+        stop("*** Vector p has values out of the range [0, 1]")
+
     hdiv <- 0
     if (!is.na(sum(p)) && (sum(p) > 0)) {
         if (is.null(n)) {

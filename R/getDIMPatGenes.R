@@ -13,7 +13,6 @@
 #'     will be created using the gene (region) coordinates.
 #' @param ignore.strand When set to TRUE, the strand information is ignored in
 #'     the calculations. Default value: TRUE
-#' @param ... Not in use.
 #' @return A GRanges object
 #'
 #' @examples
@@ -59,8 +58,7 @@ getDIMPatGenes.default <- function(GR, GENES, ignore.strand = TRUE) {
         starts = start(GENES)
         ends = end(GENES)
         strands = strand(GENES)
-        GENES$gene_id <- paste(chr, starts, ends, strands,
-            sep = "_")
+        GENES$gene_id <- paste(chr, starts, ends, strands, sep = "_")
     }
     Hits <- findOverlaps(GR, GENES, type = "within",
         ignore.strand = ignore.strand)
@@ -103,7 +101,7 @@ getDIMPatGenes.GRanges <- function(GR, GENES, ignore.strand = TRUE) {
     }
 
     GR <- getDIMPatGenes.default(GR, GENES = GENES,
-        ignore.strand = ignore.strand)
+                                ignore.strand = ignore.strand)
     return(GR)
 }
 

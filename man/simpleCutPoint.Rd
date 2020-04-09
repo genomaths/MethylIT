@@ -41,19 +41,22 @@ Internal function to estimate simple cutpoint according to
 Youden Index.
 }
 \details{
-This function is called by function \code{\link{estimateCutPoint}}.
+This function is called by function
+\code{\link{estimateCutPoint}}.
 }
 \examples{
-data(PS)
+## Get a set of potential DMPS (PS)
+data(PS, package = 'MethylIT')
 
-cutpoint = simpleCutPoint(LR = PS,
-                            column = c(hdiv = TRUE, TV = TRUE,
-                                        wprob = TRUE, pos = TRUE),
-                            classifier = 'qda', n.pc = 4,
-                            control.names = c('C1', 'C2', 'C3'),
-                            treatment.names = c('T1', 'T2', 'T3'),
-                            tv.cut = 0.5, clas.perf = TRUE, prop = 0.6,
-                            div.col = 9L)
-cutpoint$testSetPerformance
+cutp <- simpleCutPoint(LR = PS, column = c(hdiv = TRUE, TV = TRUE,
+                                           wprob = TRUE, pos = TRUE),
+                       classifier = 'qda', n.pc = 4,
+                       control.names = c('C1', 'C2', 'C3'),
+                       treatment.names = c('T1', 'T2', 'T3'),
+                       tv.cut = 0.5, clas.perf = TRUE, prop = 0.6,
+                       div.col = 9L)
+
+cutp
+
 }
 \keyword{internal}

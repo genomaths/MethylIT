@@ -86,6 +86,7 @@
 #'
 #' @importFrom S4Vectors subjectHits mcols queryHits
 #' @importFrom IRanges IRanges
+#' @importFrom methods is
 #' @importFrom GenomeInfoDb seqnames seqlevels
 #' @importFrom BiocGenerics strand end strand<-
 #' @importFrom GenomicRanges GRanges GRangesList findOverlaps

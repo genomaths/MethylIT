@@ -1,80 +1,57 @@
 ---
 title: "Get started-with Methyl-IT"
-author: |
- | Robersy Sanchez$^1$
- | rus547@psu.edu
- |
- | $^1$Department of Biology. 
- | Pennsylvania State University, University Park, PA 16802
+author: 
+    - name: Robersy Sanchez
+      affiliation: Department of Biology.
+                   Pennsylvania State University, University Park, PA 16802
+      email: rus547@psu.edu
 date: "`r format(Sys.time(), '%d %B %Y')`"
-fontsize: 0.85em
-fontfamily: "serif"
 bibliography: bibliography.bib
 output: 
-  rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 3
-    number_sections: true
-    geometry: margin=1in
-    keep_md: yes
+    BiocStyle::pdf_document: default
+    BiocStyle::html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 2
+package: BiocStyle
 abstract: |
-  A fast introduction into methylation with Methyl-IT is provided here.
-  The methylome analysis implemented in Methyl-IT based on a signal-detection
-  and machine-learning approach.
+    A fast introduction into methylation analysis with Methyl-IT is provided
+    here. The methylome analysis implemented in Methyl-IT based on a
+    signal-detection and machine-learning approach. Vignettes with 
+    further examples are available at <https://genomaths.github.io/methylit/>.
 vignette: >
-  %\VignetteIndexEntry{Get started-with Methyl-IT}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Get started-with Methyl-IT}
+    %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::knitr}
 ---
 
 <style type="text/css">
-h1 { /* Header 1 */
-    /* font-size: 2.5em; */
-    font-family: "Times New Roman", Times, serif;
-    color: DarkBlue;
-}
 
-h2 { /* Header 2 */
-    /* font-size: 22px; */
-    color: DarkBlue;
-    font-family: "Times New Roman", Times, serif;
+.sidebar {
+font-size: 9px;
+text-indent: 0;
 }
-h3 { /* Header 3 */
-    /* font-size: 18px; */
-    color: DarkBlue;
-    font-family: "Times New Roman", Times, serif;
-}
-
-body{ /* Normal  */
-    /* font-size: 18px; */
-    font-family: "Times New Roman", Times, serif;
-    text-align: justify
-}
-
-code.r{ /* Code block */
-    font-size: 14px;
-}
-pre { /* Code block - determines code spacing between lines */
-    font-size: 14px;
-}
-
-#sidebar { font-size: 0.5em; }
-#sidebarContainer .sideHeader { font-size: 0.5em; }
 
 </style>
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
+
+
+```{r style, echo = FALSE, results = 'asis'}
+  BiocStyle::markdown()
+```
+
 
 ```{r setup, message=FALSE}
 library(MethylIT)
 ```
 
-# Methyl-IT pipeline
+# Background
 MethylIT is an R package for methylome analysis based on a signal-detection
 machine learning approach (SD-ML). This approach is postulated to provide
 greater sensitivity for resolving true signal from the methylation background
@@ -89,7 +66,7 @@ distribution is, in general, a member of generalized gamma distribution family,
 and it can be deduced on a statistical mechanical/thermodynamics basis from DNA
 methylation induced by thermal fluctuations [@Sanchez2016].
 
-## Load data 
+# Data sets
 
 Methyl-IT uses the read counts of methylation called derived from whole-genome
 bisulfite sequencing (WGBS). Methylome datasets of WGBS are available at Gene
@@ -97,9 +74,10 @@ Expression Omnibus (GEO DataSets). For the current example, we just load RData
 files containing the read-counts from several samples. 
 
 ```{r reads, message=FALSE}
-#### ============ Download methylation data from PSU's GitLab =============
-url <- paste0("https://git.psu.edu/genomath/MethylIT_examples/raw/master/",
-              "MethylIT_testing/memoryLine_100k_samples_cg.RData")
+## ===== Download methylation data from PSU's GitLab ========
+url <- paste0("https://git.psu.edu/genomath/MethylIT_examples",
+            "/raw/master/MethylIT_testing/",
+            "memoryLine_100k_samples_cg.RData")
 temp <- tempfile(fileext = ".RData")
 download.file(url = url, destfile = temp)
 load(temp)
@@ -109,11 +87,12 @@ names(meth_samples)
 
 ```
 
-### Gene annotation
-
+## Gene annotation
+Download _Arabidopsis thaliana_ TAIR10 gene annotation data
 ```{r genes, message=FALSE}
-url <- paste0("https://git.psu.edu/genomath/MethylIT_examples/raw/master/",
-              "MethylIT_testing/Arabidopsis_thaliana.TAIR10.38_only_genes.RData")
+url <- paste0("https://git.psu.edu/genomath/MethylIT_examples",
+            "/raw/master/MethylIT_testing/",
+            "Arabidopsis_thaliana.TAIR10.38_only_genes.RData")
 temp <- tempfile(fileext = ".RData")
 download.file(url = url, destfile = temp)
 load(temp)
@@ -129,14 +108,14 @@ mentioned metric space. The reason to measure the uncertainty variation with
 respect to the same reference resides in that even sibling individuals follow an
 independent ontogenetic development and, consequently, their developments follow
 independent stochastic processes. The reference individual is estimated with 
-function [poolFromGRlist](https://genomaths.github.io/methylit/reference/poolFromGRlist.html):
+function [poolFromGRlist](https://is.gd/qR79kW):
 ```{r ref}
-ref <- poolFromGRlist(list(meth_samples$W_3_1, meth_samples$W_3_2, meth_samples$W_3_3),
-                      stat = "mean", num.cores = 4L
+ref <- poolFromGRlist(list(meth_samples$W_3_1, meth_samples$W_3_2,
+                        meth_samples$W_3_3), stat = "mean", num.cores = 4L
 )
 ```
 
-## Estimation of information divergences
+# Estimation of information divergences
 To perform the comparison between the uncertainty of methylation levels
 from each group of individuals, control $(c)$ and treatment $(t)$, the
 divergence between the methylation levels of each individual is estimated with
@@ -144,7 +123,7 @@ respect to the reference sample.
 
 ```{r div}
 ml_samples <- meth_samples[c("W_3_3", "W_3_4","W_3_5",
-                             "M_3_1","M_3_2","M_3_3","M_3_4")]
+                            "M_3_1","M_3_2","M_3_3","M_3_4")]
 ml_hd <- estimateDivergence(ref = ref,
                             indiv = ml_samples,
                             Bayesian = TRUE,
@@ -157,18 +136,21 @@ ml_hd <- estimateDivergence(ref = ref,
 ml_hd$M_3_1
 ```
 
-Function [estimateDivergence](https://genomaths.github.io/methylit/reference/estimateDivergence.html) returns a list of GRanges objects with the four 
-columns of counts, the information divergence, and additional columns: 
+Function [estimateDivergence](https://is.gd/0ViBO9) returns a list of GRanges
+objects with the four columns of counts, the information divergence, and
+additional columns:
 
-  1. The original matrix of methylated ($c_i$) and unmethylated ($t_i$) read
-     counts from control ($i=1$) and treatment ($i=2$) samples.
-  2. "p1" and "p2": methylation levels for control and treatment, respectively.
-  3. "bay.TV": total variation TV = p2 - p1.
-  4. "TV": total variation based on simple counts: $TV=c1/(c1+t1)-c2/(c2+t2)$.
-  5. "hdiv": Hellinger divergence.
-  
-Observe that the absolute values |TV| is an information divergence as well, which
-is known as total variation distance (widely used in information theory).
+1. The original matrix of methylated ($c_i$) and unmethylated ($t_i$) read
+   counts from control ($i=1$) and treatment ($i=2$) samples.
+2. "p1" and "p2": methylation levels for control and treatment, 
+    respectively.
+3. "bay.TV": total variation $TV = p_2 - p_1$.
+4. "TV": total variation based on simple counts: 
+    $TV=c_1/(c_1+t_1)-c_2/(c_2+t_2)$.
+5. "hdiv": Hellinger divergence.
+
+Observe that the absolute values $|TV|$ is an information divergence as well,
+which is known as total variation distance (widely used in information theory).
 
 ## _Descriptive statistical analysis_
 A descriptive analysis on the distribution of Hellinger divergences of
@@ -181,20 +163,23 @@ data is not perfect. So, it is healthy to sees for potential issues.
 ```{r crit}
 ## Critical values
 critical.val <- do.call(rbind, lapply(ml_hd, function(x) {
-  hd.95 = quantile(x$hdiv, 0.95)
-  tv.95 = quantile(abs(x$bay.TV), 0.95)
-  btv.95 = quantile(abs(x$TV), 0.95)
-  return(c(tv = tv.95, hd = hd.95, TTV = btv.95,
-           num.sites.hd95 = sum(x$hdiv > hd.95),
-           num.sites.tv95 = sum(x$bay.TV > tv.95),
-           num.sites.btv.95 = sum(x$TV > btv.95)
-  ))}))
+    hd.95 = quantile(x$hdiv, 0.95)
+    tv.95 = quantile(abs(x$bay.TV), 0.95)
+    btv.95 = quantile(abs(x$TV), 0.95)
+    return(c(tv = tv.95, hd = hd.95, TTV = btv.95,
+            num.sites.hd95 = sum(x$hdiv > hd.95),
+            num.sites.tv95 = sum(x$bay.TV > tv.95),
+            num.sites.btv.95 = sum(x$TV > btv.95)
+    ))})
+)
 critical.val
 
 ```
 
-### Quality checking of the coverage
-After the raw data filtering introduced with [estimateDivergence](https://genomaths.github.io/methylit/reference/estimateDivergence.html) function, some coverage issue could be detected.  
+## Quality checking of the coverage
+After the raw data filtering introduced with
+[estimateDivergence](https://is.gd/0ViBO9) function, some coverage issue could
+be detected.
 
 ```{r cov}
 covr <- lapply(ml_hd, function(x) {
@@ -203,45 +188,45 @@ covr <- lapply(ml_hd, function(x) {
 })
 
 do.call(rbind, lapply(covr, function(x) {
-  q60 <- quantile(x, 0.6)
-  q9999 <- quantile(x, 0.9999)
-  idx1 <- which(x >= q60)
-  idx2 <- which(x <= 500)
-  q95 <- quantile(x, 0.95)
-  idx <- intersect(idx1, idx2)
-  return(c(
-    round(summary(x)),
-    q60,
-    quantile(x, c(0.95, 0.99, 0.999, 0.9999)),
-    num.siteGreater_8 = sum(x >= 8),
-    q60_to_500 = sum((x >= q60) & (x <= 500)),
-    num.siteGreater_500 = sum(x > 500)
-))}))
+    q60 <- quantile(x, 0.6)
+    q9999 <- quantile(x, 0.9999)
+    idx1 <- which(x >= q60)
+    idx2 <- which(x <= 500)
+    q95 <- quantile(x, 0.95)
+    idx <- intersect(idx1, idx2)
+    return(c(
+        round(summary(x)),
+        q60, quantile(x, c(0.95, 0.99, 0.999, 0.9999)),
+        num.siteGreater_8 = sum(x >= 8),
+        q60_to_500 = sum((x >= q60) & (x <= 500)),
+        num.siteGreater_500 = sum(x > 500)
+))})
+)
 ```
 
-## Estimation of the best fitted probability distribution model
+# Estimation of the best fitted probability distribution model
 A basic requirement for the application of signal detection is the knowledge of
 the probability distribution of the background noise. Probability distribution,
 as a Weibull distribution model, can be deduced on a statistical
 mechanical/thermodynamics basis for DNA methylation induced by thermal
 fluctuations [@Sanchez2016].
 
-```{r gof, message=FALSE}
+```{r gof, message=FALSE, results='hide'}
 gof <- gofReport(HD = ml_hd,
-                 model = c("Weibull2P", "Weibull3P",
-                           "Gamma2P", "Gamma3P"),
-                 column = 9,
-                 output = "all",
-                 confl_model = TRUE,
-                 num.cores = 4L,
-                 task = 2L,
-                 verbose = FALSE
+                model = c("Weibull2P", "Weibull3P",
+                        "Gamma2P", "Gamma3P"),
+                column = 9,
+                output = "all",
+                confl_model = TRUE,
+                num.cores = 4L,
+                task = 2L,
+                verbose = FALSE
 )
 gof$stats
 gof$bestModel
 ```
 
-## Signal detection
+# Signal detection
 The information thermodynamics-based approach is postulated to provide greater
 sensitivity for resolving true signal from the thermodynamic background within
 the methylome [@Sanchez2016]. Since the biological signal created within the
@@ -252,7 +237,7 @@ application of signal detection theory [@Greiner2000; @Carter2016; @Harpaz2013;
 resolution of methylation signal by reducing the signal-to-noise ratio and
 objectively controlling the false positive rate and prediction accuracy/risk.
 
-### _Potential methylation signal_
+## _Potential methylation signal_
 The first estimation in our signal detection step is the identification of the
 cytosine sites carrying potential methylation signal $PS$. The methylation
 regulatory signal does not hold the theoretical distribution and, consequently,
@@ -266,10 +251,10 @@ the previous step.
 
 ```{r ps}
 ps <- getPotentialDIMP(LR = ml_hd,
-                       nlms = gof$nlms,
-                       div.col = 9L,
-                       tv.col = 0.25,
-                       dist.name = gof$bestModel)
+                        nlms = gof$nlms,
+                        div.col = 9L,
+                        tv.col = 0.25,
+                        dist.name = gof$bestModel)
 ps$M_3_1
 ```
 
@@ -288,8 +273,7 @@ Although cutpoints are estimated for a single variable, the classification
 performance can be evaluated for several variables and applying different model
 classifiers. A optimal cutpoint distinguishes disease stages from healthy
 individual. The performance of this classification is given in the output of
-function
-[estimateCutPoint](https://genomaths.github.io/methylit/reference/estimateCutPoint.html).
+function [estimateCutPoint](https://is.gd/RR9iWY).
 
 A model classifier can be requested for further predictions and its
 classification performance is also provided. Below, the selected model
@@ -308,19 +292,19 @@ information divergences: *Hellinger divergence* (*div.col* = 9) or the *total*
 ```{r cutp}
 ### Cutpoint estimated using a model classifier
 cutpoint <- estimateCutPoint(LR = ps,
-                             simple = FALSE,
-                             div.col = 9,
-                             control.names = c("W_3_3", "W_3_4", "W_3_5"),
-                             treatment.names = c("M_3_1", "M_3_2", "M_3_3",
-                                                 "M_3_4", "M_3_5"),
-                             column = c(hdiv = TRUE, bay.TV = TRUE,
+                            simple = FALSE,
+                            div.col = 9,
+                            control.names = c("W_3_3", "W_3_4", "W_3_5"),
+                            treatment.names = c("M_3_1", "M_3_2", "M_3_3",
+                                                "M_3_4", "M_3_5"),
+                            column = c(hdiv = TRUE, bay.TV = TRUE,
                                         wprob = TRUE, pos = TRUE),
-                             classifier1 = "pca.qda", n.pc = 4,
-                             classifier2 = "pca.logistic",
-                             center = TRUE,
-                              scale = TRUE,
-                              clas.perf = TRUE,
-                              verbose = FALSE
+                            classifier1 = "pca.qda", n.pc = 4,
+                            classifier2 = "pca.logistic",
+                            center = TRUE,
+                            scale = TRUE,
+                            clas.perf = TRUE,
+                            verbose = FALSE
 )
 cutpoint$cutpoint
 cutpoint$testSetPerformance
@@ -329,7 +313,7 @@ cutpoint$testSetModel.FDR
 
 
 Differentially methylated positions (DMPs) can be now identified using 
-[selectDIMP](https://genomaths.github.io/methylit/reference/selectDIMP.html) function
+[selectDIMP](https://is.gd/7cVEEd) function
 
 ```{r dmps}
 dmps <- selectDIMP(ps, div.col = 9, cutpoint = cutpoint$cutpoint)
@@ -337,64 +321,77 @@ data.frame(dmps =unlist(lapply(dmps, length)))
 
 ```
 
-## Differentially methylated genes (DMGs)
+# Differentially methylated genes (DMGs)
 Differentially methylated
 genes (DMGs) are estimated from group comparisons for the number of DMPs on
 gene-body regions between control and treatment. 
 
-Function [getDIMPatGenes](https://genomaths.github.io/methylit/reference/getDIMPatGenes.html)
-is used to count the number of DMPs at gene-body. Nevertheless, it can be used
-for any arbitrary specified genomic region as well. The operation of this
-function is based on the '*findOverlaps*' function from the '*GenomicRanges*'
-Bioconductor R package. The '*findOverlaps*' function has several critical
-parameters like, for example, '*maxgap*', '*minoverlap*', and '*ignore.strand*'.
-In our function
-[getDIMPatGenes](https://genomaths.github.io/methylit/reference/getDIMPatGenes.html),
-except for setting ignore.strand = TRUE and *type = "within"*, we preserve the rest of default
-'findOverlaps' parameters. In this case, these are important parameter settings
-because the local mechanical effect of methylation changes on a DNA region
-where a gene is located is independent of the strand where the gene is encoded.
-That is, methylation changes located in any of the two DNA strands inside the
-gene-body region will affect the flexibility of the DNA molecule [@Choy2010;
+Function [getDIMPatGenes](https://is.gd/WQzX5I) is used to count the number of
+DMPs at gene-body. Nevertheless, it can be used for any arbitrary specified
+genomic region as well. The operation of this function is based on the
+'*findOverlaps*' function from the '*GenomicRanges*' Bioconductor R package. The
+'*findOverlaps*' function has several critical parameters like, for example,
+'*maxgap*', '*minoverlap*', and '*ignore.strand*'. In our function
+[getDIMPatGenes](https://is.gd/WQzX5I), except for setting ignore.strand = TRUE
+and *type = "within"*, we preserve the rest of default 'findOverlaps'
+parameters. In this case, these are important parameter settings because the
+local mechanical effect of methylation changes on a DNA region where a gene is
+located is independent of the strand where the gene is encoded. That is,
+methylation changes located in any of the two DNA strands inside the gene-body
+region will affect the flexibility of the DNA molecule [@Choy2010;
 @Severin2011].
 
 ```{r dmps_at_genes}
 nams <- names(dmps)
 dmps_at_genes <- getDIMPatGenes(GR = dmps, GENES = genes, ignore.strand = TRUE)
 dmps_at_genes <- uniqueGRanges(dmps_at_genes, columns = 2L,
-                               ignore.strand = TRUE, type = "equal")
+                                ignore.strand = TRUE, type = "equal")
 colnames(mcols(dmps_at_genes)) <- nams
 dmps_at_genes
 
 ```
 
-### _Setting experiment design_
+## _Setting the experiment design_
 
-The experimental design is set with [glmDataSet](https://genomaths.github.io/methylit/reference/glmDataSet.html) 
+The experimental design is set with
+[glmDataSet](https://genomaths.github.io/methylit/reference/glmDataSet.html) 
 function
 ```{r exper}
 colData <- data.frame(condition = factor(c("WT", "WT", "WT",
-                                           "ML", "ML", "ML", "ML"),
-                                         levels = c("WT", "ML")),
-                      nams,
-                      row.names = 2)
+                                            "ML", "ML", "ML", "ML"),
+                                        levels = c("WT", "ML")),
+                    nams,
+                    row.names = 2)
 ## A RangedGlmDataSet is created
 ds <- glmDataSet(GR = dmps_at_genes, colData = colData)
 ```
 
-### Testing for DMGs
-DMGs are detected using function [countTest2](https://genomaths.github.io/methylit/reference/countTest2.html).
+## Testing for DMGs
+DMGs are detected using function
+[countTest2](https://genomaths.github.io/methylit/reference/countTest2.html).
 ```{r }
 dmgs <- countTest2(DS = ds, num.cores = 4L,
-                   tasks = 2L,
-                   minCountPerIndv = 7,
-                   maxGrpCV = c(1.2, 1.2),
-                   Minlog2FC = 0.5,
-                   CountPerBp = 0.001,
-                   test = "LRT",
-                   verbose = TRUE)
+                    tasks = 2L,
+                    minCountPerIndv = 7,
+                    maxGrpCV = c(1.2, 1.2),
+                    Minlog2FC = 0.5,
+                    CountPerBp = 0.001,
+                    test = "LRT",
+                    verbose = TRUE)
 dmgs
 ```
 
-## References
+# References
+
+<div id="refs"></div>
+
+
+# Session info {.unnumbered}
+
+Here is the output of `sessionInfo()` on the system on which this document was
+compiled running pandoc `r rmarkdown::pandoc_version()`:
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
 

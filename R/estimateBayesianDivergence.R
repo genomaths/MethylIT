@@ -201,10 +201,8 @@ estimateBayesianDivergence <- function(x, Bayesian = FALSE,
             n1[n1 == 0] <- 2
             n2[n2 == 0] <- 2
 
-            p1 <- .betaBinPosteriors(x[, 1], n1, a = beta1[1],
-                b = beta1[2])
-            p2 <- .betaBinPosteriors(x[, 3], n2, a = beta2[1],
-                b = beta2[2])
+            p1 <- .betaBinPosteriors(x[, 1], n1, a = beta1[1], b = beta1[2])
+            p2 <- .betaBinPosteriors(x[, 3], n2, a = beta2[1], b = beta2[2])
         }
 
         x <- cbind(p1, p2)
@@ -212,8 +210,7 @@ estimateBayesianDivergence <- function(x, Bayesian = FALSE,
         if (verbose)
             cat("*** Estimating Hellinger divergence... \n")
         hdiv <- bplapply(seq_len(nrow(x)), function(i) {
-            estimateHellingerDiv(p = as.numeric(x[i,
-                ]), n = as.numeric(n[i, ]))
+            estimateHellingerDiv(p = as.numeric(x[i, ]), n = as.numeric(n[i, ]))
         }, BPPARAM = bpparam)
         if (verbose)
             cat("* Coercing from list to vector...\n")

@@ -136,16 +136,13 @@ classification performance indicators (see below) suggest that the treatment
 does not induce a significant regulatory signal different from control.
 }
 \examples{
-data(cutpoint, PS, package = 'MethylIT')
-
-## DMPs are selected using the cupoints
-DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
-tv.cut = 0.68)
+## Get a data set of DMPs
+data(dmps, package = 'MethylIT')
 
 ## Classification of DMPs into two clases: DMPS from control and DMPs
 ## from treatment samples and evaluation of the classifier performance
 ## (for more details see ?evaluateDIMPclass).
-perf <- evaluateDIMPclass(LR = DMPs,
+perf <- evaluateDIMPclass(LR = dmps,
                         column = c(hdiv = TRUE, TV = TRUE,
                                     wprob = TRUE, pos = TRUE),
                         classifier = 'lda', n.pc = 4L,
@@ -155,4 +152,5 @@ perf <- evaluateDIMPclass(LR = DMPs,
 
 ## Model classification performance
 perf$Performance
+
 }

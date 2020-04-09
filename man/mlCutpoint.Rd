@@ -48,8 +48,10 @@ machine-learning approach
 This function is called by function \code{\link{estimateCutPoint}}.
 }
 \examples{
+## Get a set of potential DMPS (PS)
 data(PS, package = 'MethylIT')
-cutp = mlCutpoint(LR = PS,
+
+cutp <- mlCutpoint(LR = PS,
                  column = c(hdiv = TRUE, TV = TRUE,
                             wprob = TRUE, pos = TRUE),
                  classifier1 = 'qda', n.pc = 4,
@@ -57,6 +59,6 @@ cutp = mlCutpoint(LR = PS,
                  treatment.names = c('T1', 'T2', 'T3'),
                  tv.cut = 0.68, prop = 0.6,
                  div.col = 9L)
-cutp$testSetPerformance
+cutp
 }
 \keyword{internal}

@@ -2,20 +2,14 @@
 % Please edit documentation in R/glmDataSet.R
 \name{glmDataSet}
 \alias{glmDataSet}
-\alias{print.glmDataSet}
-\alias{print.RangedGlmDataSet}
 \title{Data set constructor for class glmDataSet}
 \usage{
 glmDataSet(GR = NULL, counts = NULL, colData = NULL)
-
-\method{print}{glmDataSet}(x, digits = getOption("digits"), ...)
-
-\method{print}{RangedGlmDataSet}(x, digits = getOption("digits"), ...)
 }
 \arguments{
-\item{GR}{A GRanges object with the count matrix of DMPs in the metacolumns
-(see \emph{'counts'}). If provided, then leave parameter
-\emph{'counts = NULL'}.}
+\item{GR}{A \code{\link[GenomicRanges]{GRanges-class}} object with the count
+matrix of DMPs in the metacolumns (see \emph{'counts'}). If provided, then
+leave parameter \emph{'counts = NULL'}.}
 
 \item{counts}{Count matrix of DMPs with minimal dimensions 1 (row) x 4
 (columns). Column names must corresponds to the rownames from parameter
@@ -25,11 +19,6 @@ glmDataSet(GR = NULL, counts = NULL, colData = NULL)
 a factor with exactly two levels. The rownames of \emph{colData}
 individual samples. The row names of \emph{colData} must correspond to
 th column names of the count matrix.}
-
-\item{x}{Object from class \emph{glmDataSet} or from class
-\emph{'RangedGlmDataSet'}.}
-
-\item{digits}{Number of significant digits to be used.}
 }
 \value{
 An object from 'RangedGlmDataSet' class containing these attributes:
@@ -65,10 +54,9 @@ colData <- data.frame(condition = factor(c('A','A','B','B')),
 c('A1','A2','B1','B2'), row.names = 2)
 
 ## A RangedGlmDataSet is created
-ds <- glmDataSet(GR = GR, colData = colData)
+glmDataSet(GR = GR, colData = colData)
 
 }
 \author{
 Robersy Sanchez
 }
-\keyword{internal}

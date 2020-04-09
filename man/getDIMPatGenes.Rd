@@ -33,8 +33,6 @@ will be created using the gene (region) coordinates.}
 
 \item{ignore.strand}{When set to TRUE, the strand information is ignored in
 the calculations. Default value: TRUE}
-
-\item{...}{Not in use.}
 }
 \value{
 A GRanges object

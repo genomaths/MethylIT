@@ -79,14 +79,93 @@ cutpoint = estimateCutPoint(LR = PS, simple = FALSE,
                           clas.perf = TRUE, prop = 0.6,
                           div.col = 9L)
 
-usethis::use_data(PS, HD, cutpoint, gof, overwrite = TRUE )
+
+## DMPs are selected using the cupoints
+dmps <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint,
+tv.cut = 0.68)
+
+## Classification of DMPs into two clases: DMPS from control and DMPs
+## from treatment samples and evaluation of the classifier performance
+## (for more details see ?evaluateDIMPclass).
+lda_perf <- evaluateDIMPclass(LR = dmps,
+                        column = c(hdiv = TRUE, TV = TRUE,
+                                    wprob = TRUE, pos = TRUE),
+                        classifier = 'lda', n.pc = 4L,
+                        control.names =  c('C1', 'C2', 'C3'),
+                        treatment.names = c('T1', 'T2', 'T3'),
+                        center = TRUE, scale = TRUE, prop = 0.6)
+
+qda_perf <- evaluateDIMPclass(LR = dmps,
+                              column = c(hdiv = TRUE, TV = TRUE,
+                                         wprob = TRUE, pos = TRUE),
+                              classifier = 'qda', n.pc = 4L,
+                              control.names =  c('C1', 'C2', 'C3'),
+                              treatment.names = c('T1', 'T2', 'T3'),
+                              center = TRUE, scale = TRUE, prop = 0.6)
+
+pcaLda_perf <- evaluateDIMPclass(LR = dmps,
+                              column = c(hdiv = TRUE, TV = TRUE,
+                                         wprob = TRUE, pos = TRUE),
+                              classifier = 'pca.lda', n.pc = 4L,
+                              control.names =  c('C1', 'C2', 'C3'),
+                              treatment.names = c('T1', 'T2', 'T3'),
+                              center = TRUE, scale = TRUE, prop = 0.6)
+
+pcaQda_perf <- evaluateDIMPclass(LR = dmps,
+                              column = c(hdiv = TRUE, TV = TRUE,
+                                         wprob = TRUE, pos = TRUE),
+                              classifier = 'pca.qda', n.pc = 4L,
+                              control.names =  c('C1', 'C2', 'C3'),
+                              treatment.names = c('T1', 'T2', 'T3'),
+                              center = TRUE, scale = TRUE, prop = 0.6)
 
 
+logit_perf <- evaluateDIMPclass(LR = dmps,
+                              column = c(hdiv = TRUE, TV = TRUE,
+                                         wprob = TRUE, pos = TRUE),
+                              classifier = 'logistic', n.pc = 4L,
+                              control.names =  c('C1', 'C2', 'C3'),
+                              treatment.names = c('T1', 'T2', 'T3'),
+                              center = TRUE, scale = TRUE, prop = 0.6)
+
+pcalogit_perf <- evaluateDIMPclass(LR = dmps,
+                                column = c(hdiv = TRUE, TV = TRUE,
+                                           wprob = TRUE, pos = TRUE),
+                                classifier = 'pca.logistic', n.pc = 4L,
+                                control.names =  c('C1', 'C2', 'C3'),
+                                treatment.names = c('T1', 'T2', 'T3'),
+                                center = TRUE, scale = TRUE, prop = 0.6)
 
 
+# ========================= dataset for countTes2 =============================
+set.seed(133) # Set a seed
+## A GRanges object with the count matrix in the metacolumns is created
+countData <- matrix(sample.int(200, 500, replace = TRUE), ncol = 4)
+colnames(countData) <- c('A1','A2','B1','B2')
+
+start <- seq(1, 25e4, 2000)
+end <- start + 1000
+chr <- c(rep('chr1', 70), rep('chr2', 55))
+GR <- GRanges(seqnames = chr, IRanges(start = start, end = end))
+mcols(GR) <- countData
+
+## Gene IDs
+names(GR) <- paste0('gene', 1:length(GR))
+
+## An experiment design is set.
+colData <- data.frame(condition = factor(c('A','A','B','B')),
+                    c('A1','A2','B1','B2'), row.names = 2)
+
+## A RangedGlmDataSet is created
+ds <- glmDataSet(GR = GR, colData = colData)
 
 
+usethis::use_data(PS, HD, cutpoint, gof, dmps, lda_perf, qda_perf,
+                  logit_perf, pcalogit_perf, pcaLda_perf, pcaQda_perf, ds,
+                  overwrite = TRUE )
 
+data(PS, HD, cutpoint, gof, dmps, lda_perf, qda_perf,
+     logit_perf, pcalogit_perf, pcaLda_perf, pcaQda_perf)
 
 
 

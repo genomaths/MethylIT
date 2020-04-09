@@ -71,6 +71,7 @@ data(PS, cutpoint)
 ## the noise. That is, DMPs are selected using the cupoints
 dmps <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint)
 
+\donttest{
 ## Build clusters of DMPs
 x1 = dmpClusters(GR = dmps, maxDist = 7, minNumDMPs = 6, num.cores=2L,
                 verbose = FALSE)
@@ -99,6 +100,8 @@ dmrs <- countTest2(DS = ds, num.cores = 4L, minCountPerIndv = 4,
                 CountPerBp = 0.001, test = 'LRT',
                 verbose = TRUE)
 dmrs
+}
+
 }
 \references{
 \enumerate{

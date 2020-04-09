@@ -35,6 +35,12 @@ navbar:
       - text: ------
       - text: "Optimal cutpoint for the methylation signal"
         href: articles/Cutpoint_estimation_with_Methyl-IT.html
+      - text: ------
+      - text: "Principal Components and Linear Discriminant Analyses with Methyl-IT"
+        href: articles/pca_lda_with_methylit.html
+      - text: ------
+      - text: "Association Between Gene Expression and Cytosine DNA Methylation at gene-body"
+        href: articles/GenExp_Methylation_association_hyper_down-regulated.html
     news:
       text: News
       href: news/index.html
@@ -108,8 +114,15 @@ reference:
   - '`HD`'
   - '`PS`'
   - '`cutpoint`'
+  - '`dmps`'
+  - '`ds`'
   - '`gof`'
-
+  - '`lda_perf`'
+  - '`logit_perf`'
+  - '`pcaLda_perf`'
+  - '`pcaQda_perf`'
+  - '`pcalogit_perf`'
+  - '`qda_perf`'
 articles:
 - title: Vignettes
   desc: ~
@@ -117,5 +130,5 @@ articles:
   - '`MethylIT`'
   - '`Methylation_analysis_with_Methyl-IT`'
   - '`cancer_example`'
-  - '`Cutpoint_estimation_with_Methyl-IT`'
-
+  - '`pca_lda_with_methylit`'
+  - '`GenExp_Methylation_association_hyper_down-regulated`'
