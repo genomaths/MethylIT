@@ -1,5 +1,5 @@
 #' @rdname getDIMPatGenes
-#' @name getDIMPatGene
+#' @name getDIMPatGenes
 #' @title Count DMPs at gene-body
 #' @description The function counts DMPs overlapping with gene-body. In fact,
 #'     this function also can be used to count DMPs overlapping with any set of
@@ -11,8 +11,12 @@
 #'     meta-column named 'gene_id' carying the gene ids should be included. If
 #'     the meta-column named 'gene_id' is not provided, then gene (region) ids
 #'     will be created using the gene (region) coordinates.
-#' @param ignore.strand When set to TRUE, the strand information is ignored in
-#'     the calculations. Default value: TRUE
+#' @param ignore.strand,type Same as for
+#'  \code{\link[GenomicRanges]{findOverlaps-methods}}.
+#' @param ... optional arguments for
+#'  \code{\link[GenomicRanges]{findOverlaps-methods}}. Users must evaluate
+#'  whether specific setting makes sense on each particular context.
+#' @seealso \code{\link{getDMPatRegions}}
 #' @return A GRanges object
 #'
 #' @examples
@@ -41,13 +45,15 @@
 #' @importFrom data.table data.table
 #' @importFrom rtracklayer import
 #' @export
-getDIMPatGenes <- function(GR, GENES, ignore.strand = TRUE)
+getDIMPatGenes <- function(GR, GENES, type = "within",
+                            ignore.strand = TRUE, ...)
                             UseMethod("getDIMPatGenes")
 
 #' @rdname getDIMPatGenes
 #' @importFrom S4Vectors mcols
 #' @export
-getDIMPatGenes.default <- function(GR, GENES, ignore.strand = TRUE) {
+getDIMPatGenes.default <- function(GR, GENES, type = "within",
+                                    ignore.strand = TRUE, ...) {
     gene_id <- GENES$gene_id
     if (any(is.na(gene_id))) {
         warnings("At least one gene ID is NA. Using gene coordinates as IDs")
@@ -60,8 +66,8 @@ getDIMPatGenes.default <- function(GR, GENES, ignore.strand = TRUE) {
         strands = strand(GENES)
         GENES$gene_id <- paste(chr, starts, ends, strands, sep = "_")
     }
-    Hits <- findOverlaps(GR, GENES, type = "within",
-        ignore.strand = ignore.strand)
+    Hits <- findOverlaps(GR, GENES, type = type,
+                        ignore.strand = ignore.strand, ...)
     if (length(Hits) > 0) {
         DIMP <- GENES[subjectHits(Hits)]
         DIMP <- data.table(as.data.frame(DIMP))
@@ -70,8 +76,8 @@ getDIMPatGenes.default <- function(GR, GENES, ignore.strand = TRUE) {
             by = gene_id]
         DIMP <- data.frame(DIMP)
         DIMP <- makeGRangesFromDataFrame(DIMP, keep.extra.columns = TRUE)
-        Hits <- findOverlaps(DIMP, GENES, type = "within",
-            ignore.strand = ignore.strand)
+        Hits <- findOverlaps(DIMP, GENES, type = type,
+                            ignore.strand = ignore.strand, ...)
         GENES <- GENES[subjectHits(Hits), ]
         DIMP <- as.data.frame(DIMP[queryHits(Hits),
             ])
@@ -89,7 +95,8 @@ getDIMPatGenes.default <- function(GR, GENES, ignore.strand = TRUE) {
 #' @importFrom S4Vectors mcols
 #' @exportMethod getDIMPatGenes.GRanges
 #' @export
-getDIMPatGenes.GRanges <- function(GR, GENES, ignore.strand = TRUE) {
+getDIMPatGenes.GRanges <- function(GR, GENES, type = "within",
+                                    ignore.strand = TRUE, ...) {
     vn <- c("hdiv", "TV", "wprob")
     ns <- colnames(mcols(GR))
     nams <- sum(is.element(vn, ns))
@@ -100,30 +107,33 @@ getDIMPatGenes.GRanges <- function(GR, GENES, ignore.strand = TRUE) {
             " named columns to be used as an argument for 'getDIMPatGenes'")
     }
 
-    GR <- getDIMPatGenes.default(GR, GENES = GENES,
-                                ignore.strand = ignore.strand)
+    GR <- getDIMPatGenes.default(GR, GENES = GENES, type = type,
+                                ignore.strand = ignore.strand, ...)
     return(GR)
 }
 
 #' @rdname getDIMPatGenes
 #' @export
-getDIMPatGenes.pDMP <- function(GR, GENES, ignore.strand = TRUE) {
-    return(lapply(GR, getDIMPatGenes.default, GENES = GENES,
-        ignore.strand = ignore.strand, keep.attr = TRUE))
+getDIMPatGenes.pDMP <- function(GR, GENES, type = "within",
+                                ignore.strand = TRUE, ...) {
+    return(lapply(GR, getDIMPatGenes.default, GENES = GENES, type = type,
+        ignore.strand = ignore.strand, keep.attr = TRUE, ...))
 }
 
 #' @rdname getDIMPatGenes
 #' @export
-getDIMPatGenes.InfDiv <- function(GR, GENES, ignore.strand = TRUE) {
-    return(lapply(GR, getDIMPatGenes.default, GENES = GENES,
-        ignore.strand = ignore.strand, keep.attr = TRUE))
+getDIMPatGenes.InfDiv <- function(GR, GENES, type = "within",
+                                ignore.strand = TRUE, ...) {
+    return(lapply(GR, getDIMPatGenes.default, GENES = GENES, type = type,
+        ignore.strand = ignore.strand, keep.attr = TRUE, ...))
 }
 
 #' @rdname getDIMPatGenes
 #' @export
-getDIMPatGenes.list <- function(GR, GENES, ignore.strand = TRUE) {
-    return(lapply(GR, getDIMPatGenes.default, GENES = GENES,
-        ignore.strand = ignore.strand, keep.attr = TRUE))
+getDIMPatGenes.list <- function(GR, GENES, type = "within",
+                                ignore.strand = TRUE, ...) {
+    return(lapply(GR, getDIMPatGenes.default, GENES = GENES, type = type,
+        ignore.strand = ignore.strand, keep.attr = TRUE, ...))
 }
 
 
