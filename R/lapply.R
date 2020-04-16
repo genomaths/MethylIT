@@ -22,14 +22,12 @@
 #' class(lapply(x, mean, keep.attr = TRUE))
 #' @keywords internal
 #' @export
-lapply <- function(x, FUN, ...) UseMethod("lapply", 
-    x)
+lapply <- function(x, FUN, ...) UseMethod("lapply", x)
 
 #' @name lapply.default
 #' @rdname lapply
 #' @export
-lapply.default <- function(x, FUN, keep.attr = FALSE, 
-    ...) {
+lapply.default <- function(x, FUN, keep.attr = FALSE, ...) {
     if (keep.attr) {
         cl <- class(x)
         nm <- names(x)
