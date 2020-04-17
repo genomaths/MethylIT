@@ -9,36 +9,67 @@
 \alias{getDIMPatGenes.list}
 \title{Count DMPs at gene-body}
 \usage{
-getDIMPatGenes(GR, GENES, type = "within", ignore.strand = TRUE, ...)
+getDIMPatGenes(
+  GR,
+  GENES,
+  type = "within",
+  ignore.strand = TRUE,
+  output = c("list", "GRanges"),
+  ...
+)
 
 \method{getDIMPatGenes}{default}(GR, GENES, type = "within", ignore.strand = TRUE, ...)
 
 \method{getDIMPatGenes}{GRanges}(GR, GENES, type = "within", ignore.strand = TRUE, ...)
 
-\method{getDIMPatGenes}{pDMP}(GR, GENES, type = "within", ignore.strand = TRUE, ...)
+\method{getDIMPatGenes}{pDMP}(
+  GR,
+  GENES,
+  type = "within",
+  ignore.strand = TRUE,
+  output = c("list", "GRanges"),
+  ...
+)
 
-\method{getDIMPatGenes}{InfDiv}(GR, GENES, type = "within", ignore.strand = TRUE, ...)
+\method{getDIMPatGenes}{InfDiv}(
+  GR,
+  GENES,
+  type = "within",
+  ignore.strand = TRUE,
+  output = c("list", "GRanges"),
+  ...
+)
 
-\method{getDIMPatGenes}{list}(GR, GENES, type = "within", ignore.strand = TRUE, ...)
+\method{getDIMPatGenes}{list}(
+  GR,
+  GENES,
+  type = "within",
+  ignore.strand = TRUE,
+  output = c("list", "GRanges"),
+  ...
+)
 }
 \arguments{
 \item{GR}{An objects object from the any of the classes: 'pDMP', 'InfDiv',
 GRangesList, GRanges or a list of GRanges.}
 
 \item{GENES}{A GRanges object with gene coordinates and gene IDs. A
-meta-column named 'gene_id' carying the gene ids should be included. If
-the meta-column named 'gene_id' is not provided, then gene (region) ids
-will be created using the gene (region) coordinates.}
+meta-column named \strong{'gene_id'} carying the gene ids should be
+included. If the meta-column named 'gene_id' is not provided, then gene
+(region) ids will be created using the gene (region) coordinates.}
 
 \item{ignore.strand, type}{Same as for
 \code{\link[GenomicRanges]{findOverlaps-methods}}.}
+
+\item{output}{Class of the object to be returned, a "list", or a "GRanges"
+object.}
 
 \item{...}{optional arguments for
 \code{\link[GenomicRanges]{findOverlaps-methods}}. Users must evaluate
 whether specific setting makes sense on each particular context.}
 }
 \value{
-A GRanges object
+A a list GRanges object.
 }
 \description{
 The function counts DMPs overlapping with gene-body. In fact,
