@@ -14,9 +14,17 @@
 #' @importFrom BiocGenerics sort start
 #' @importFrom GenomeInfoDb seqlevels seqlevels<- seqnames
 #'
+#' @aliases sortBySeqnameAndStart
 #' @export
 sortBySeqnameAndStart <- function(gr) {
     seqlevels(gr) <- sort(seqlevels(gr))
-    return(gr[order(as.factor(seqnames(gr)), start(gr)), 
-        ])
+    return(gr[order(as.factor(seqnames(gr)), start(gr)),])
+}
+
+#' @rdname sortBySeqnameAndStart
+#' @aliases sortBySeqnameAndEnd
+#' @export
+sortBySeqnameAndEnd <- function(gr) {
+  seqlevels(gr) <- sort(seqlevels(gr))
+  return(gr[order(as.factor(seqnames(gr)), end(gr)),])
 }
