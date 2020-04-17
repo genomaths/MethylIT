@@ -208,11 +208,14 @@ meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
     if (verbose)
         progressbar = TRUE
 
-    if (Sys.info()["sysname"] == "Linux") {
-        bpparam <- MulticoreParam(workers = num.cores,
-            tasks = tasks, progressbar = progressbar)
-    } else bpparam <- SnowParam(workers = num.cores,
-        type = "SOCK", progressbar = progressbar)
+    if (num.cores > 1) {
+        if (Sys.info()["sysname"] == "Linux") {
+            bpparam <- MulticoreParam(workers = num.cores,
+                                    tasks = tasks, progressbar = progressbar)
+        } else bpparam <- SnowParam(workers = num.cores,
+                                    type = "SOCK", progressbar = progressbar)
+    }
+
     status <- function(y, status, CHR, verbose) {
         if (verbose)
             message("\n *** Processing chromosome:  ",
@@ -230,12 +233,18 @@ meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
             idx <- which(ends < max.end)
             starts <- starts[idx]
             ends <- ends[idx]
-            post <- bpmapply(function(s, e) s:e, starts,
-                ends, USE.NAMES = FALSE, BPPARAM = bpparam)
+
+            if (num.cores > 1) {
+                post <- bpmapply(function(s, e) s:e, starts,
+                                ends, USE.NAMES = FALSE, BPPARAM = bpparam)
+            } else {
+                post <- mapply(function(s, e) s:e, starts,
+                                ends, USE.NAMES = FALSE)
+            }
 
             post <- sort(unique(unlist(post)))
             y <- GRanges(seqnames = CHR, ranges = IRanges(start = post,
-                end = post))
+                                                          end = post))
         }
 
         if (status == 1) {
@@ -273,15 +282,20 @@ meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
     if (verbose)
         cat("* Computing the genomic signal for status '1' ...\n")
     r <- lapply(CHRs, function(chr) status(y = gr,
-        status = 1, CHR = chr, verbose = verbose))
+                                status = 1, CHR = chr, verbose = verbose))
     if (verbose)
         cat("* Computing the genomic signal for status '0' ...\n")
     y <- lapply(CHRs, function(chr) status(y = gr,
-        status = 0, CHR = chr, verbose = verbose))
+                                status = 0, CHR = chr, verbose = verbose))
     if (verbose)
         cat("* Building the methylation signal ...\n")
-    gr <- bpmapply(function(x, y) sortBySeqnameAndStart(c(x,
-        y)), r, y, BPPARAM = bpparam)
+
+    if (num.cores > 1) {
+        gr <- bpmapply(function(x, y) sortBySeqnameAndStart(c(x, y)),
+                        r, y, BPPARAM = bpparam)
+    }
+    else gr <- mapply(function(x, y) sortBySeqnameAndStart(c(x, y)), r, y)
+
     rm(r, y)
     gc()
     gr <- lapply(gr, unique)
