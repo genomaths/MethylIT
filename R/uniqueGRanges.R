@@ -165,8 +165,7 @@ uniqueGRanges <- function(ListOfGranges, ncols = NULL,
     }
 
     cond1 <- all(unlist(lapply(ListOfGranges, function(x) !is.null(mcols(x)))))
-    cond2 <- all(unlist(lapply(ListOfGranges, function(x) ncol(mcols(x)) >
-        0)))
+    cond2 <- all(unlist(lapply(ListOfGranges, function(x) ncol(mcols(x)) > 0)))
 
     ## It assigns the data to the GRanges metacolumns
     if (verbose)
@@ -215,8 +214,9 @@ uniqueGRanges <- function(ListOfGranges, ncols = NULL,
         }
 
         Hits <- findOverlaps(seq, granges, maxgap = maxgap,
-            minoverlap = minoverlap, type = type, select = select,
-            ignore.strand = ignore.strand)
+                            minoverlap = minoverlap, type = type,
+                            select = select,
+                            ignore.strand = ignore.strand)
         x <- mzeros(l, nc = ncol, seq, Hits)
         methl <- data.frame(x, stringsAsFactors = FALSE)
         rm(x, seq, Hits)

@@ -14,6 +14,7 @@
 ^vignettes/GenExp_Methylation_association_hyper_down-regulated\.Rmd$
 ^vignettes/Cutpoint_estimation_with_Methyl-IT\.Rmd$
 ^vignettes/pca_lda_with_methylit\.Rmd$
+^vignettes/dmr_at_memory\.Rmd$
 ^_pkgdown\.yml$
 ^pkgdown$
 ^data-raw$
