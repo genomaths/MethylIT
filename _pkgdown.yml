@@ -79,7 +79,8 @@ reference:
   - '`evaluateDIMPclass`'
 - title: Differentially methylated regions
   contents:
-  - '`getDIMPatGene`'
+  - '`getDIMPatGenes`'
+  - '`getDMPatRegions`'
   - '`dmpClusters`'
   - '`glmDataSet`'
   - '`countTest2`'

@@ -835,7 +835,7 @@ output of function [estimateCutPoint](https://is.gd/RR9iWY).
 A model classifier can be requested for further predictions and its
 classification performance is also provided. Below, the selected model
 classifier is a logistic model applied on the principal components derived from
-a previus principal component analysis (PCA, *classifier1* = "pca.logistic"",
+a previous principal component analysis (PCA, *classifier1* = "pca.logistic"",
 *clas.perf* = TRUE). Four predictor variables are available: the Hellinger
 divergence of methylation levels (*hdiv*), total variation distance (with
 Bayesian correction for the methylation levels, *bay.TV*, absolute difference of

@@ -1,18 +1,14 @@
 ---
 title: "DMR detection with Methyl-IT"
-subtitle: "Analysis for Arabisopsis MSH1-memory versus non-memory first generation"
+subtitle: "Analysis for Arabidopsis MSH1-memory versus non-memory first generation"
 author: |
-    | Robersy Sanchez$^1$
-    | rus547@psu.edu
-    |
-    | Sally Mackenzie$^{1,2}$
-    | sam795@psu.edu
-    |
-    | $^1$Department of Biology.
-    | Pennsylvania State University, University Park, PA 16802
-    |
-    | $^2$Department of Plant Science.
-    | Pennsylvania State University, University Park, PA 16802
+     | Robersy Sanchez
+     | rus547@psu.edu
+     | Mackenzie's lab
+     
+     | Department of Biology and Plant Science. 
+     | Pennsylvania State University, University Park, PA 16802
+     | Maintainer: Robersy Sanchez
 date: "`r format(Sys.time(), '%d %B %Y')`"
 fontsize: 11pt
 fontfamily: "serif"
@@ -20,7 +16,7 @@ bibliography: bibliography.bib
 output:
     rmarkdown::html_vignette:
         toc: true
-        toc_depth: 3
+        toc_depth: 4
         number_sections: true
         geometry: margin=1in
         keep_md: yes
@@ -151,7 +147,7 @@ altering the local DNA flexibility [@Severin2011; @Perez2012; @Yusufaly2013].
 DNA flexibility was shown to affect the binding of proteins to methylated DNA
 and DNA-containing lesion [@Teng2018; @Hodges2020] and nucleosome mechanical
 stability [@Ngo2016]. In other words, the sizes of naturally occurrying
-methylation motifs are not arbibitrally set, but very well constrained
+methylation motifs are not arbitrarily set, but very well constrained
 under molecular evolutionary pressure, probably, particular for each species.
 
 The R packages required in this example are:
@@ -348,11 +344,11 @@ ds_50.100 <- glmDataSet(GR = dmps_at.clust.50.100, colData = colData)
 ```
 
 
-### Testing to detect DMRs
+### DMR detection
 
 Herein, we are requesting a minimum density DMP of 1/100 bp = 0.01/bp (CountPerBp = 0.01), minimum 
 of logarithm of fold changes in the number of DMPs, treatment versus control 
-samples, equal to 1 (Minlog2FC = 1). Also, it is requested a coeffiecient of 
+samples, equal to 1 (Minlog2FC = 1). Also, it is requested a coefficient of 
 variation, on each sample set, not greater than 1 (maxGrpCV = c(1, 1)). 
 
 Notice that in the case of species with big genes, for example, human genes, we
@@ -372,8 +368,8 @@ dmrs_fixed.int = countTest2(DS = ds_50_100,
 dmrs_fixed.int
 ```
 
-The DMR assciated genes at a $distance \leq 1000$:
-```{r}
+The DMR associated genes at a $distance \leq 1000$:
+```{r dist_dmrs_fixed.int}
 hits <- distanceToNearest(dmrs_fixed.int, GENES, ignore.strand=FALSE)
 
 ## DMR associated genes 
@@ -396,7 +392,7 @@ DMRs derived method = "relaxed" from dmpClusters function
 ```
 
 The DMR assciated genes at a $distance \leq 1000$:
-```{r}
+```{r dist.dmrs_relaxed}
 hits <- distanceToNearest(.dmrs_relaxed, GENES, ignore.strand=FALSE)
 
 ## DMR associated genes 
@@ -419,7 +415,7 @@ dmrs.fixed.int
 ```
 
 The DMR assciated genes at a $distance \leq 1000$:
-```{r}
+```{r dist_dmrs.fixed.int}
 hits <- distanceToNearest(dmrs.fixed.int, GENES, ignore.strand=FALSE)
 
 ## DMR associated genes 
@@ -442,7 +438,7 @@ dmrs.relaxed
 ```
 
 The DMR assciated genes at a $distance \leq 1000$:
-```{r}
+```{r dist_dmrs.relaxed}
 hits <- distanceToNearest(dmrs.relaxed, GENES, ignore.strand=FALSE)
 
 ## DMR associated genes 
@@ -456,7 +452,7 @@ As was mentioned in the introduction algorithmically identified DMRs do not
 necessarily will be associated to the local DNA physico-chemical properties and
 to local molecular evolutionary features of every DMR detected.
 
-All the weight of the evolulationary pressure lie down on naturally ocurring
+All the weight of the evolutionary pressure lie down on naturally ocurrying
 methylation patternings inside, for example (but not limited to), exons and
 introns.
 
@@ -514,7 +510,7 @@ dmrs_introns
 ```
 
 
-### Differentically methylated genes DMGs
+### Differentially methylated genes DMGs
 
 The last results for introns and exons contrasts with the result for the whole
 gene-body.
@@ -545,7 +541,7 @@ dmrs_genes = countTest2(DS = ds_genes,
 dmrs_genes
 ```
 
-It seems to be that metylation patterning inside of gene-body forms a sort
+It seems to be that methylation patterning inside of gene-body forms a sort
 continuous regions simultaneously covering portions of exon and introns. In
 particular, this is true for genes experiencing alternative splicing, where some
 regions inside introns works as exons as well.

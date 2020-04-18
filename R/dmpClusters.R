@@ -6,7 +6,7 @@
 #'     clusters of DMPs, which can be further tested to identify differentially
 #'     methylated regions (DMRs) with \code{\link{countTest2}} function.
 #' @details Two algorithmic approaches are implemented, named: "relaxed" and
-#'  "fixed.int" (see the decription of parmeter 'method'). The "fixed.int" is
+#'  "fixed.int" (see the description of parameter 'method'). The "fixed.int" is
 #'  mostly addressed to find specific methylation patterns, but the price is
 #'  the number of DMRs found is lower.
 #'
@@ -33,11 +33,12 @@
 #'   \item{\strong{"relaxed":}}{DMP ranges which are separated by a distance
 #'          less than \emph{'maxClustDist'} are merged and ranges with less
 #'          than \emph{'minNumDMPs'} are removed.}
-#'   \item{\strong{"fixed.int":}}{It will gnetate a partition where the distance
-#'          between consecutive DMPs is not greater than \emph{'maxDist'}.
-#'          Ranges with less than \emph{'minNumDMPs'} are removed. If,
-#'          aditionally, a value \emph{maxClustDist > 0 } is provided, then the
-#'          "relaxed" approach is applied to the ranges from the first step.}
+#'   \item{\strong{"fixed.int":}}{It will generate a partition where the
+#'          distance between consecutive DMPs is not greater than
+#'          \emph{'maxDist'}. Ranges with less than \emph{'minNumDMPs'} are
+#'          removed. If, additionally, a value \emph{maxClustDist > 0 } is
+#'          provided, then the "relaxed" approach is applied to the ranges from
+#'          the first step.}
 #' }
 #'
 #' @param chromosomes vector of characters labeling the chromosomes included in

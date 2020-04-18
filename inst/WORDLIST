@@ -80,6 +80,7 @@ Dugas
 dmpClusters
 ecdf
 ECDF
+effectivity
 Ensembl
 epigenomic
 esc
@@ -186,6 +187,7 @@ Mihram
 minCountPerIndv
 minoverlap
 minpack
+modelled
 modelConfMatrix
 Mol
 MulticoreParam
@@ -193,6 +195,8 @@ MVrate
 nb
 NBR
 ncbi
+notchs
+nucleosome
 ncols
 newdata
 nih
@@ -206,6 +210,7 @@ npoints
 npoint
 NUll
 num
+occurrying
 ontogenetic
 optStatVal
 optionData

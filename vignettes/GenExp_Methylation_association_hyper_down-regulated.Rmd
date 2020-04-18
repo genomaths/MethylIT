@@ -297,8 +297,9 @@ lines(x1, dmixtdistr(x1, phi = gexp_FIT$phi, arg = gexp_FIT$args), col = "blue")
 
 ## Joint distribution of $MD$ and $|logFC|$ expressed in terms of Copula distribution.
 
-There various steps involved in investigating the dependence between two random variables.
-The state of the art in this subject include the application of copula distribtuions.
+There various steps involved in investigating the dependence between two random
+variables. The state of the art in this subject include the application of
+copula distributions.
 
 Sklar's theorem ([@Sklar1959; @Sklar1973]) named after Abe Sklar, provides the 
 theoretical foundation for 
@@ -312,17 +313,19 @@ expressed in terms of its marginals CDFs:
 $F_i(x_i)=Pr(X_i \leq x_i)$ a copula $C$:
 
 $$H(x_1, ..., x_d)=C(F_1(x_1), ..., F_d(x_d))$$
-While Sklar showed that $C$ and $F_i$ are uniquely determined when H is known, a valid
-model for $(X_1, ..., X_d)$ arises from the last equation whenever the "ingredients"
-are chosen from given parametric families of distribtuion ([@Christian2007]):
-$$F \in (F_\delta), C \in (C_\alpha)$$
-Current literature on copula theory provides abundant information on models and copula families. 
-Here, for the particular case of bi-dimensional copula defined for $MD$ and $|logFC|$, we have
-chosen Farlie–Gumbel–Morgenstern family of copulas, which are defined for,
-each $\theta \in [-1, 1]$ by: 
-$$C_\alpha(u, v)=uv+\alpha uv(1-u)(1-v)$$ 
-$u,v \in [0,1]$. The correlation coefficient $\rho$ is linked to $\alpha$ by the relationship: $\rho=\frac{\alpha}{3}$,
-which ranges from $-\frac{1}{3}$ to $\frac{1}{3}$, where $u=F(x)$, $v=G(y)$, with marginal CDFs: $F(x)$ and $G(y)$.
+While Sklar showed that $C$ and $F_i$ are uniquely determined when H is known, a
+valid model for $(X_1, ..., X_d)$ arises from the last equation whenever the
+"ingredients" are chosen from given parametric families of distribution
+([@Christian2007]): $$F \in (F_\delta), C \in (C_\alpha)$$
+
+Current literature on copula theory provides abundant information on models and
+copula families. Here, for the particular case of bi-dimensional copula defined
+for $MD$ and $|logFC|$, we have chosen Farlie–Gumbel–Morgenstern family of
+copulas, which are defined for, each $\theta \in [-1, 1]$ by: $$C_\alpha(u,
+v)=uv+\alpha uv(1-u)(1-v)$$ $u,v \in [0,1]$. The correlation coefficient $\rho$
+is linked to $\alpha$ by the relationship: $\rho=\frac{\alpha}{3}$, which ranges
+from $-\frac{1}{3}$ to $\frac{1}{3}$, where $u=F(x)$, $v=G(y)$, with marginal
+CDFs: $F(x)$ and $G(y)$.
 
 ### Fitting Farlie–Gumbel–Morgenstern copulas with $MD$ and $|logFC|$ marginal CDFs
 
@@ -452,7 +455,7 @@ That is, the probability to observe DEGs with values, say between 0.1 and 0.5,
 $0.1 \leq |log_2FC| \leq 0.5$, is greater for $0.1 \eq MD \leq 0.5$ than for 
 $0.5 < MD \leq 1$.
 
-### Two-dimentional copula density plot, Contour plot
+### Two-dimensional copula density plot, Contour plot
 The 2D-dimensional plot permits to see in more detail the projection of the 
 density surface on the $XY$ plane and contour lines.
 
@@ -490,7 +493,7 @@ abline(h = 1, col = "black", lty = "dashed")
 
 It is not difficult to see that for a fixed value of $MD$ (a line parallel to $|log_2FC|$ axis) 
 the joint probability density distribution function $f(X \leq MD, Y \leq |log_2FC|)$ 
-(color gradient from red to blue) decreasses with the increment of $|log_2FC|$. 
+(color gradient from red to blue) decreases with the increment of $|log_2FC|$. 
 That is, the probability to observe $MD$ values, say between 0.1 and 0.5
 (see the squared region below) $0.1 \leq MD \leq 0.5$, is greater for 
 $0.1 \leq |log_2FC| \leq 0.5$ than for $0.5 < |log_2FC| \leq 1$.
@@ -520,6 +523,7 @@ level of technical noise. The percentage of the genes at noise level are:
 ```{r noise}
 round(100 * sum(MD < 0.08)/length(MD), 2)
 ```
+
 Hence,  the genes considered in the downstream analysis are:
 ```{r filtering}
 idx <- which(MD > 0.08)
@@ -660,14 +664,14 @@ xy$md[xy$MD > meth_cut] <- 1
 ```
 
 The glm support the decrease of $-logFC$ with th increment of $MD$. The model
-coefficients are higly statistically significant.
+coefficients are highly statistically significant.
 ```{r glm}
 gm <- glm(formula = logFC ~ md, data=xy, family = Gamma(link = "identity"))
 summary( gm )
 ```
 
 The ANOVA test confirm the negative trend given by the coefficient of MD 
-(highly statisticallly significant).
+(highly statistically significant).
 ```{r anova_gamma}
 anova(gm, test = "LRT")
 
@@ -787,7 +791,7 @@ lines(x1, dmixtdistr(x1, phi = gexp_FIT$phi, arg = gexp_FIT$args), col = "blue")
 ### Fitting Farlie–Gumbel–Morgenstern copulas with $MD$ and $|logFC|$ marginal CDFs (II)
 
 The first step requires for provide the parameters values, previously estimated,
-of the marginal distributions, which were given troughout the function
+of the marginal distributions, which were given throughout the function
 [mixtdistr](https://genomaths.github.io/usefr_manual/mixtdistr.html). The
 specific parameter values are retrieved from the previous nonlinear fit obtained
 for the marginal CDFs:
@@ -798,8 +802,8 @@ parMargins = list(
   list(phi = gexp_FIT$phi, arg = gexp_FIT$args))
 ```
 
-The parameter estimation and goodness-of-fit (GOF) test take adventages of the
-tools availables in the R package
+The parameter estimation and goodness-of-fit (GOF) test take advantage of the
+tools available in the R package
 [copula](https://www.rdocumentation.org/packages/copula/versions/0.999-19.1).
 Both, parameter estimation and GOF, can be accomplished with function
 [bicopulaGOF](https://genomaths.github.io/usefr_manual/bicopulaGOF.html) from
@@ -920,12 +924,12 @@ $0.5 < MD \leq 1$.
 The 2D-dimensional plot permits to see in more detail the projection of the 
 density surface on the $XY$ plane and contour lines.
 
-It is not dificult to see that for a fixed value of $MD$ (a line parallel to $|log_2FC|$ axis) 
-the joint probability density distribution function $f(X \leq MD, Y \leq |log_2FC|)$ 
-(color gradient from red to blue) decreasses with the increment of $|log_2FC|$. 
-That is, the probability to observe $MD$ values, say between 0.1 and 0.5
-(see the squared region below) $0.1 \leq MD \leq 0.5$, is greater for 
-$0.1 \leq |log_2FC| \leq 0.5$ than for $0.5 < |log_2FC| \leq 1$.
+It is not difficult to see that for a fixed value of $MD$ (a line parallel to
+$|log_2FC|$ axis) the joint probability density distribution function $f(X \leq
+MD, Y \leq |log_2FC|)$ (color gradient from red to blue) decreasses with the
+increment of $|log_2FC|$. That is, the probability to observe $MD$ values, say
+between 0.1 and 0.5 (see the squared region below) $0.1 \leq MD \leq 0.5$, is
+greater for $0.1 \leq |log_2FC| \leq 0.5$ than for $0.5 < |log_2FC| \leq 1$.
 
 ```{r contour2_2, echo=FALSE, fig.height=6, fig.width=8}
 X = seq(-0, 2, length = 300)
@@ -969,7 +973,7 @@ expected values $|log_2FC|$ given $MD$, and vice versa.
 ## Asymptotic linear-by-linear association test (II)
 
 As in the previous case (above), tt is obvious from the 2D density plots that
-for $MD$ < 0.08 the any relationship is not meaninful. In particular, both
+for $MD$ < 0.08 the any relationship is not meaningful. In particular, both
 variables, $logFC$ and $MD$, are at the level of technical noise. The percentage
 of the genes at noise level are:
 ```{r noise_2}
@@ -1055,7 +1059,7 @@ m
 
 The [spineplot](https://www.rdocumentation.org/packages/graphics/versions/3.6.0/topics/spineplot)
 of this contingency table (table(x = logfc_level, y = md_level)) help to visualize the
-existent relationship bewtween $|logFC|$ and $MD$.
+existent relationship between $|logFC|$ and $MD$.
 
 ```{r spineplot_2}
 par( mar = c(5, 7, 4, 4), family = "Serif", font = 2, cex = 0.8, las = 1, lwd = 0.2 )
@@ -1082,7 +1086,7 @@ Here, we use the LLT test implemented in function  [lbl_test](https://www.rdocum
 from the R package _coin_. Two test variants are available: 1) permutation test 
 and asymptotic test. 
 
-The asimptotic LLT test:
+The asymptotic LLT test:
 ```{r allt_2}
 lbl_test( m )
 ```
@@ -1115,8 +1119,8 @@ xy$md[xy$MD > meth_cut2] <- 2
 ```
 
 
-The glm support the decrease of $-logFC$ with th eincrement of $MD$. The model coefficients
-are higly statistically significant.
+The glm support the decrease of $-logFC$ with the increment of $MD$. The model
+coefficients are higly statistically significant.
 ```{r glm_2}
 gm <- glm(formula = logFC ~ md, data=xy, family = Gamma(link = "identity"))
 summary( gm )
@@ -1166,7 +1170,7 @@ anova(gm, test = "LRT")
 ```
 
 ### Boxplot (II)
-The boxplot suggest a clear trend of $-logFC$ decreassing with increment of MD
+The boxplot suggest a clear trend of $-logFC$ decreasing with increment of MD
 levels. Notice that the _notchs_ from the boxes do not overlap, which implies
 that the differences between medians from three groups ("Low", "Middle", and
 "High") are statistically significant. So, the GLM results can be visualized.
