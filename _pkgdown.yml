@@ -41,6 +41,7 @@ navbar:
       - text: ------
       - text: "Association Between Gene Expression and Cytosine DNA Methylation at gene-body"
         href: articles/GenExp_Methylation_association_hyper_down-regulated.html
+      - text: ------
       - text: "DMR detection with Methyl-IT"
         href: articles/dmr_at_memory.html
     news:
@@ -133,6 +134,9 @@ articles:
   - '`MethylIT`'
   - '`Methylation_analysis_with_Methyl-IT`'
   - '`cancer_example`'
+  - '`Cutpoint_estimation_with_Methyl-IT`'
   - '`pca_lda_with_methylit`'
   - '`GenExp_Methylation_association_hyper_down-regulated`'
   - '`dmr_at_memory`'
+
+

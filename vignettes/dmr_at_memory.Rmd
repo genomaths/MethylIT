@@ -5,7 +5,7 @@ author: |
      | Robersy Sanchez
      | rus547@psu.edu
      | Mackenzie's lab
-     
+     |
      | Department of Biology and Plant Science. 
      | Pennsylvania State University, University Park, PA 16802
      | Maintainer: Robersy Sanchez
@@ -22,7 +22,7 @@ output:
         keep_md: yes
 vignette: >
     %\VignetteIndexEntry{DMR detection with Methyl-IT}
-    %\VignetteEngine{knitr::knitr}
+    %\VignetteEngine{knitr::rmarkdown}
     \usepackage[utf8]{inputenc}
 abstract: |
     Herein, an example of Methyl-IT application to the detection of differential
@@ -142,7 +142,7 @@ It is worthy to notices that any clustering algorithm will impose non-natural
 constraints on the methylation patterning, which not necessarily will be
 associated to the local DNA physico-chemical properties and to local molecular
 evolutionary features of every DMR detected. Every cytosine methylation has a
-concrete physical effect of the DNA, altering the DNA persistance length, i.e.,
+concrete physical effect of the DNA, altering the DNA persistence length, i.e.,
 altering the local DNA flexibility [@Severin2011; @Perez2012; @Yusufaly2013].
 DNA flexibility was shown to affect the binding of proteins to methylated DNA
 and DNA-containing lesion [@Teng2018; @Hodges2020] and nucleosome mechanical
@@ -352,7 +352,7 @@ samples, equal to 1 (Minlog2FC = 1). Also, it is requested a coefficient of
 variation, on each sample set, not greater than 1 (maxGrpCV = c(1, 1)). 
 
 Notice that in the case of species with big genes, for example, human genes, we
-could may want to use lower densities, e.g., CountPerBp = 0.001.
+might want to use lower densities, e.g., CountPerBp = 0.001.
 
 DMRs derived method = "fixed.int" from dmpClusters function 
 ```{r dmrs_100, message=FALSE, results='hide'}

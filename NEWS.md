@@ -1,7 +1,10 @@
 # MethylIT 0.3.2
 * Current version 
 * Actively used in methylome analysis
-* In development
+* In development     
+   * 04-17-20:    
+         1) A new vignette added:      
+              - DMR detection with Methyl-IT
    * 03-08-20:  
          1) Two new vignette added:    
               - Principal Components and Linear Discriminant Analyses with Methyl-IT   
