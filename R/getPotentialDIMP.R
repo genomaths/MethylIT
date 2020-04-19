@@ -20,15 +20,23 @@
 #' @param div.col Column number for divergence variable is located in the
 #'     meta-column.
 #' @param dist.name Name of the fitted distribution. This could be the name of
-#'     one distribution or a characters vector of length(nlms). Default is two
-#'     parameters Weibull distribution: 'Weibull2P'. The available options are
-#'     Weibull three- parameters ('Weibull3P'), gamma with three-parameter
-#'     ('Gamma3P'), gamma with two-parameter ('Gamma2P'), generalized gamma with
-#'     three-parameter ('GGamma3P') or four-parameter ('GGamma4P'), the
-#'     empirical cumulative distribution function ('ECDF') or 'None'. If
-#'     \strong{dist.name != 'None'}, and \strong{nlms != NULL}, then a column
-#'     named 'wprob' with a probability vector derived from the application of
-#'     model 'nlms' will be returned.
+#'     one distribution or a characters vector of length(nlms). Default is the
+#'     two parameters Weibull distribution: 'Weibull2P'. The available options
+#'     are:
+#' \describe{
+#'   \item{\strong{"Weibull2P"}}{Weibull with two-parameters.}
+#'   \item{\strong{"Weibull3P"}}{Weibull with three-parameters.}
+#'   \item{\strong{"Gamma2P"}}{Gamma with two-parameters.}
+#'   \item{\strong{"Gamma3P"}}{Gamma with three-parameters.}
+#'   \item{\strong{"GGamma3P"}}{Generalized gamma with three-parameters.}
+#'   \item{\strong{"GGamma4P"}}{Generalized gamma with four-parameters.}
+#'   \item{\strong{"ECDF"}}{The empirical cumulative distribution function.}
+#'   \item{\strong{"None"}}{No distribution.}
+#' }
+#'
+#'  If \strong{dist.name != 'None'}, and \strong{nlms != NULL}, then a column
+#'  named 'wprob' with a probability vector derived from the application of
+#'  model 'nlms' will be returned.
 #' @param absolute Logic (default, FALSE). Total variation (TV, the difference
 #'     of methylation levels) is normally an output in the downstream MethylIT
 #'     analysis. If 'absolute = TRUE', then TV is transformed into |TV|, which
