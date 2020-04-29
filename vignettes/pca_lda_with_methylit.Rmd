@@ -380,7 +380,7 @@ plot(as.phylo(hc.rsq), tip.color = colors, label.offset = 0.5, font = 2, cex = 0
 axisPhylo( 2, las = 1, lwd = 0.4, cex.axis = 1.4, hadj = 0.8, tck = -0.01 )
 ## cuts = c(xleft, ybottom, xright, ytop)
 hclust_rect(hc.rsq, k = 3L, border = c("green4", "blue", "red"), 
-            color = clusters.color, cuts = c(0.56, 1.4, 0.41, 34))
+            color = clusters.color, cuts = c(0.56, 1.4, 0.41, 106))
 ```
 
 Here, we have use function
