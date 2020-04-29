@@ -50,7 +50,7 @@ analysis. If 'absolute = TRUE', then TV is transformed into |TV|, which
 is an information divergence that can be fitted to Weibull or to
 Generalized Gamma distribution.}
 
-\item{npoints}{number of points used in the fit}
+\item{npoints}{number of points to be used in the fit. Default is NULL.}
 
 \item{model}{Optional. Only when dist.name = 'Weibull'. A selection of the
 distribution model, two-parameters and three-parameters Weibull model

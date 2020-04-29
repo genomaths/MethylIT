@@ -11,6 +11,7 @@ gofReport(
   absolute = FALSE,
   output = c("best.model", "all"),
   confl_model = FALSE,
+  npoints = NULL,
   num.cores = 1L,
   verbose = FALSE,
   ...
@@ -41,6 +42,8 @@ corresponding statistics. Default is 'best.model'}
 \item{confl_model}{Logic. If TRUE, then the best model based on highest
 R.Cross.val is returned for those samples where the model(s) with lowest
 AIC has not the highest R.Cross.val.}
+
+\item{npoints}{number of points to be used in the fit. Default is NULL.}
 
 \item{num.cores}{The number of cores to use in the nonlinear fit step, i.e.
 at most how many child processes will be run simultaneously (see
