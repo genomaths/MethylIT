@@ -119,7 +119,7 @@ Some simple examples
 
 --------
 
-MethylIT documentation:
+Methyl-IT documentation:
 ------------
 
 Whole documentation, manual and several examples, are available at <a href="https://genomaths.github.io/methylit/" target="_blank">Methyl-IT website</a>

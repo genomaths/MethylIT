@@ -279,15 +279,14 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
         DS$optionData <- DataFrame(tests)
         DS$optionData$adj.pval <- rep(NA, nrow(DS$optionData))
         DS <- DS[!is.na(tests$log2FC)]
-        if (FilterLog2FC && is.null(pvalCutOff) &&
-            !saveAll) {
+        if (FilterLog2FC && is.null(pvalCutOff) && !saveAll) {
             DS <- DS[abs(DS$optionData$log2FC) > Minlog2FC]
         }
         if (!is.null(pvalCutOff) && !saveAll) {
             if (FilterLog2FC)
                 DS <- DS[abs(DS$optionData$log2FC) > Minlog2FC]
             DS$optionData$adj.pval <- p.adjust(DS$optionData$pvalue,
-                                            method = pAdjustMethod)
+                                                method = pAdjustMethod)
             DS <- DS[DS$optionData$adj.pval < pvalCutOff]
         } else {
             if (!is.null(pvalCutOff) && saveAll) {
