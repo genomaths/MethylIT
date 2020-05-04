@@ -4,7 +4,15 @@
 \alias{.estimateGLM}
 \title{Poisson and Negative Binomial regression analysis.}
 \usage{
-.estimateGLM(x, groups, baseMV, w, MVrate, test = c("Wald", "LRT"))
+.estimateGLM(
+  x,
+  groups,
+  baseMV,
+  w,
+  MVrate,
+  test = c("Wald", "LRT"),
+  p.value = NULL
+)
 }
 \arguments{
 \item{x}{Matrix of counts.}
@@ -31,6 +39,8 @@ is the negative binomial. As suggested for \code{\link[stats]{glm}}, if
 best fitted model is Poisson or quasi-Poisson, then the best test is
 'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
 the corresponding suitable test will be applied when test = 'LRT'.}
+
+\item{p.value}{Cut off p-value to reject the null hypothesis}
 }
 \value{
 GLM model of the group comparison for the given genomic region

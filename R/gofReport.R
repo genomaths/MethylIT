@@ -208,8 +208,7 @@ gofReport <- function(HD,
             issuekey <- paste(names(mdl2), mdl2, sep = "_")
             issue_nlms <- nlms[match(issuekey, names(nlms))]
         }
-        mdl[issue] <- vapply(mdl[issue], function(x) x[1],
-            character(1))
+        mdl[issue] <- vapply(mdl[issue], function(x) x[1], character(1))
 
         bestAIC <- unlist(mdl)
         mdl[issue] <- "Needs revision"
@@ -223,8 +222,7 @@ gofReport <- function(HD,
     modelkey <- paste(names(bestAIC), bestAIC, sep = "_")
     nlms <- nlms[match(modelkey, names(nlms))]
     names(nlms) <- sn
-    nlms <- structure(nlms, class = c("ProbDistrList",
-        "list"))
+    nlms <- structure(nlms, class = c("ProbDistrList", "list"))
 
     bestModel <- model[match(bestAIC, nams)]
     names(bestModel) <- names(HD)

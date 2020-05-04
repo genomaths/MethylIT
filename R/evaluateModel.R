@@ -15,25 +15,25 @@
 #'     best fitted model is Poisson or quasi-Poisson, then the best test is
 #'     'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
 #'     the corresponding suitable test will be applied when test = 'LRT'.
+#' @param p.value Cut off p-value to reject the null hypothesis
 #' @importFrom stats anova
 #' @return AIC value
 #' @keywords internal
-.evaluateModel <- function(model, test = c("Wald",
-    "LRT")) {
+.evaluateModel <- function(model, test = c("Wald", "LRT"), p.value = 1) {
     if (!inherits(model, "try-error")) {
         cfs <- coef(summary(model))
         log2FC <- cfs[2, 1]
         if (test[1] == "LRT") {
             if (grepl("Negative", model$family$family))
-                model$family$family <- "negBin"
+                    model$family$family <- "negBin"
             stat <- model$family$family
             statist <- switch(stat,
                             quasipoisson = "F",
                             poisson = "Chisq",
                             negBin = "LRT")
 
-            anov <- try(suppressWarnings(anova(model,
-                test = statist)), silent = TRUE)
+            anov <- try(suppressWarnings(anova(model, test = statist)),
+                        silent = TRUE)
             if (!inherits(anov, "try-error")) {
                 if (statist != "F")
                     coef.pval <- anov$`Pr(>Chi)`[2]
@@ -46,7 +46,7 @@
         } else {
             AICs <- AIC(model)
         }
-        if (coef.pval < 0.05) {
+        if (coef.pval < p.value) {
             res <- list(Eval = TRUE, log2FC = log2FC,
                 coef.pval = coef.pval, AIC = AICs,
                 mdl = model)

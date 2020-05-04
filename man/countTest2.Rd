@@ -65,7 +65,7 @@ treatment is differentially expressed in respect to the control}
 
 \item{pAdjustMethod}{method used to adjust the results; default: BH}
 
-\item{pvalCutOff}{cutoff used then a p-value adjustment is performed}
+\item{pvalCutOff}{cutoff used then a p-value adjustment is performed.}
 
 \item{MVrate}{Minimum Mean/Variance rate.}
 

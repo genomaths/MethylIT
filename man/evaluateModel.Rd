@@ -4,7 +4,7 @@
 \alias{.evaluateModel}
 \title{Evaluate a model using the Akaike information criterion (AIC)}
 \usage{
-.evaluateModel(model, test = c("Wald", "LRT"))
+.evaluateModel(model, test = c("Wald", "LRT"), p.value = 1)
 }
 \arguments{
 \item{model}{glm object}
@@ -19,6 +19,8 @@ is the negative binomial. As suggested for \code{\link[stats]{glm}}, if
 best fitted model is Poisson or quasi-Poisson, then the best test is
 'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
 the corresponding suitable test will be applied when test = 'LRT'.}
+
+\item{p.value}{Cut off p-value to reject the null hypothesis}
 }
 \value{
 AIC value

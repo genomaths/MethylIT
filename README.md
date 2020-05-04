@@ -94,12 +94,7 @@ You can install MethylIT from GitHub or PSU's GitLab:
     devtools::install_git("https://github.com/genomaths/MethylIT.git")
     
     # Beta (developing) version (0.3.2_beta):
-    devtools::install_git("https://github.com/genomaths/MethylIT.git", ref = "MethylIT_0.3.2_beta")
-    
-    Or (older version 0.3.1)
-    
-    devtools::install_git("https://git.psu.edu/genomath/MethylIT.git", ref = "MethylIT_0.3.1")
-    
+    devtools::install_git("https://github.com/genomaths/MethylIT.git", ref = "MethylIT_0.3.2_beta") 
        
 
 Flow diagram
@@ -124,17 +119,14 @@ Some simple examples
 
 --------
 
-MethylIT Package Manual:
+MethylIT documentation:
 ------------
 
-<a href="https://github.com/genomaths/MethylIT/blob/master/MethylIT.pdf" target="_blank">MethylIT PDF manual</a>
-
-
-<a href="https://genomaths.github.io/methylit/reference/index.html" target="_blank">MethylIT browser manual</a>
+Whole documentation, manual and several examples, are available at <a href="https://genomaths.github.io/methylit/" target="_blank">Methyl-IT website</a>
 
 --------
 
-Scripts and examples at:
+Scripts and additional examples at:
 ---------
 
 https://git.psu.edu/genomath/MethylIT_examples
