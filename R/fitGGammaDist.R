@@ -29,7 +29,7 @@
 #' @param location.par whether to consider the fitting to generalized gamma
 #'     distribution (GGamma) including the location parameter, i.e., a GGamma
 #'     with four parameters (GGamma4P).
-#' @param sample.size size of the sample.
+#' @param sample.size Minimum size of the sample.
 #' @param npoints number of points used in the fit. If the number of points if
 #'     greater than 10^6, then the fit is automatically set to npoints = 999999.
 #'     However, the reported values for R.Cross.val, AIC, and BIC are
@@ -114,10 +114,9 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
     }
 
     N <- length(x)
-    if (N > 10^6)
-        npoints = 999999
+    if (!is.null(npoints) && npoints > 999999) npoints = 999999
 
-    if (!is.null(npoints) && npoints < N) {
+    if (!is.null(npoints) && npoints < min(N, 999999)) {
         DENS <- hist(x, breaks = npoints, plot = FALSE)
         X <- DENS$mids
         Y <- Fy(X)
@@ -137,17 +136,17 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
     } else {
         if (verbose && location.par) {
             message(paste0("*** Trying nonlinear fit to a generalized 4P ",
-                "Gamma distribution model ", npoints, " values..."))
+                "Gamma distribution model ", N, " values..."))
         }
         if (verbose && !location.par) {
             message(paste0("*** Trying nonlinear fit to a generalized 3P ",
-                "Gamma distribution model ", npoints, " values..."))
+                "Gamma distribution model ", N, " values..."))
         }
     }
 
     if (is.null(npoints)) {
-        X = x
-        Y = Fy(X)
+        X <- x
+        Y <- Fy(X)
         probFun <- pggamma
     }
 
@@ -161,21 +160,20 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
         scale <- VAR/MEAN
         alpha <- 1
         if (location.par) {
-            mu <- MIN
-            starts <- c(alpha = alpha, scale = scale,
-                mu = mu[1], psi = psi)
-        } else starts <- c(alpha = alpha, scale = scale,
-            psi = psi)
+            starts0 <- c(alpha = alpha, scale = scale, mu = MIN, psi = psi)
+            starts <- c(shape_scale(x, gg = TRUE), mu = MIN, psi = 1 )
+        } else {
+            starts0 <- c(alpha = alpha, scale = scale, psi = psi)
+            starts <- c(shape_scale(x, gg = TRUE), psi = 1 )
+        }
     } else {
         alpha <- parameter.values$alpha
         scale <- parameter.values$scale
         psi <- parameter.values$psi
         if (location.par) {
             mu <- parameter.values$mu
-            starts <- c(alpha = alpha, scale = scale,
-                mu = mu, psi = psi)
-        } else starts <- c(alpha = alpha, scale = scale,
-            psi = psi)
+            starts0 <- c(alpha = alpha, scale = scale, mu = mu, psi = psi)
+        } else starts0 <- c(alpha = alpha, scale = scale, psi = psi)
     }
 
     ## ============ END starting parameter values ========== #
@@ -186,17 +184,14 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
             ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
         silent = TRUE)
     if (inherits(FIT, "try-error") && location.par) {
-        starts <- c(alpha = alpha, scale = scale, psi = 1)
-        FIT <- try(nls.lm(par = starts, fn = optFun,
+        FIT <- try(nls.lm(par = starts0, fn = optFun,
             probfun = probFun, quantiles = X, prob = Y,
             control = nls.lm.control(maxiter = maxiter,
                 ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
             silent = TRUE)
     }
-    if (inherits(FIT, "try-error") && location.par &&
-        probFun != dggamma) {
-        DENS <- hist(x, breaks = npoints, plot = FALSE,
-            ...)
+    if (inherits(FIT, "try-error") && location.par && probFun != dggamma) {
+        DENS <- hist(x, breaks = npoints, plot = FALSE, ...)
         X <- DENS$mids
         Y <- DENS$density
         probFun <- dggamma
@@ -206,11 +201,9 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
                 ftol = ftol, maxfev = maxfev, ptol = 1e-12)),
             silent = TRUE)
     }
-    if (inherits(FIT, "try-error") && !location.par &&
-        probFun != dggamma) {
+    if (inherits(FIT, "try-error") && !location.par && probFun != dggamma) {
         starts <- c(alpha = alpha, scale = scale, psi = 1)
-        DENS <- hist(x, breaks = npoints, plot = FALSE,
-            ...)
+        DENS <- hist(x, breaks = npoints, plot = FALSE, ...)
         X <- DENS$mids
         Y <- DENS$density
         probFun <- dggamma
@@ -356,3 +349,14 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
     return(stats)
 }
 
+## ======= Auxiliary function for parameter estimation of Gamma Dist ===== #
+
+shape_scale <- function(x, gg = TRUE) {
+    n <- length(x)
+    s1 <- n * sum(x * log(x)) - sum(log(x)) * sum(x)
+    alpha <- n * sum(x)/s1
+    scale <- s1/n^2
+
+    if (gg) return(c(alpha = alpha, scale = scale))
+    else return(c(c(shape = alpha, scale = scale)))
+}

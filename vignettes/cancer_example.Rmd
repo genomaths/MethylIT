@@ -834,13 +834,15 @@ output of function [estimateCutPoint](https://is.gd/RR9iWY).
 
 A model classifier can be requested for further predictions and its
 classification performance is also provided. Below, the selected model
-classifier is a quadratic discriminant analysis (QDA) (*classifier1* = "qda",
+classifier is a logistic model applied on the principal components derived from
+a previous principal component analysis (PCA, *classifier1* = "pca.logistic"",
 *clas.perf* = TRUE). Four predictor variables are available: the Hellinger
-divergence of methylation levels (*hdiv*), total variation distance (*TV*,
-absolute difference of methylation levels), relative position of cytosine site
-in the chromosome (*pos*), and the logarithm base two of the probability to
-observe a Hellinger divergence value $H$ greater than the critical value
-$H_{\alpha = 0.05}$ (values given as probabilities in object PS, *wprob*).
+divergence of methylation levels (*hdiv*), total variation distance (with
+Bayesian correction for the methylation levels, *bay.TV*, absolute difference of
+methylation levels), relative position of cytosine site in the chromosome
+(*pos*), and the logarithm base two of the probability to observe a Hellinger
+divergence value $H$ greater than the critical value $H_{\alpha = 0.05}$ (values
+given as probabilities in object PS, *wprob*).
 
 Notice that the cutpoint can be estimated for any of the two currently available
 information divergences: *Hellinger divergence* (*div.col* = 9) or the *total*
@@ -1064,9 +1066,19 @@ performance
 
 
 ## Differentially methylated genomic regions (DMRs)
+In Methyl-IT, the concept of DMR is generalized and it is not limited to any
+particular genomic region found with specific clustering algorithm. It can be
+applied to any naturally or algorithmically defined genomic region. For example,
+an exon region identified statistically to be differentially methylated by using
+generalized linear regression model (GLM) is a DMR. Differentially methylated
+genes (DMGs) are estimated from group comparisons for the number of DMPs on
+gene-body regions between control and treatment. This permits the extension of
+the concept of DMR by considering a differentially methylated gene as a
+particular case of DMRs.
+
 Our degree of confidence in whether DMP counts in both groups of samples,
 control and treatment, represent true biological signal was determined in the
-signal detection step. To estimate DIMRs, we followed similar steps to those
+signal detection step. To estimate DMRs, we followed similar steps to those
 proposed in Bioconductor R package DESeq2 [@Love2014], but our GLM test looks
 for statistical difference between the groups based on gene-body DMP counts
 overlapping a given genomic region rather than read counts. The regression
@@ -1077,16 +1089,6 @@ The fitting algorithmic approaches provided by 'glm' and 'glm.nb' functions from
 the R packages stat and MASS, respectively, were used for Poisson (PR),
 Quasi-Poisson (QPR) and Negative Binomial (NBR) linear regression analyses,
 respectively.
-
-In Methyl-IT, the concept of DMR is generalized and it is not limited to any
-particular genomic region found with specific clustering algorithm. It can be
-applied to any naturally or algorithmically defined genomic region. For example,
-an exon region identified statistically to be differentially methylated by using
-generalized linear regression model (GLM) is a DMR. Differentially methylated
-genes (DMGs) are estimated from group comparisons for the number of DMPs on
-gene-body regions between control and treatment. This permits the extension of
-the concept of DMR by considering a differentially methylated gene as a
-particular case of DMRs.
 
 ### _Differentially methylated genes (DMGs)_
 We shall call DMGs those DIMRs restricted to gene-body regions.
@@ -1235,13 +1237,18 @@ our mathematical modeling.
 ## Funding The work was supported by funding from NSF-SBIR
 (2015-33610-23428-UNL) and the Bill and Melinda Gates Foundation (OPP1088661).
 
-## S2. Session Information
-
-```{r, echo=FALSE}
-sessionInfo()
-
-```
-
 
 ## References.
+
+<div id="refs"></div>
+
+
+# Session info {.unnumbered}
+
+Here is the output of `sessionInfo()` on the system on which this document was
+compiled running pandoc `r rmarkdown::pandoc_version()`:
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
 

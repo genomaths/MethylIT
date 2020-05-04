@@ -1,0 +1,561 @@
+---
+title: "DMR detection with Methyl-IT"
+subtitle: "Analysis for Arabidopsis MSH1-memory versus non-memory first generation"
+author: |
+     | Robersy Sanchez
+     | rus547@psu.edu
+     | Mackenzie's lab
+     |
+     | Department of Biology and Plant Science. 
+     | Pennsylvania State University, University Park, PA 16802
+     | Maintainer: Robersy Sanchez
+date: "`r format(Sys.time(), '%d %B %Y')`"
+fontsize: 11pt
+fontfamily: "serif"
+bibliography: bibliography.bib
+output:
+    rmarkdown::html_vignette:
+        toc: true
+        toc_depth: 4
+        number_sections: true
+        geometry: margin=1in
+        keep_md: yes
+vignette: >
+    %\VignetteIndexEntry{DMR detection with Methyl-IT}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+abstract: |
+    Herein, an example of Methyl-IT application to the detection of differential
+    methylated regions (DMRs) on first generation MSH1 RNAi transgene segregants
+    data set is presented.  
+---
+
+
+<style type="text/css">
+
+.list-group-item.active, .list-group-item.active:focus,
+.list-group-item.active:hover {
+    z-index: 2;
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+}
+
+.tocify-subheader .tocify-item {
+    font-size: 0.80em;
+    padding-left: 25px;
+    text-indent: 0;
+}
+
+.tocify-header .tocify-item {
+    font-size: 0.85em;
+    padding-left: 20px;
+    text-indent: 0;
+}
+
+body{ /* Normal */
+    font-size: 18px;
+    font-family: "Times New Roman", Times, serif;
+    text-align: justify
+}
+td { /* Table */
+    font-size: 8px;
+}
+
+h1.title {
+    font-size: 38px;
+    font-family: "Times New Roman", Times, serif;
+    color: DarkRed;
+    .subTitle {
+        font-size: 24px;
+        font-family: "Times New Roman", Times, serif;
+        color: DarkRed;
+    }
+}
+
+h1 { /* Header 1 */
+    font-size: 28px;
+    font-family: "Times New Roman", Times, serif;
+    color: DarkBlue;
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+h3 { /* Header 3 */
+    font-size: 18px;
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+</style>
+
+```{r, echo = FALSE}
+library(knitr)
+opts_chunk$set(options(width = 80))
+```
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Introduction  
+MethylIT is an R package for methylome analysis based on a signal-detection
+machine learning approach (SD-ML). This approach is postulated to provide
+greater sensitivity for resolving true signal from the methylation background
+within the methylome [@Sanchez2016; @Sanchez2019]. Because the biological signal
+created within the dynamic methylome environment characteristic of plants is not
+free from background noise, the approach, designated Methyl-IT, includes the
+application of signal detection theory [@Greiner2000;
+@Carter2016; @Harpaz2013; @Kruspe2017].
+
+A basic requirement for the application of signal detection is the
+knowledge of the probability distribution of the background noise, which is used
+as null hypothesis in the detection of the methylation signal. This probability
+distribution is, in general, a member of generalized gamma distribution family,
+and it can be deduced on a statistical mechanical/thermodynamics basis from DNA
+methylation induced by thermal fluctuations [@Sanchez2016].
+
+Herein, we provide an example of Methyl-IT application to DMR estimation on
+patients with PALL [@Wahlberg2016]. Due to the size of human methylome the
+current example only covers the analysis of chromosome 9. A full description of
+Methyl-IT application of methylome analysis for Clinical Diagnostics is given in
+the manuscript [@Sanchez2019]. A wider analysis of PALL data set is given in
+[@Sanchez2020].
+
+The first step of DMR estimation follows the general step of Methyl-IT pipeline
+for the estimation of DMPs. In Methyl-IT, a DMP is a cytosine positions that,
+with high probability, carries a statistically significant methylation change in
+respect to the same position in a control population. Once DMPs are identified, 
+a simple algorithm can be applied to identify clusters of DMPs using [dmpClusters](https://genomaths.github.io/methylit/reference/dmpClusters.html)
+function. Next, [countTest2](https://is.gd/kltCXl) is applied to test whether a
+given cluster of DMPs is a DMR.
+
+It is worthy to notices that any clustering algorithm will impose non-natural
+constraints on the methylation patterning, which not necessarily will be
+associated to the local DNA physico-chemical properties and to local molecular
+evolutionary features of every DMR detected. Every cytosine methylation has a
+concrete physical effect of the DNA, altering the DNA persistence length, i.e.,
+altering the local DNA flexibility [@Severin2011; @Perez2012; @Yusufaly2013].
+DNA flexibility was shown to affect the binding of proteins to methylated DNA
+and DNA-containing lesion [@Teng2018; @Hodges2020] and nucleosome mechanical
+stability [@Ngo2016]. In other words, the sizes of naturally occurrying
+methylation motifs are not arbitrarily set, but very well constrained
+under molecular evolutionary pressure, probably, particular for each species.
+
+The R packages required in this example are:
+```{r libraries, message=FALSE, results='hide'}
+        library(MethylIT)
+        library(MethylIT.utils)
+        library(ggplot2) # graphic
+        library(grid) # For multiple plots
+        library(gridExtra) # For multiple plots
+        library(rtracklayer) # To import gene annotation
+```
+
+
+# Estimation of differentially methylated regions (DMRs)
+
+DMP data set is available for download.  
+```{r dmps, message=FALSE, results='hide'}
+## ===== Download methylation data from Github ========
+url <- paste0("https://github.com/genomaths/genomaths.github.io/raw/master/AT_memory/", 
+              "dmps_mm-vs-nm_all-context_gen1_nmRef_min-meth-3_cov-4_04-16-20.RData")
+temp <- tempfile(fileext = ".RData")
+download.file(url = url, destfile = temp)
+load(temp)
+file.remove(temp); rm(temp, url)
+
+```
+
+The gene annotation
+```{r annotation, message=FALSE, results='hide'}
+## ===== Download methylation data from GitHub ========
+url <- paste0("https://github.com/genomaths/genomaths.github.io/raw/master/", 
+              "Annotation/Arabidopsis_thaliana_genes_TAIR10.38.gtf.RData")
+temp <- tempfile(fileext = ".RData")
+download.file(url = url, destfile = temp)
+load(temp)
+file.remove(temp); rm(temp, url);
+
+GENES <- genes[genes$type == "gene"]
+
+## To get exons and introns
+exons <- genes[genes$type == "exon"]
+introns <- setdiff(x = genes, y = exons, ignore.strand = TRUE)
+
+## To add the corresponding gene names to introns
+hits <- findOverlaps(introns, genes, type = "within", ignore.strand = TRUE)
+introns <- introns[queryHits(hits)]
+mcols(introns) <- mcols(genes[subjectHits(hits)])
+
+```
+
+## Cluster of DMPs
+
+Function [dmpClusters](https://is.gd/K2cRgZ) search for cluster of DMPs found
+from all the samples. The basic idea reside in that if a given cluster of DMP is
+a DMR, then it will be consistently differentially methylated in all treatment
+samples, and we can identify them applying function [countTest2](https://
+is.gd/kltCXl).
+
+There is not a unique approach to build DMP clusters, since several clustering
+criteria can be applied. Herein, we use the two approach implemented in  [dmpClusters](https://is.gd/K2cRgZ) function (follow the link or type 
+?dmpClusters to see the help for the function).
+```{r clusters_fixed.int}
+clust_50_100 = dmpClusters(GR = dmps, maxDist = 50, minNumDMPs = 10, 
+                           maxClustDist = 100, method = "fixed.int",
+                           num.cores = 1L, verbose = FALSE)
+
+clust_50_100
+```
+
+DMPs clusterization strongly depends on the maximum distance permitted between 
+two consecutive DMPs that belong to the same cluster (parameter: `minNumDMPs`) 
+and on the minimum number of DMPs that must be present on a detected 
+agglomeration of DMPs to be considered a cluster (parameter: `maxDist`).
+```{r clusters_relaxed}
+.clust_50_100 = dmpClusters(GR = dmps, maxDist = 50, minNumDMPs = 10, 
+                           maxClustDist = 100, method = "relaxed",
+                           num.cores = 1L, verbose = FALSE)
+.clust_50_100
+```
+
+
+Alternatively, we can use function _dmpClustering_ from MethylIT.utils R package.
+Notice that although _'method'_ parameter are named the same, on each function
+these stand for different approaches.
+```{r clusters.fixed.int}
+clust.50.100 = dmpClustering(dmps = dmps, minNumDMPs = 10, win.size = 50,
+                            step.size = 50, method = "fixed.int", 
+                            maxClustDist = 100, verbose = FALSE)
+clust.50.100
+```
+
+
+```{r clusters.relaxed}
+.clust.50.100 = dmpClustering(dmps = dmps, minNumDMPs = 10, method = "relaxed", 
+                            maxClustDist = 100, verbose = FALSE)
+.clust.50.100
+```
+
+
+## DMR detection
+
+The count of the number of DMPs on each region will be accomplished with
+[getDMPatRegions](https://genomaths.github.io/methylit/reference/getDMPatRegions.html)
+function. This function operates based on [*findOverlaps*](https://is.gd/zJ7U9l)
+function from the '*GenomicRanges*' Bioconductor R package. The
+[*findOverlaps*](https://is.gd/zJ7U9l) function has several critical parameters
+like, for example, '*maxgap*', '*minoverlap*', and '*ignore.strand*'. In our
+[getDMPatRegions](https://genomaths.github.io/methylit/reference/getDMPatRegions.html)
+function, except for setting ignore.strand = TRUE and *type = "within"*, we
+preserve the rest of default 'findOverlaps' parameters.
+
+### Experiment design for each clustering approach 
+
+Design for method = "fixed.int" from dmpClusters function 
+```{r design_fixed.int}
+## ==== Setting up the experiment design to test for DMRs ===
+nams <- names(dmps)
+dmps_at_clust_50_100 <- getDMPatRegions(GR = dmps, regions = clust_50_100,
+                                       ignore.strand = TRUE)
+dmps_at_clust_50_100 <- uniqueGRanges(dmps_at_clust_50_100, columns = 2L,
+                                      ignore.strand = TRUE, type = 'equal',
+                                      verbose = FALSE)
+colnames(mcols(dmps_at_clust_50_100)) <- nams
+
+colData <- data.frame(condition = factor(c("MM", "MM","MM","MM", "MM", 
+                                           "NM","NM","NM","NM"),
+                                         levels = c("NM", "MM")),
+                      nams,
+                      row.names = 2)
+
+## Build a RangedGlmDataSet object
+ds_50_100 <- glmDataSet(GR = dmps_at_clust_50_100, colData = colData)
+
+```
+
+The GRanges object with DMPs on it
+```{r dmr_dat}
+dmps_at_clust_50_100
+```
+
+The [glmDataSet](https://is.gd/VZaazz) object.
+```{r glm}
+ds_50_100
+```
+
+
+Design for method = "relaxed" from dmpClusters function 
+```{r design_relaxed}
+## ==== Setting up the experiment design to test for DMRs ===
+nams <- names(dmps)
+.dmps_at_clust_50_100 <- getDMPatRegions(GR = dmps, regions = .clust_50_100,
+                                       ignore.strand = TRUE)
+.dmps_at_clust_50_100 <- uniqueGRanges(.dmps_at_clust_50_100, columns = 2L,
+                                      ignore.strand = TRUE, type = 'equal',
+                                      verbose = FALSE)
+colnames(mcols(.dmps_at_clust_50_100)) <- nams
+
+## Build a RangedGlmDataSet object
+.ds_50_100 <- glmDataSet(GR = .dmps_at_clust_50_100, colData = colData)
+
+```
+
+Design for method = "fixed.int" from dmpClustering function 
+```{r design.fixed.int}
+## ==== Setting up the experiment design to test for DMRs ===
+nams <- names(dmps)
+dmps_at_clust.50.100 <- getDMPatRegions(GR = dmps, regions = clust.50.100,
+                                       ignore.strand = TRUE)
+dmps_at_clust.50.100 <- uniqueGRanges(dmps_at_clust.50.100, columns = 2L,
+                                      ignore.strand = TRUE, type = 'equal',
+                                      verbose = FALSE)
+colnames(mcols(dmps_at_clust.50.100)) <- nams
+
+## Build a RangedGlmDataSet object
+ds.50.100 <- glmDataSet(GR = dmps_at_clust.50.100, colData = colData)
+
+```
+
+
+Design for method = "relaxed" from dmpClustering function 
+```{r design.relaxed}
+## ==== Setting up the experiment design to test for DMRs ===
+nams <- names(dmps)
+dmps_at.clust.50.100 <- getDMPatRegions(GR = dmps, regions = .clust.50.100,
+                                       ignore.strand = TRUE)
+dmps_at.clust.50.100 <- uniqueGRanges(dmps_at.clust.50.100, columns = 2L,
+                                      ignore.strand = TRUE, type = 'equal',
+                                      verbose = FALSE)
+colnames(mcols(dmps_at.clust.50.100)) <- nams
+
+## Build a RangedGlmDataSet object
+ds_50.100 <- glmDataSet(GR = dmps_at.clust.50.100, colData = colData)
+
+```
+
+
+### DMR detection
+
+Herein, we are requesting a minimum density DMP of 1/100 bp = 0.01/bp (CountPerBp = 0.01), minimum 
+of logarithm of fold changes in the number of DMPs, treatment versus control 
+samples, equal to 1 (Minlog2FC = 1). Also, it is requested a coefficient of 
+variation, on each sample set, not greater than 1 (maxGrpCV = c(1, 1)). 
+
+Notice that in the case of species with big genes, for example, human genes, we
+might want to use lower densities, e.g., CountPerBp = 0.001.
+
+DMRs derived method = "fixed.int" from dmpClusters function 
+```{r dmrs_100, message=FALSE, results='hide'}
+dmrs_fixed.int = countTest2(DS = ds_50_100, 
+                            minCountPerIndv = 8,
+                            maxGrpCV = c(1, 1),
+                            Minlog2FC = 1,
+                            CountPerBp = 0.01, 
+                            test = 'LRT',
+                            num.cores = 4L, 
+                            verbose = TRUE)
+
+dmrs_fixed.int
+```
+
+The DMR associated genes at a $distance \leq 1000$:
+```{r dist_dmrs_fixed.int}
+hits <- distanceToNearest(dmrs_fixed.int, GENES, ignore.strand=FALSE)
+
+## DMR associated genes 
+hits <- hits[mcols(hits)[,1] <= 1000]
+GENES[subjectHits(hits)]
+```
+
+
+DMRs derived method = "relaxed" from dmpClusters function 
+```{r dmrs_relaxed, message=FALSE, results='hide'}
+.dmrs_relaxed = countTest2(DS = .ds_50_100, 
+                           minCountPerIndv = 8,
+                           maxGrpCV = c(1, 1),
+                           Minlog2FC = 1,
+                           CountPerBp = 0.01, 
+                           test = 'LRT',
+                           num.cores = 4L, 
+                           verbose = TRUE)
+.dmrs_relaxed
+```
+
+The DMR assciated genes at a $distance \leq 1000$:
+```{r dist.dmrs_relaxed}
+hits <- distanceToNearest(.dmrs_relaxed, GENES, ignore.strand=FALSE)
+
+## DMR associated genes 
+hits <- hits[mcols(hits)[,1] <= 1000]
+GENES[subjectHits(hits)]
+```
+
+
+DMRs derived method = "fixed.int" from dmpClustering function 
+```{r dmrs.fixed.int, message=FALSE, results='hide'}
+dmrs.fixed.int = countTest2(DS = ds.50.100,
+                            minCountPerIndv = 8,
+                            maxGrpCV = c(1, 1),
+                            Minlog2FC = 1,
+                            CountPerBp = 0.01,
+                            test = 'LRT',
+                            num.cores = 4L,
+                            verbose = TRUE)
+dmrs.fixed.int
+```
+
+The DMR assciated genes at a $distance \leq 1000$:
+```{r dist_dmrs.fixed.int}
+hits <- distanceToNearest(dmrs.fixed.int, GENES, ignore.strand=FALSE)
+
+## DMR associated genes 
+hits <- hits[mcols(hits)[,1] <= 1000]
+GENES[subjectHits(hits)]
+```
+
+
+DMRs derived method = "relaxed" from dmpClustering function 
+```{r dmrs.relaxed, message=FALSE, results='hide'}
+dmrs.relaxed = countTest2(DS = ds_50.100,
+                          minCountPerIndv = 8,
+                          maxGrpCV = c(1, 1), 
+                          Minlog2FC = 1,
+                          CountPerBp = 0.01,
+                          test = 'LRT',
+                          num.cores = 4L,
+                          verbose = TRUE)
+dmrs.relaxed
+```
+
+The DMR assciated genes at a $distance \leq 1000$:
+```{r dist_dmrs.relaxed}
+hits <- distanceToNearest(dmrs.relaxed, GENES, ignore.strand=FALSE)
+
+## DMR associated genes 
+hits <- hits[mcols(hits)[,1] <= 1000]
+GENES[subjectHits(hits)]
+```
+
+# Naturally ocurring regions
+
+As was mentioned in the introduction algorithmically identified DMRs do not
+necessarily will be associated to the local DNA physico-chemical properties and
+to local molecular evolutionary features of every DMR detected.
+
+All the weight of the evolutionary pressure lie down on naturally ocurrying
+methylation patternings inside, for example (but not limited to), exons and
+introns.
+
+For introns we have:
+```{r exons_introns}
+## ==== Setting up the experiment design to test for DMRs ===
+nams <- names(dmps)
+dmps_at_exons <- getDIMPatGenes(GR = dmps, GENES = exons,
+                                ignore.strand = TRUE,
+                                output = "GRanges")
+
+## Build a RangedGlmDataSet object
+ds_exons <- glmDataSet(GR = dmps_at_exons, colData = colData)
+
+```
+
+Differentially methylated exons
+```{r dmrs_exons}
+dmrs_exons = countTest2(DS = ds_exons,
+                        minCountPerIndv = 8,
+                        maxGrpCV = c(1, 1), 
+                        Minlog2FC = 1,
+                        CountPerBp = 0.01, 
+                        test = 'LRT',
+                        num.cores = 4L,
+                        verbose = TRUE)
+
+dmrs_exons
+```
+
+For introns we have:
+```{r design_introns}
+## ==== Setting up the experiment design to test for DMRs ===
+nams <- names(dmps)
+dmps_at_introns <- getDIMPatGenes(GR = dmps, GENES = introns,
+                                 ignore.strand = TRUE,
+                                 output = "GRanges")
+
+## Build a RangedGlmDataSet object
+ds_introns <- glmDataSet(GR = dmps_at_introns, colData = colData)
+
+```
+
+Differentially methylated introns
+```{r dmrs_introns}
+dmrs_introns = countTest2(DS = ds_introns,
+                          minCountPerIndv = 8,
+                          maxGrpCV = c(1, 1), 
+                          Minlog2FC = 1,
+                          CountPerBp = 0.01,
+                          test = 'LRT',
+                          num.cores = 4L,
+                          verbose = TRUE)
+dmrs_introns
+```
+
+
+### Differentially methylated genes DMGs
+
+The last results for introns and exons contrasts with the result for the whole
+gene-body.
+
+```{r design_genes}
+## ==== Setting up the experiment design to test for DMRs ===
+nams <- names(dmps)
+dmps_at_genes <- getDIMPatGenes(GR = dmps, GENES = genes,
+                                ignore.strand = TRUE,
+                                output = "GRanges")
+
+## Build a RangedGlmDataSet object
+ds_genes <- glmDataSet(GR = dmps_at_genes, colData = colData)
+
+```
+
+Differentically methylated genes
+```{r dmrs_genes}
+dmrs_genes = countTest2(DS = ds_genes, 
+                        minCountPerIndv = 8,
+                        maxGrpCV = c(1, 1),
+                        Minlog2FC = 1,
+                        CountPerBp = 0.01,
+                        test = 'LRT',
+                        num.cores = 4L, 
+                        verbose = TRUE)
+
+dmrs_genes
+```
+
+It seems to be that methylation patterning inside of gene-body forms a sort
+continuous regions simultaneously covering portions of exon and introns. In
+particular, this is true for genes experiencing alternative splicing, where some
+regions inside introns works as exons as well.
+
+# References.
+
+<div id="refs"></div>
+
+
+# Session info {.unnumbered}
+
+Here is the output of `sessionInfo()` on the system on which this document was
+compiled running pandoc `r rmarkdown::pandoc_version()`:
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

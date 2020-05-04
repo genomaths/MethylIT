@@ -41,7 +41,7 @@
 #'     analysis. If 'absolute = TRUE', then TV is transformed into |TV|, which
 #'     is an information divergence that can be fitted to Weibull or to
 #'     Generalized Gamma distribution.
-#' @param npoints number of points used in the fit
+#' @param npoints number of points to be used in the fit. Default is NULL.
 #' @param model Optional. Only when dist.name = 'Weibull'. A selection of the
 #'     distribution model, two-parameters and three-parameters Weibull model
 #'     ('2P' and '3P'). Default is 'all' and the model with the best AIC
@@ -134,57 +134,72 @@ nonlinearFitDist <- function(LR, column = 9, dist.name = "Weibull",
     num.cores = NULL, tasks = 0L, maxfev = 1e+05, verbose = TRUE,
     ...) {
 
-    # ------------------------- valid 'InfDiv' object
-    # ------------------------- #
+    ## ---------------------- valid 'InfDiv' object ------------------------ ##
     validateClass(LR)
-    # -------------------------------------------------------------------------
-    # #
+    ## --------------------------------------------------------------------- ##
+    ##
 
     sn <- names(LR)
-    toFit <- function(k, dist.name, sample.size, npoints,
+    toFit <- function(k, dist.name, column, sample.size, npoints,
         maxiter, tol, ftol, ptol, minFactor, verbose) {
         if (verbose)
             message("* Processing sample #", k, " ",
                 sn[k])
         x <- LR[[k]]
         x <- mcols(x[, column])[, 1]
-        if (absolute)
-            x = abs(x)
+        if (absolute) x = abs(x)
         x <- x[x > 0]
-        x <- switch(dist.name, LogNorm = fitLogNormDist(x,
-            sample.size = sample.size, npoints = npoints,
-            maxiter = maxiter, ftol = ftol, ptol = ptol,
-            verbose = verbose), Weibull = weibull3P(x,
-            sample.size = sample.size, model = model,
-            npoints = npoints, maxiter = maxiter, tol = tol,
-            ftol = ftol, ptol = ptol, minFactor = minFactor,
-            verbose = verbose, ...), Weibull2P = weibull3P(x,
-            sample.size = sample.size, model = "2P",
-            npoints = npoints, maxiter = maxiter, tol = tol,
-            ftol = ftol, ptol = ptol, minFactor = minFactor,
-            verbose = verbose, ...), Weibull3P = weibull3P(x,
-            sample.size = sample.size, model = "3P",
-            npoints = npoints, maxiter = maxiter, tol = tol,
-            ftol = ftol, ptol = ptol, minFactor = minFactor,
-            verbose = verbose, ...), Gamma2P = fitGammaDist(x,
-            location.par = FALSE, sample.size = sample.size,
-            npoints = npoints, maxiter = maxiter, ftol = ftol,
-            ptol = ptol, verbose = verbose, ...), Gamma3P = fitGammaDist(x,
-            location.par = TRUE, sample.size = sample.size,
-            npoints = npoints, maxiter = maxiter, ftol = ftol,
-            ptol = ptol, verbose = verbose, ...), GGamma3P = fitGGammaDist(x,
-            location.par = FALSE, sample.size = sample.size,
-            npoints = npoints, maxiter = maxiter, ftol = ftol,
-            ptol = ptol, verbose = verbose, ...), GGamma4P = fitGGammaDist(x,
-            location.par = TRUE, sample.size = sample.size,
-            npoints = npoints, maxiter = maxiter, ftol = ftol,
-            ptol = ptol, verbose = verbose, ...))
-        if (dist.name == "GGamma4P" && sum(is.na(x)) ==
-            15) {
+        x <- switch(dist.name,
+                    LogNorm = fitLogNormDist(x, sample.size = sample.size,
+                                            npoints = npoints,
+                                            maxiter = maxiter,
+                                            ftol = ftol, ptol = ptol,
+                                            verbose = verbose),
+                    Weibull = weibull3P(x, sample.size = sample.size,
+                                        model = model, npoints = npoints,
+                                        maxiter = maxiter, tol = tol,
+                                        ftol = ftol, ptol = ptol,
+                                        minFactor = minFactor,
+                                        verbose = verbose, ...),
+                    Weibull2P = weibull3P(x, sample.size = sample.size,
+                                        model = "2P", npoints = npoints,
+                                        maxiter = maxiter, tol = tol,
+                                        ftol = ftol, ptol = ptol,
+                                        minFactor = minFactor,
+                                        verbose = verbose, ...),
+                    Weibull3P = weibull3P(x, sample.size = sample.size,
+                                        model = "3P", npoints = npoints,
+                                        maxiter = maxiter, tol = tol,
+                                        ftol = ftol, ptol = ptol,
+                                        minFactor = minFactor,
+                                        verbose = verbose, ...),
+                    Gamma2P = fitGammaDist(x, location.par = FALSE,
+                                        sample.size = sample.size,
+                                        npoints = npoints, maxiter = maxiter,
+                                        ftol = ftol, ptol = ptol,
+                                        verbose = verbose, ...),
+                    Gamma3P = fitGammaDist(x, location.par = TRUE,
+                                        sample.size = sample.size,
+                                        npoints = npoints, maxiter = maxiter,
+                                        ftol = ftol, ptol = ptol,
+                                        verbose = verbose, ...),
+                    GGamma3P = fitGGammaDist(x, location.par = FALSE,
+                                            sample.size = sample.size,
+                                            npoints = npoints,
+                                            maxiter = maxiter, ftol = ftol,
+                                            ptol = ptol,
+                                            verbose = verbose, ...),
+                    GGamma4P = fitGGammaDist(x, location.par = TRUE,
+                                            sample.size = sample.size,
+                                            npoints = npoints,
+                                            maxiter = maxiter, ftol = ftol,
+                                            ptol = ptol,
+                                            verbose = verbose, ...))
+        if (dist.name == "GGamma4P" && sum(is.na(x)) == 15) {
             x <- fitGGammaDist(x, location.par = FALSE,
-                sample.size = sample.size, npoints = npoints,
-                maxiter = maxiter, ftol = ftol, ptol = ptol,
-                verbose = verbose)
+                            sample.size = sample.size, npoints = npoints,
+                            maxiter = maxiter, ftol = ftol, ptol = ptol,
+                            verbose = verbose)
         }
         x <- structure(x, class = c("ProbDistr", "data.frame"))
         return(x)
@@ -195,9 +210,11 @@ nonlinearFitDist <- function(LR, column = 9, dist.name = "Weibull",
     if (is.null(num.cores)) {
         x <- mapply(toFit, seq_along(LR), dist.name,
             MoreArgs = list(sample.size = sample.size,
-                npoints = npoints, maxiter = maxiter,
-                tol = tol, ftol = ftol, ptol = ptol,
-                minFactor = minFactor, verbose = verbose),
+                        columnn = column, npoints = npoints,
+                        maxiter = maxiter, tol = tol,
+                        ftol = ftol, ptol = ptol,
+                        minFactor = minFactor,
+                        verbose = verbose),
             SIMPLIFY = FALSE)
     } else {
         if (Sys.info()["sysname"] == "Linux") {
@@ -209,9 +226,11 @@ nonlinearFitDist <- function(LR, column = 9, dist.name = "Weibull",
         }
         x <- bpmapply(toFit, seq_along(LR), dist.name,
             MoreArgs = list(sample.size = sample.size,
-                npoints = npoints, maxiter = maxiter,
-                tol = tol, ftol = ftol, ptol = ptol,
-                minFactor = minFactor, verbose = verbose),
+                        column = column, npoints = npoints,
+                        maxiter = maxiter, tol = tol,
+                        ftol = ftol, ptol = ptol,
+                        minFactor = minFactor,
+                        verbose = verbose),
             SIMPLIFY = FALSE, BPPARAM = bpparam)
     }
     names(x) <- sn

@@ -37,7 +37,7 @@
 #'     absolute value of log2FoldChanges observed to accept that a gene in the
 #'     treatment is differentially expressed in respect to the control
 #' @param pAdjustMethod method used to adjust the results; default: BH
-#' @param pvalCutOff cutoff used then a p-value adjustment is performed
+#' @param pvalCutOff cutoff used then a p-value adjustment is performed.
 #' @param MVrate Minimum Mean/Variance rate.
 #' @param Minlog2FC minimum logarithm base 2 of fold changes.
 #' @param test A character string matching one of 'Wald' or 'LRT'. If test =
@@ -100,6 +100,7 @@
 #' @importFrom IRanges width
 #' @importFrom stats var
 #' @importFrom methods is
+#' @importFrom genefilter rowVars
 #' @seealso \code{\link{glmDataSet}}
 #' @export
 countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
@@ -114,6 +115,7 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
     sample.names <- DS$sampleNames
     res <- GRanges()
     test <- match.arg(test)
+    res <- GRanges()
 
     # ======================= Filtering Block ============================= #
     if (countFilter) {
@@ -150,9 +152,8 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
             ## For each group the count per bp must be equal or
             ## greater than CountPerBp
             size <- width(DS$GR)
-            idx <- which((unname((rowMeans(dc[, g1]))/size) >=
-                CountPerBp) | (unname((rowMeans(dc[,
-                g2]))/size) >= CountPerBp))
+            idx <- which((unname((rowMeans(dc[, g1]))/size) >= CountPerBp) |
+                            (unname((rowMeans(dc[, g2]))/size) >= CountPerBp))
             if (length(idx) == 0) {
                 warning("* No genomic region passed the 'CountPerBp' \n",
                         "filtering conditions")
@@ -213,12 +214,11 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
         X <- DS$counts
         # if only one range: A trick
         if (is.null(nrow(X))) {
-            baseMeanAndVar <- data.frame(baseMean = mean(X),
-                baseVar = var(X))
+            baseMeanAndVar <- data.frame(baseMean = mean(X), baseVar = var(X))
             X <- data.frame(t(X))
         } else {
             baseMeanAndVar <- data.frame(baseMean = rowMeans(X),
-                baseVar = rowVars(X))
+                                        baseVar = rowVars(X))
         }
 
         m1 <- rowMeans(log(X[, group == lev[1]] + 1))
@@ -255,7 +255,8 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
                 tests <- rbind(tests, .estimateGLM(x = X[k,], groups = group,
                                                 baseMV = baseMeanAndVar[k,],
                                                 w = w[k, ], MVrate = MVrate,
-                                                test = test))
+                                                test = test,
+                                                p.value = pvalCutOff))
             }
         }
         if (num.cores > 1) {

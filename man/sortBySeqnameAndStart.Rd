@@ -2,9 +2,12 @@
 % Please edit documentation in R/sortBySeqnameAndStart.R
 \name{sortBySeqnameAndStart}
 \alias{sortBySeqnameAndStart}
+\alias{sortBySeqnameAndEnd}
 \title{Sorting 'GRanges' objects}
 \usage{
 sortBySeqnameAndStart(gr)
+
+sortBySeqnameAndEnd(gr)
 }
 \arguments{
 \item{gr}{GRanges object}

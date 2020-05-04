@@ -53,6 +53,7 @@
 #' @param confl_model Logic. If TRUE, then the best model based on highest
 #'     R.Cross.val is returned for those samples where the model(s) with lowest
 #'     AIC has not the highest R.Cross.val.
+#' @param npoints number of points to be used in the fit. Default is NULL.
 #' @param num.cores The number of cores to use in the nonlinear fit step, i.e.
 #'     at most how many child processes will be run simultaneously (see
 #'     \code{\link[BiocParallel]{bplapply}} function from BiocParallel package).
@@ -117,8 +118,8 @@ gofReport <- function(HD,
                     model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"),
                     column = 9, absolute = FALSE,
                     output = c("best.model", "all"),
-                    confl_model = FALSE, num.cores = 1L,
-                    verbose = FALSE, ...) {
+                    confl_model = FALSE, npoints = NULL,
+                    num.cores = 1L, verbose = FALSE, ...) {
     validateClass(HD)
     output <- match.arg(output)
     model <- unique(model)  # just in case
@@ -137,12 +138,15 @@ gofReport <- function(HD,
 
     stp <- seq_along(model)
     nlms <- list()
-    pb <- txtProgressBar(max = max(stp), style = 3,
-        char = "=")
+    pb <- txtProgressBar(max = max(stp), style = 3, char = "=")
     for (k in stp) {
         mdl <- suppressWarnings(nonlinearFitDist(LR = HD,
-            column = column, absolute = absolute, num.cores = num.cores,
-            dist.name = model[k], verbose = verbose))
+                                                column = column,
+                                                absolute = absolute,
+                                                num.cores = num.cores,
+                                                dist.name = model[k],
+                                                npoints = npoints,
+                                                verbose = verbose, ...))
         names(mdl) <- paste(names(mdl), nams[k], sep = "_")
         stat <- vapply(mdl, function(x) {
             AIC <- as.numeric(x$AIC[1])
@@ -160,8 +164,7 @@ gofReport <- function(HD,
         }, FUN.VALUE = numeric(2))
 
         colnames(stat) <- sn
-        rownames(stat) <- paste(nams[k], rownames(stat),
-            sep = "_")
+        rownames(stat) <- paste(nams[k], rownames(stat), sep = "_")
 
         nlms[[k]] <- mdl
         if (k == 1)
@@ -205,8 +208,7 @@ gofReport <- function(HD,
             issuekey <- paste(names(mdl2), mdl2, sep = "_")
             issue_nlms <- nlms[match(issuekey, names(nlms))]
         }
-        mdl[issue] <- vapply(mdl[issue], function(x) x[1],
-            character(1))
+        mdl[issue] <- vapply(mdl[issue], function(x) x[1], character(1))
 
         bestAIC <- unlist(mdl)
         mdl[issue] <- "Needs revision"
@@ -220,8 +222,7 @@ gofReport <- function(HD,
     modelkey <- paste(names(bestAIC), bestAIC, sep = "_")
     nlms <- nlms[match(modelkey, names(nlms))]
     names(nlms) <- sn
-    nlms <- structure(nlms, class = c("ProbDistrList",
-        "list"))
+    nlms <- structure(nlms, class = c("ProbDistrList", "list"))
 
     bestModel <- model[match(bestAIC, nams)]
     names(bestModel) <- names(HD)

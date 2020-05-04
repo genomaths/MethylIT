@@ -28,6 +28,7 @@
 #'     best fitted model is Poisson or quasi-Poisson, then the best test is
 #'     'Chi-squared' or 'F-test', respectively. So, for the sake of simplicity,
 #'     the corresponding suitable test will be applied when test = 'LRT'.
+#' @param p.value Cut off p-value to reject the null hypothesis
 #'
 #' @return GLM model of the group comparison for the given genomic region
 #'
@@ -48,15 +49,15 @@
 #'                         test = "LRT")
 #'
 .estimateGLM <- function(x, groups, baseMV, w, MVrate,
-                        test = c("Wald", "LRT")) {
-
+                        test = c("Wald", "LRT"), p.value = NULL) {
+    if (is.null(p.value)) p.value <- 1
     test <- match.arg(test)
 
     neg_Bin <- function(data, weights, control) {
 
-        res <- try(suppressWarnings(glm.nb(count ~
-            group, data = data, weights = weights,
-            control = control)), silent = TRUE)
+        res <- try(suppressWarnings(glm.nb(count ~  group, data = data,
+                                            weights = weights,
+                                          control = control)), silent = TRUE)
         if (inherits(res, "try-error")) {
             res <- try(suppressWarnings(glm(count ~
                 group, family = negative.binomial(theta = 1),
@@ -82,64 +83,80 @@
                                         family = quasipoisson(link = "log"),
                                         data = dt, control = controls)),
                                 silent = TRUE),
-            Neg.Binomial = try(suppressWarnings(glm.nb(count ~ group,
-                                        data = dt, control = controls)),
-                                silent = TRUE),
+            Neg.Binomial = neg_Bin(data = dt,  weights = NULL,
+                                   control = controls),
             Neg.Binomial.W = neg_Bin(data = dt,  weights = weights,
                                     control = controls))
     }
 
     levels(groups) <- c("CT", "TT")  ## Control vs Treatment
     relevel(groups, ref = "CT")
+
     # Add pseudocounts (1s) to all the individuals if
     # at least one individual has zero count.
-    if (sum(x == 0) > 0)
-        x <- x + 1
+    if (sum(x == 0) > 0) x <- x + 1
 
     dat <- data.frame(group = groups, count = x)
-    mdl <- list(Eval = FALSE)
+    # mdl <- list(Eval = FALSE)
     mdl <- list()
     if (baseMV$baseMean >= baseMV$baseVar * MVrate) {
-        mdls <- c("Poisson", "QuasiPoisson", "Neg.Binomial",
-            "Neg.Binomial.W")
-        mdl$P <- .evaluateModel(model(dat, "Poisson"),
-            test = test)
-        mdl$Q <- .evaluateModel(model(dat, "QuasiPoisson"),
-            test = test)
-        mdl$NB <- .evaluateModel(model(dat, "Neg.Binomial"),
-            test = test)
-        mdl$NBW <- .evaluateModel(model(dat, "Neg.Binomial.W",
-            weights = w), test = test)
-        aic <- c(mdl$P$AIC, mdl$Q$AIC, mdl$NB$AIC,
-            mdl$NBW$AIC)
+        mdls <- c("Poisson", "QuasiPoisson", "Neg.Binomial", "Neg.Binomial.W")
 
-        aic <- aic[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval,
-            mdl$NBW$Eval)]
-        mdls <- mdls[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval,
-            mdl$NBW$Eval)]
-        mdl <- mdl[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval,
-            mdl$NBW$Eval)]
+        mdl$P <- .evaluateModel(model(dat, "Poisson"), test = test,
+                                p.value = p.value)
+
+        mdl$Q <- .evaluateModel(model(dat, "QuasiPoisson"), test = test,
+                                p.value = p.value)
+
+        mdl$NB <- .evaluateModel(model(dat, "Neg.Binomial"), test = test,
+                                p.value = p.value)
+
+        mdl$NBW <- .evaluateModel(model(dat, "Neg.Binomial.W", weights = w),
+                                test = test, p.value = p.value)
+
+        aic <- c(mdl$P$AIC, mdl$Q$AIC, mdl$NB$AIC, mdl$NBW$AIC)
+        aic <- aic[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
+        pval <- c(mdl$P$coef.pval, mdl$Q$coef.pval, mdl$NB$coef.pval,
+                    mdl$NBW$coef.pval)
+        pval <- pval[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
+        mdls <- mdls[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
+        mdl <- mdl[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
     } else {
         mdls <- c("QuasiPoisson", "Neg.Binomial", "Neg.Binomial.W")
-        mdl$Q <- .evaluateModel(model(dat, "QuasiPoisson"),
-            test = test)
-        mdl$NB <- .evaluateModel(model(dat, "Neg.Binomial"),
-            test = test)
-        mdl$NBW <- .evaluateModel(model(dat, "Neg.Binomial.W",
-            weights = w), test = test)
+
+        mdl$Q <- .evaluateModel(model(dat, "QuasiPoisson"), test = test,
+                                p.value = p.value)
+
+        mdl$NB <- .evaluateModel(model(dat, "Neg.Binomial"), test = test,
+                                p.value = p.value)
+
+        mdl$NBW <- .evaluateModel(model(dat, "Neg.Binomial.W", weights = w),
+                                test = test, p.value = p.value)
 
         aic <- c(mdl$Q$AIC, mdl$NB$AIC, mdl$NBW$AIC)
-
         aic <- aic[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
+        pval <- c(mdl$Q$coef.pval, mdl$NB$coef.pval, mdl$NBW$coef.pval)
+        pval <- pval[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
         mdls <- mdls[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
         mdl <- mdl[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
     }
     if (length(mdl) > 0) {
         Eval <- TRUE
         if (length(mdls) > 1) {
-            ind <- which(aic == min(aic))
+            ind <- which.min(pval)
             mdl <- mdl[ind][[1]]
             mdls <- mdls[ind][1]
+            if (length(mdls) > 1) {
+                ind <- which.min(aic)
+                mdl <- mdl[ind][[1]]
+                mdls <- mdls[ind][1]
+            }
         } else mdl <- mdl[[1]]
     } else Eval <- FALSE
     if (Eval) {
@@ -147,7 +164,7 @@
         disp <- summary(m, dispersion = NULL)$dispersion
         deviance <- (m$null.deviance - m$deviance)/disp
         res <- data.frame(log2FC = mdl$log2FC, scaled.deviance = deviance,
-            pvalue = mdl$coef.pval, model = mdls)
+                        pvalue = mdl$coef.pval, model = mdls)
     } else {
         res <- data.frame(log2FC = NA, scaled.deviance = NA,
             pvalue = NA, model = NA)

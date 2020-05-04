@@ -14,5 +14,5 @@ test_that("estimateCutPoint tests", {
                             treatment.names = c("T1", "T2", "T3"),
                             tv.cut = 0.7, clas.perf = TRUE, prop = 0.6,
                             div.col = 9L)
-    expect_equal(round(cutp$cutpoint), 118)
+    expect_equal(round(cutp$cutpoint), 117)
 })

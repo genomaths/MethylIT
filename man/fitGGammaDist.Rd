@@ -33,7 +33,7 @@ is provided.}
 distribution (GGamma) including the location parameter, i.e., a GGamma
 with four parameters (GGamma4P).}
 
-\item{sample.size}{size of the sample.}
+\item{sample.size}{Minimum size of the sample.}
 
 \item{npoints}{number of points used in the fit. If the number of points if
 greater than 10^6, then the fit is automatically set to npoints = 999999.
