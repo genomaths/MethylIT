@@ -1,14 +1,16 @@
 #' @rdname dmpClusters
 #' @name dmpClusters
 #' @title DMP clustering
-#' @description Given a 'pDMP' object carrying DMPs obtained in Methyl-IT
-#'     downstream analysis, function \strong{\emph{'dmpClusters'}} build
-#'     clusters of DMPs, which can be further tested to identify differentially
-#'     methylated regions (DMRs) with \code{\link{countTest2}} function.
+#' @description Given a 'pDMP' (or 'InfDiv') object carrying DMPs (methylated
+#' cytosines) detected in Methyl-IT downstream analysis, function
+#' \strong{\emph{'dmpClusters'}} build clusters of DMPs, which can be further
+#' tested to identify differentially methylated regions (DMRs) with
+#' \code{\link{countTest2}} function.
+#'
 #' @details Two algorithmic approaches are implemented, named: "relaxed" and
-#'  "fixed.int" (see the description of parameter 'method'). The "fixed.int" is
-#'  mostly addressed to find specific methylation patterns, but the price is
-#'  the number of DMRs found is lower.
+#'   "fixed.int" (see the description of parameter 'method'). The "fixed.int" is
+#'   mostly addressed to find specific methylation patterns, but the price is
+#'   the number of DMRs found is lower.
 #'
 #'  The number of DMPs reported in each cluster corresponds to the numbers of
 #'  sites inside the cluster where DMPs were found in at least one of the
@@ -130,9 +132,10 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
                         num.cores = 1L, tasks = 0L,
                         verbose = TRUE, ...) {
     validateClass(GR)
-    if (!inherits(GR, "pDMP"))
+    if (!inherits(GR, "pDMP") || !inherits(GR, "InfDiv"))
         stop("*** GR object must inherits from 'pDMP' class",
-            " which is returned by calling 'selectDMP' function.")
+            " which is returned by calling 'selectDMP' function. \n",
+            "Or it must inherits from 'InfDiv' class")
     GR <- structure(GR, class = "list")
     GR <- GRangesList(GR)
     if (length(GR) == 1) GR <- unlist(GR, use.names = FALSE)
@@ -143,8 +146,8 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
 
         GR <- meth_status(gr = GR, chromosomes = chromosomes,
                           ignore.strand = ignore.strand,
-                          num.cores = num.cores,
-                          tasks = tasks, verbose = verbose)
+                          num.cores = num.cores, tasks = tasks,
+                          verbose = verbose, ...)
         GR <- unlist(GR, use.names = FALSE)
         GR <- GR[GR$signal > 0, ]
     }
@@ -159,8 +162,8 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
             GR <- uniqueGRanges(GR, chromosomes = chromosomes, columns = 9L,
                                 missing = 0, type = "equal",
                                 ignore.strand = ignore.strand,
-                                num.cores = num.cores,
-                                tasks = tasks, verbose = FALSE)
+                                num.cores = num.cores, tasks = tasks,
+                                verbose = FALSE, ...)
         }
         mcols(GR) <- rowSums(as.matrix(mcols(GR)), na.rm = TRUE)
         colnames(mcols(GR)) <- "signal"
@@ -203,7 +206,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
 #
 ## Methylation status at each cytosine base
 meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
-                    num.cores = 1L, tasks = 0L, verbose = TRUE) {
+                    num.cores = 1L, tasks = 0L, verbose = TRUE, ...) {
     ## Set parallel computation
     progressbar = FALSE
     if (verbose)
@@ -244,8 +247,8 @@ meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
             }
 
             post <- sort(unique(unlist(post)))
-            y <- GRanges(seqnames = CHR, ranges = IRanges(start = post,
-                                                          end = post))
+            y <- GRanges(seqnames = CHR,
+                        ranges = IRanges(start = post, end = post))
         }
 
         if (status == 1) {
@@ -270,7 +273,7 @@ meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
         gr <- uniqueGRanges(gr, chromosomes = chromosomes, missing = 0,
                             type = "equal", ignore.strand = ignore.strand,
                             num.cores = num.cores, tasks = tasks,
-                            verbose = FALSE)
+                            verbose = FALSE, ...)
         mcols(gr) <- NULL
     }
 

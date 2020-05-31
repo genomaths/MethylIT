@@ -67,10 +67,11 @@ A GRanges object with the numbers of positions inside each cluster,
 where DMPs were reported in at least one of the samples.
 }
 \description{
-Given a 'pDMP' object carrying DMPs obtained in Methyl-IT
-downstream analysis, function \strong{\emph{'dmpClusters'}} build
-clusters of DMPs, which can be further tested to identify differentially
-methylated regions (DMRs) with \code{\link{countTest2}} function.
+Given a 'pDMP' (or 'InfDiv') object carrying DMPs (methylated
+cytosines) detected in Methyl-IT downstream analysis, function
+\strong{\emph{'dmpClusters'}} build clusters of DMPs, which can be further
+tested to identify differentially methylated regions (DMRs) with
+\code{\link{countTest2}} function.
 }
 \details{
 Two algorithmic approaches are implemented, named: "relaxed" and
