@@ -53,7 +53,8 @@ to carry the regulatory signals.
 The application of Methyl-T signal detection-machine learning approach to
 methylation analysis of whole genome bisulfite sequencing (WGBS) data permits
 a high level of methylation signal resolution in cancer-associated genes and
-pathways ([4](#4)).
+pathways ([4](#4)), as well as, treatment-associated genes and pathways in 
+plants ([5](#5)).
 
 Status
 ------
@@ -151,6 +152,8 @@ References
 <br><a name="3">3</a>. Sanchez R, Mackenzie SA: Information Thermodynamics of Cytosine DNA Methylation. [Plos One 2016, 11](https://doi.org/10.1371/journal.pone.0150427).<br>
 
 <br><a name="4">4</a>. Sanchez R, Mackenzie SA: Integrative Network Analysis of Differentially Methylated and Expressed Genes for Biomarker Identification in Leukemia. [Sci Rep 2020, 10(1), 2123](https://doi.org/10.1038/s41598-020-58123-2).<br>
+
+<br><a name="5">5</a>. Yang, X, Sanchez, R et al.: Segregation of an MSH1 RNAi transgene produces heritable non-genetic memory in association with methylome reprogramming. [Nature Communications 2020, 11(1), 2214](https://doi.org/10.1038/s41467-020-16036-8).<br>
 
 License
 -------
