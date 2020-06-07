@@ -47,13 +47,16 @@
 #'     the analysis. Default: chromosomes = NULL (all chromosomes are included).
 #' @param ignore.strand Same as in
 #'  \code{\link[GenomicRanges]{findOverlaps-methods}.}
+#' @param columns An integer number corresponding to the specific column(s) to
+#' use from the meta-column of each GRanges. Default values is 9 (the column
+#' carrying to the Hellinger divergence values).
 #' @param num.cores,tasks integer(1). The number of cores to use, i.e. at most
 #'     how many child processes will be run simultaneously (see
 #'     \code{\link[BiocParallel]{bplapply}} function from BiocParallel
 #'     package).The number of tasks per job. value must be a scalar integer >=
 #'     0L (see MulticoreParam from BiocParallel package).
 #' @param verbose if TRUE, prints the function log to stdout.
-#' @param ... Further parameters for uniqueGRanges function.
+#' @param ... Further parameters for \code{\link{uniqueGRanges}} function.
 #'
 #' @return A GRanges object with the numbers of positions inside each cluster,
 #'     where DMPs were reported in at least one of the samples.
@@ -128,7 +131,8 @@
 dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
                         maxClustDist = NULL,
                         method = c("relaxed", "fixed.int"),
-                        chromosomes = NULL, ignore.strand = TRUE,
+                        chromosomes = NULL, columns = 9L,
+                        ignore.strand = TRUE,
                         num.cores = 1L, tasks = 0L,
                         verbose = TRUE, ...) {
     validateClass(GR)
@@ -145,21 +149,22 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
     if (method == "fixed.int") {
 
         GR <- meth_status(gr = GR, chromosomes = chromosomes,
-                          ignore.strand = ignore.strand,
-                          num.cores = num.cores, tasks = tasks,
-                          verbose = verbose, ...)
+                        columns = columns, ignore.strand = ignore.strand,
+                        num.cores = num.cores, tasks = tasks,
+                        verbose = verbose, ...)
         GR <- unlist(GR, use.names = FALSE)
         GR <- GR[GR$signal > 0, ]
     }
     if (method == "relaxed") {
         if (is.null(maxClustDist))
-            stop('\nIf method = "relaxed", then a value for "maxClustDist"',
-                 ' must be provided')
+            stop('\n*** If method = "relaxed", then a value for "maxClustDist"',
+                ' must be provided')
         # if gr is a GRangesList object
         if (inherits(GR, "GRangesList")) {
             if (verbose)
                 message("* Building a unique GRange objects ... \n")
-            GR <- uniqueGRanges(GR, chromosomes = chromosomes, columns = 9L,
+            GR <- uniqueGRanges(GR, chromosomes = chromosomes,
+                                columns = columns,
                                 missing = 0, type = "equal",
                                 ignore.strand = ignore.strand,
                                 num.cores = num.cores, tasks = tasks,
@@ -181,7 +186,13 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
                     ignore.strand = ignore.strand)
         GR <- getDMPatRegions(GR = signals, regions = GR,
                             ignore.strand = ignore.strand)
-        if (minNumDMPs > 0) GR <- GR[GR$dmps >= minNumDMPs]
+        if (minNumDMPs > 0) {
+            idx <- (GR$dmps >= minNumDMPs)
+            if (sum(idx) > 0) GR <- GR[idx]
+            else
+                stop("\n*** No intervals holding the condition '>= minNumDMPs'",
+                     " were found ")
+        }
     }
 
     if (verbose) message("*** Counting DMPs in clusters ...")
@@ -197,7 +208,13 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
 
         GR <- getDMPatRegions(GR = signals, regions = GR,
                             ignore.strand = ignore.strand)
-        if (minNumDMPs > 0) GR <- GR[GR$dmps >= minNumDMPs]
+        if (minNumDMPs > 0) {
+            idx <- (GR$dmps >= minNumDMPs)
+            if (sum(idx) > 0) GR <- GR[idx]
+            else
+                stop("\n*** No intervals holding the condition '>= minNumDMPs'",
+                    " were found ")
+        }
     }
     return(GR[, "dmps"])
 }
@@ -205,7 +222,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
 # ========================= Auxiliary functions ========================= #
 #
 ## Methylation status at each cytosine base
-meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
+meth_status <- function(gr, chromosomes = NULL, columns, ignore.strand = TRUE,
                     num.cores = 1L, tasks = 0L, verbose = TRUE, ...) {
     ## Set parallel computation
     progressbar = FALSE
@@ -231,16 +248,17 @@ meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
             y <- disjoin(gaps(y))
             starts <- start(y)
             ends <- end(y)
-            idx <- which(starts > min.start)
+            idx <- which(starts >= min.start)
             starts <- starts[idx]
             ends <- ends[idx]
-            idx <- which(ends < max.end)
+            idx <- which(ends <= max.end)
             starts <- starts[idx]
             ends <- ends[idx]
 
             if (num.cores > 1) {
                 post <- bpmapply(function(s, e) s:e, starts,
-                                ends, USE.NAMES = FALSE, BPPARAM = bpparam)
+                                ends, USE.NAMES = FALSE,
+                                BPPARAM = bpparam)
             } else {
                 post <- mapply(function(s, e) s:e, starts,
                                 ends, USE.NAMES = FALSE)
@@ -273,20 +291,25 @@ meth_status <- function(gr, chromosomes = NULL, ignore.strand = TRUE,
         gr <- uniqueGRanges(gr, chromosomes = chromosomes, missing = 0,
                             type = "equal", ignore.strand = ignore.strand,
                             num.cores = num.cores, tasks = tasks,
-                            verbose = FALSE, ...)
+                            columns = columns, verbose = FALSE)
         mcols(gr) <- NULL
     }
 
-    if (is.null(chromosomes))
-        CHRs <- unique(as.character(seqnames(gr))) else {
+    if (is.null(chromosomes)) {
+        CHRs <- table(seqnames(gr))
+        CHRs <- names(CHRs[which(CHRs > 2)])
+        seqlevels(gr, pruning.mode = "coarse") <- CHRs
+    }
+    else {
         CHRs <- chromosomes
+        seqlevels(gr, pruning.mode = "coarse") <- CHRs
     }
 
     kCHR <- length(CHRs)
     if (verbose)
         cat("* Computing the genomic signal for status '1' ...\n")
-    r <- lapply(CHRs, function(chr) status(y = gr,
-                                status = 1, CHR = chr, verbose = verbose))
+    r <- lapply(CHRs, function(chr)
+                status(y = gr, status = 1, CHR = chr, verbose = verbose))
     if (verbose)
         cat("* Computing the genomic signal for status '0' ...\n")
     y <- lapply(CHRs, function(chr) status(y = gr,
