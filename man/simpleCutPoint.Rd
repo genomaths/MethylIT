@@ -14,6 +14,7 @@ simpleCutPoint(
   tv.cut,
   clas.perf,
   classifier,
+  interactions = NULL,
   n.pc,
   prop,
   cutp_data = FALSE,
@@ -31,6 +32,11 @@ simpleCutPoint(
 
 \item{classifier, n.pc, prop, cutp_data, num.cores, tasks}{Same as in
 \code{\link{estimateCutPoint}}}
+
+\item{interactions}{If a logistic classifier is used. Variable interactions to
+consider in a logistic regression model. Any pairwise combination of the
+variable 'hdiv', 'TV', 'wprob', and 'pos' can be provided. For example:
+'hdiv:TV', 'wprob:pos', 'wprob:TV', etc.}
 }
 \value{
 Specified in function \code{\link{estimateCutPoint}} for parameter

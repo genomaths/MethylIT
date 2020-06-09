@@ -10,7 +10,10 @@
 #'  \code{\link{estimateCutPoint}}
 #' @param classifier,n.pc,prop,cutp_data,num.cores,tasks Same as in
 #'  \code{\link{estimateCutPoint}}
-#'
+#' @param interactions If a logistic classifier is used. Variable interactions to
+#'     consider in a logistic regression model. Any pairwise combination of the
+#'     variable 'hdiv', 'TV', 'wprob', and 'pos' can be provided. For example:
+#'     'hdiv:TV', 'wprob:pos', 'wprob:TV', etc.
 #' @return Specified in function \code{\link{estimateCutPoint}} for parameter
 #' setting \emph{simple = TRUE}
 #' @importFrom caret confusionMatrix
@@ -33,7 +36,8 @@
 #'
 simpleCutPoint <- function(LR, control.names, treatment.names,
                         column, div.col, tv.col = NULL, tv.cut, clas.perf,
-                        classifier, n.pc, prop, cutp_data = FALSE, num.cores,
+                        classifier, interactions = NULL,
+                        n.pc, prop, cutp_data = FALSE, num.cores,
                         tasks, ...) {
 
     LR = list(unlist(LR[control.names]), unlist(LR[treatment.names]))
@@ -80,6 +84,7 @@ simpleCutPoint <- function(LR, control.names, treatment.names,
                                 column = column, control.names = "ctrl",
                                 treatment.names = "treat",
                                 classifier = classifier[1],
+                                interactions = interactions,
                                 prop = prop, n.pc = n.pc,
                                 output = "conf.mat",
                                 num.cores = num.cores, tasks = tasks, ...)

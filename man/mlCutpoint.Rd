@@ -15,6 +15,7 @@ mlCutpoint(
   post.cut = 0.5,
   classifier1,
   classifier2 = NULL,
+  interactions = NULL,
   n.pc,
   prop = 0.6,
   stat = 0L,
@@ -33,6 +34,13 @@ mlCutpoint(
 
 \item{classifier1, classifier2, n.pc, prop, post.cut}{Same as in
 \code{\link{estimateCutPoint}}}
+
+\item{interactions}{If a logistic classifier is used. Variable interactions to
+consider in a logistic regression model. Any pairwise combination of the
+variable 'hdiv', 'TV', 'wprob', and 'pos' can be provided. For example:
+'hdiv:TV', 'wprob:pos', 'wprob:TV', etc.}
+
+\item{...}{Additional arguments for \code{\link{evaluateDIMPclass}} function}
 
 \item{cutp_data, num.cores, tasks}{Same as in \code{\link{estimateCutPoint}}}
 }

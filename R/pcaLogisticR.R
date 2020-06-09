@@ -49,9 +49,13 @@
 #' @importFrom stats prcomp glm
 #'
 #' @export
-pcaLogisticR <- function(formula = NULL, data = NULL,
-    n.pc = 1, scale = FALSE, center = FALSE, tol = 1e-04,
-    max.pc = NULL) {
+pcaLogisticR <- function(formula = NULL,
+                        data = NULL,
+                        n.pc = 1,
+                        scale = FALSE,
+                        center = FALSE,
+                        tol = 1e-04,
+                        max.pc = NULL) {
 
     Check <- ArgumentCheck::newArgCheck()
     if (!is.null(formula) && !is(formula, "formula")) {
@@ -76,7 +80,7 @@ pcaLogisticR <- function(formula = NULL, data = NULL,
         }
     }
     if (is.null(formula)) {
-        ans <- "A formula or grouping varible must be provided."
+        ans <- "A formula or grouping variable must be provided."
         ArgumentCheck::addError(msg = ans, argcheck = Check)
     }
     ArgumentCheck::finishArgCheck(Check)
@@ -88,7 +92,7 @@ pcaLogisticR <- function(formula = NULL, data = NULL,
         warning(paste0(ans, n.pc, ans1))
     }
     pc <- prcomp(x = data[vn], retx = TRUE, center = center,
-        scale. = scale, tol = tol, rank. = max.pc)
+                scale. = scale, tol = tol, rank. = max.pc)
 
     cn <- colnames(pc$x)
     if (ncol(pc$x) > n.pc) {
@@ -111,7 +115,7 @@ pcaLogisticR <- function(formula = NULL, data = NULL,
     predictors <- paste(colnames(ind.coord), collapse = " + ")
     formula <- paste0(resp, " ~ ", predictors)
     model <- suppressWarnings(glm(formula = formula,
-        family = binomial(link = "logit"), data = data))
+                            family = binomial(link = "logit"), data = data))
 
     model <- structure(list(logistic = model, pca = pc,
         reference.level = l[1], positive.level = l[2]),

@@ -60,7 +60,7 @@
 #' @param scale A logical value indicating whether the variables should be
 #'     scaled to have unit variance before the analysis takes place (same as in
 #'     'prcomp' {prcomp}). Only used if classifier = 'pcaLDA'.
-#' @param interaction Variable interactions to consider in a logistic
+#' @param interactions Variable interactions to consider in a logistic
 #'     regression model. Any pairwise combination of the variable 'hdiv', 'TV',
 #'     'wprob', and 'pos' can be provided. For example: 'hdiv:TV', 'wprob:pos',
 #'     'wprob:TV', etc.
@@ -116,19 +116,29 @@
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom MASS qda lda
 #' @export
-evaluateDIMPclass <- function(LR, control.names, treatment.names,
-    column = c(hdiv = FALSE, TV = FALSE, bay.TV = FALSE,
-        wprob = FALSE, pos = FALSE), classifier = c("logistic",
-        "pca.logistic", "lda", "qda", "pca.lda", "pca.qda"),
-    pval.col = NULL, n.pc = 1, center = FALSE, scale = FALSE,
-    interaction = NULL, output = "conf.mat", prop = 0.6,
-    num.boot = 100, num.cores = 1L, tasks = 0L, seed = 1234,
-    verbose = FALSE) {
+evaluateDIMPclass <- function(LR,
+                            control.names, treatment.names,
+                            column = c(hdiv = FALSE, TV = FALSE,
+                                        bay.TV = FALSE, wprob = FALSE,
+                                        pos = FALSE),
+                            classifier = c("logistic", "pca.logistic",
+                                           "lda", "qda", "pca.lda", "pca.qda"),
+                            pval.col = NULL,
+                            n.pc = 1,
+                            center = FALSE,
+                            scale = FALSE,
+                            interactions = NULL,
+                            output = "conf.mat",
+                            prop = 0.6,
+                            num.boot = 100,
+                            num.cores = 1L,
+                            tasks = 0L,
+                            seed = 1234,
+                            verbose = FALSE) {
 
     classifier <- match.arg(classifier)
 
-    # -------------------------- valid 'pDMP'
-    # object--------------------------- #
+    # -------------------------- valid 'pDMP' object ------------------------ #
     validateClass(LR)
     # ---------------------------------------------------=---------------------
     # #
@@ -142,101 +152,6 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
     }
     set.seed(seed)
 
-    # ----------------------- Auxiliary functions -------------------------- #
-    position <- function(gr) {
-        chrs <- split(gr, seqnames(gr))
-        gr <- lapply(chrs, function(grc) {
-            x <- start(grc)
-            x.min <- min(x)
-            x.max <- max(x)
-            if (x.min == Inf)
-                x.min = 0
-            if (x.max == -Inf)
-                x.max = 1
-            delta <- max(c(x.max - x, 1))
-            return((x - x.min)/(delta))
-        })
-        return(unlist(gr))
-    }
-
-    DIV <- function(LR) {
-        ## This builds data frames from the list or ranges
-        ## LR to be used for ROC analysis LR: list of sample
-        ## GRanges
-        vn <- c("hdiv", "TV", "bay.TV", "wprob", "pos")
-        if (classifier[1] == "logistic") {
-            idx <- unlist(lapply(vn, function(s)
-                sum(grepl(s, interaction)) > 0))
-            column[union(vn[column], vn[idx])] <- TRUE
-        }
-
-        vn <- vn[column]
-        vn <- setdiff(vn, "pos")
-        sn <- names(LR)
-        dt <- data.frame()
-        for (k in seq_len(length(LR))) {
-            dc <- c()
-            x <- LR[[k]]
-            if (!is.null(pval.col))
-                x$wprob <- mcols(x[, pval.col])[, 1]
-            x <- x[, vn]
-            if (column["hdiv"])
-                dc <- cbind(dc, hdiv = x$hdiv)
-            if (column["TV"])
-                dc <- cbind(dc, TV = x$TV)
-            if (column["bay.TV"])
-                dc <- cbind(dc, bay.TV = x$bay.TV)
-            if (column["wprob"])
-                dc <- cbind(dc, logP = log10(x$wprob + 2.2e-308))
-            if (column["pos"] || sum(grepl("pos", interaction)) > 0) {
-                dc = cbind(dc, pos = position(x))
-            }
-            dt <- rbind(dt, data.frame(dc, treat = sn[k]))
-        }
-        return(dt)
-    }
-
-    LogistR <- function(dt, formula, center = FALSE,
-        scale = FALSE) {
-        ## This function performs a logistic regression
-        ## using 'glm'.
-        l <- levels(dt$treat)
-        dt$treat <- as.character(dt$treat)
-        dt$treat[dt$treat == l[1]] <- 0
-        dt$treat[dt$treat == l[2]] <- 1
-        dt$treat <- as.numeric(dt$treat)
-        nc <- ncol(dt)
-        ## Centering and scaling individuals
-        x <- scale(dt[, -ncol(dt)], center = center,
-            scale = scale)
-        if (center)
-            center <- as.numeric(attr(x, "scaled:center"))
-        if (scale)
-            scale <- as.numeric(attr(x, "scaled:scale"))
-        dt[, -ncol(dt)] <- x
-        rm(x)
-        gc()
-        model <- try(suppressWarnings(glm(formula,
-            family = binomial(link = "logit"), data = dt)),
-            silent = TRUE)
-        if (!inherits(model, "try-error")) {
-            modeling <- list(modeling = model, center = center, scale = scale)
-            modeling <- structure(modeling, class = "LogisticR")
-            return(modeling)
-        } else stop("The logistic model cannot be fitted")
-    }
-
-    predictLogistic <- function(object, newdata) {
-        ## Centering and scaling new individuals
-        newdata[, -ncol(newdata)] <- scale(newdata[, -ncol(newdata)],
-                                            center = object$center,
-                                            scale = object$scale)
-        object$modeling <- structure(object$modeling, class = c("glm", "lm"))
-        return(predict.glm(object = object$modeling, newdata = newdata,
-                            type = "response"))
-    }
-
-    # ------------------------------------------------------------------------
     ## ================== To build the regression formula ================== ##
     vn <- c("hdiv", "TV", "bay.TV", "logP", "pos")
     cols <- c(hdiv = FALSE, TV = FALSE, bay.TV = FALSE,
@@ -247,29 +162,30 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
 
     cn <- column
     names(cn) <- c("hdiv", "TV", "bay.TV", "logP", "pos")
-    form <- as.character(outer(vn, vn, FUN = paste,
-        sep = ":"))
+    form <- as.character(outer(vn, vn, FUN = paste,  sep = ":"))
     form <- form[c(2:6, 8:12, 14:18, 20:24)]
-    inter <- c(`hdiv:TV` = FALSE, `hdiv:logP` = FALSE,
-        `hdiv:pos` = FALSE, `hdiv:bay.TV` = FALSE,
-        `TV:hdiv` = FALSE, `TV:logP` = FALSE, `TV:pos` = FALSE,
-        `TV:bay.TV` = FALSE, `bay.TV:hdiv` = FALSE,
-        `bay.TV:logP` = FALSE, `bay.TV:pos` = FALSE,
-        `bay.TV:TV` = FALSE, `logP:hdiv` = FALSE, `logP:TV` = FALSE,
-        `logP:pos` = FALSE, `logP:bay.TV` = FALSE,
-        `pos:hdiv` = FALSE, `pos:TV` = FALSE, `pos:logP` = FALSE,
-        `pos:bay.TV` = FALSE)
-    if (!is.null(interaction) && classifier[1] == "logistic") {
-        if (sum(grepl("wprob", interaction)) > 0) {
-            idx <- sub("wprob", "logP", interaction)
+    inter <- c(`hdiv:TV` = FALSE, `hdiv:logP` = FALSE, `hdiv:pos` = FALSE,
+                `hdiv:bay.TV` = FALSE, `TV:hdiv` = FALSE, `TV:logP` = FALSE,
+                `TV:pos` = FALSE, `TV:bay.TV` = FALSE,
+                `bay.TV:hdiv` = FALSE, `bay.TV:logP` = FALSE,
+                `bay.TV:pos` = FALSE, `bay.TV:TV` = FALSE,
+                `logP:hdiv` = FALSE, `logP:TV` = FALSE,
+                `logP:pos` = FALSE, `logP:bay.TV` = FALSE,
+                `pos:hdiv` = FALSE, `pos:TV` = FALSE,
+                `pos:logP` = FALSE, `pos:bay.TV` = FALSE)
+    if (!is.null(interactions) && (classifier[1] == "logistic" ||
+                                    classifier[1] == "pca.logistic")) {
+        if (sum(grepl("wprob", interactions)) > 0) {
+            idx <- sub("wprob", "logP", interactions)
             inter[idx] <- TRUE
-        } else inter[interaction] <- TRUE
+        } else inter[interactions] <- TRUE
     }
 
-    if (sum(inter) > 0 && classifier[1] == "logistic") {
+    if (sum(inter) > 0 && (classifier[1] == "logistic" ||
+                           classifier[1] == "pca.logistic")) {
         predictors <- paste(paste0(vn = vn[cn], collapse = " + "),
-            paste0(form[inter], collapse = " + "),
-            sep = " + ")
+                            paste0(form[inter], collapse = " + "),
+                            sep = " + ")
         form <- paste0("treat ~ ", predictors)
         formula <- as.formula(form)
     } else {
@@ -306,8 +222,12 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
         testSet$CT <- CT[-lct]
         testSet$TT <- TT[-ltt]
 
-        trainingSet <- DIV(trainingSet)
-        testSet <- DIV(testSet)
+        trainingSet <- DIV(LR = trainingSet, classifier = classifier,
+                           interactions = interactions, column = column,
+                           pval.col = pval.col)
+        testSet <- DIV(LR = testSet, classifier = classifier,
+                        interactions = interactions, column = column,
+                        pval.col = pval.col)
         model <- switch(classifier[1],
                         logistic = LogistR(dt = trainingSet, formula = formula,
                                             center = center, scale = scale),
@@ -374,15 +294,17 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
         }, BPPARAM = bpparam)
         boots <- do.call(rbind, boots)
     }
-    res <- switch(output, conf.mat = conf.mat(1), mc.val = summary(boots),
-        boot.all = list(stats = summary(boots), boots = boots),
-        all = list(con.mat = conf.mat(1), mc.val = summary(boots),
-                    boots = boots))
+    res <- switch(output,
+                conf.mat = conf.mat(1),
+                mc.val = summary(boots),
+                boot.all = list(stats = summary(boots), boots = boots),
+                all = list(con.mat = conf.mat(1), mc.val = summary(boots),
+                            boots = boots))
     return(res)
 }
 
 
-### ==================== Auxiliary functions ========================== #
+### ==================== Additional functions ========================== #
 
 #' @rdname print.mlDMP
 #' @aliases print.mlDMP
@@ -400,7 +322,8 @@ evaluateDIMPclass <- function(LR, control.names, treatment.names,
 #' @keywords internal
 #' @export
 print.ldaDMP <- function(x, digits = getOption("digits"), ...) {
-    if (!is.null(cl <- x$call)) {
+    cl <- x$call
+    if (!is.null(cl)) {
         names(cl)[2L] <- ""
         cat("Call:\n")
         dput(cl, control = NULL)
@@ -437,3 +360,106 @@ print.qdaDMP <- function(x, digits = getOption("digits"), ...) {
     print(x$means, digits)
     invisible(x)
 }
+
+#### ========================== Auxiliary functions ========================== #
+
+## To get cytosine coordinates
+position <- function(gr) {
+    chrs <- split(gr, seqnames(gr))
+    gr <- lapply(chrs, function(grc) {
+                                x <- start(grc)
+                                x.min <- min(x, na.rm = TRUE)
+                                x.max <- max(x, na.rm = TRUE)
+                                if (x.min == Inf) x.min = 0
+                                if (x.max == -Inf) x.max = 1
+                                delta <- max(c(x.max - x, 1))
+                                return((x - x.min)/(delta))
+    })
+    return(unlist(gr))
+}
+
+## This builds data frames from the list or ranges
+## LR to be used for ROC analysis LR: list of sample
+## GRanges
+
+DIV <- function(LR, classifier, interactions, column, pval.col) {
+
+    vn <- c("hdiv", "TV", "bay.TV", "wprob", "pos")
+    if (classifier[1] == "logistic" || classifier[1] == "pca.logistic") {
+        if (!is.null(interactions)) {
+            idx <- unlist(lapply(vn, function(s)
+                sum(grepl(s, interactions)) > 0))
+            column[union(vn[column], vn[idx])] <- TRUE
+        }
+    }
+
+    vn <- vn[column]
+    vn <- setdiff(vn, "pos")
+    sn <- names(LR)
+    dt <- data.frame()
+    for (k in seq_along(LR)) {
+        dc <- c()
+        x <- LR[[k]]
+        if (!is.null(pval.col)) x$wprob <- mcols(x[, pval.col])[, 1]
+        x <- x[, vn]
+        if (column["hdiv"]) dc <- cbind(dc, hdiv = x$hdiv)
+
+        if (column["TV"]) dc <- cbind(dc, TV = x$TV)
+
+        if (column["bay.TV"]) dc <- cbind(dc, bay.TV = x$bay.TV)
+
+        if (column["wprob"]) dc <- cbind(dc, logP = log10(x$wprob + 2.2e-308))
+
+        if (column["pos"]) dc = cbind(dc, pos = position(x))
+
+        if (!is.null(interactions) && (!column["pos"])) {
+            if (sum(grepl("pos", interactions)) > 0)
+                dc = cbind(dc, pos = position(x))
+        }
+        dt <- rbind(dt, data.frame(dc, treat = sn[k]))
+    }
+    dt$treat <- factor(dt$treat, levels = c("CT", "TT"))
+    return(dt)
+}
+
+## To run the nonlinear regression for a logistic model
+LogistR <- function(dt, formula, center = FALSE, scale = FALSE) {
+    ## This function performs a logistic regression
+    ## using 'glm'.
+    l <- levels(dt$treat)
+    dt$treat <- as.character(dt$treat)
+    dt$treat[dt$treat == l[1]] <- 0
+    dt$treat[dt$treat == l[2]] <- 1
+    dt$treat <- as.numeric(dt$treat)
+    nc <- ncol(dt)
+    ## Centering and scaling individuals
+    x <- scale(dt[, -ncol(dt)], center = center,
+               scale = scale)
+    if (center)
+        center <- as.numeric(attr(x, "scaled:center"))
+    if (scale)
+        scale <- as.numeric(attr(x, "scaled:scale"))
+    dt[, -ncol(dt)] <- x
+    rm(x)
+    gc()
+    model <- try(suppressWarnings(glm(formula,
+                                family = binomial(link = "logit"), data = dt)),
+                silent = TRUE)
+    if (!inherits(model, "try-error")) {
+        modeling <- list(modeling = model, center = center, scale = scale)
+        modeling <- structure(modeling, class = "LogisticR")
+        return(modeling)
+    } else stop("\n*** The logistic model cannot be fitted")
+}
+
+## To accomplish predictions using the logistic model
+predictLogistic <- function(object, newdata) {
+    ## Centering and scaling new individuals
+    newdata[, -ncol(newdata)] <- scale(newdata[, -ncol(newdata)],
+                                       center = object$center,
+                                       scale = object$scale)
+    object$modeling <- structure(object$modeling, class = c("glm", "lm"))
+    return(predict.glm(object = object$modeling, newdata = newdata,
+                       type = "response"))
+}
+

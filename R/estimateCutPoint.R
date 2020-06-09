@@ -86,7 +86,7 @@
 #'     testing.
 #' @param n.pc Number of principal components (PCs) to use if the classifier is
 #'     not 'logistic'. In the current case, the maximun number of PCs is 4.
-#' @param interaction If a logistic classifier is used. Variable interactions to
+#' @param interactions If a logistic classifier is used. Variable interactions to
 #'     consider in a logistic regression model. Any pairwise combination of the
 #'     variable 'hdiv', 'TV', 'wprob', and 'pos' can be provided. For example:
 #'     'hdiv:TV', 'wprob:pos', 'wprob:TV', etc.
@@ -165,15 +165,29 @@
 #'                    div.col = 9L)
 #' cutp
 #'
-estimateCutPoint <- function(LR, control.names, treatment.names,
-    simple = TRUE, column = c(hdiv = TRUE, TV = TRUE,
-        bay.TV = FALSE, wprob = TRUE, pos = TRUE),
-    classifier1 = c("logistic", "pca.logistic", "lda",
-        "qda", "pca.lda", "pca.qda"), classifier2 = NULL,
-    tv.cut = 0.25, tv.col = NULL, div.col = NULL, clas.perf = FALSE,
-    post.cut = 0.5, prop = 0.6, n.pc = 1, interaction = NULL,
-    cut.values = NULL, stat = 1, cutp_data = FALSE,
-    num.cores = 1L, tasks = 0L, ...) {
+estimateCutPoint <- function(LR,
+                            control.names,
+                            treatment.names,
+                            simple = TRUE,
+                            column = c(hdiv = TRUE, TV = TRUE,
+                                       bay.TV = FALSE, wprob = TRUE,
+                                       pos = TRUE),
+                            classifier1 = c("logistic", "pca.logistic", "lda",
+                                            "qda", "pca.lda", "pca.qda"),
+                            classifier2 = NULL,
+                            tv.cut = 0.25,
+                            tv.col = NULL,
+                            div.col = NULL,
+                            clas.perf = FALSE,
+                            post.cut = 0.5,
+                            prop = 0.6,
+                            n.pc = 1,
+                            interactions = NULL,
+                            cut.values = NULL,
+                            stat = 1,
+                            cutp_data = FALSE,
+                            num.cores = 1L,
+                            tasks = 0L, ...) {
 
     classifier1 <- match.arg(classifier1)
     if (!is.null(classifier2))
@@ -260,6 +274,7 @@ estimateCutPoint <- function(LR, control.names, treatment.names,
                                 control.names = control.names,
                                 treatment.names = treatment.names,
                                 tv.col = tv.col, tv.cut = tv.cut,
+                                interactions = interactions,
                                 clas.perf = clas.perf, prop = prop,
                                 div.col = div.col, cutp_data = cutp_data,
                                 num.cores = num.cores, tasks = tasks, ...)
@@ -273,6 +288,7 @@ estimateCutPoint <- function(LR, control.names, treatment.names,
                             post.cut = post.cut,
                             classifier1 = classifier1,
                             classifier2 = classifier2,
+                            interactions = interactions,
                             n.pc = n.pc, prop = prop,
                             stat = stat, cut.values = cut.values,
                             num.cores = num.cores, tasks = tasks, ...)
