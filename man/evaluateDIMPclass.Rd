@@ -14,7 +14,7 @@ evaluateDIMPclass(
   n.pc = 1,
   center = FALSE,
   scale = FALSE,
-  interaction = NULL,
+  interactions = NULL,
   output = "conf.mat",
   prop = 0.6,
   num.boot = 100,
@@ -71,7 +71,7 @@ classifier = 'pcaLDA'.}
 scaled to have unit variance before the analysis takes place (same as in
 'prcomp' {prcomp}). Only used if classifier = 'pcaLDA'.}
 
-\item{interaction}{Variable interactions to consider in a logistic
+\item{interactions}{Variable interactions to consider in a logistic
 regression model. Any pairwise combination of the variable 'hdiv', 'TV',
 'wprob', and 'pos' can be provided. For example: 'hdiv:TV', 'wprob:pos',
 'wprob:TV', etc.}

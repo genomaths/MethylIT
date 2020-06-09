@@ -209,6 +209,7 @@ is.gd/kltCXl).
 There is not a unique approach to build DMP clusters, since several clustering
 criteria can be applied. Herein, we use the two approach implemented in  [dmpClusters](https://is.gd/K2cRgZ) function (follow the link or type 
 ?dmpClusters to see the help for the function).
+
 ```{r clusters_fixed.int}
 clust_50_100 = dmpClusters(GR = dmps, maxDist = 50, minNumDMPs = 10, 
                            maxClustDist = 100, method = "fixed.int",

@@ -15,7 +15,7 @@ output:
 abstract: |
     This document is Supplementary Information for the manuscript: _"Segregation
     of an MSH1 RNAi transgene produces heritable non-genetic memory in
-    association with methylome reprogramming"_ (currently in Press). Statistical
+    association with methylome reprogramming"_ [@Yang2020]. Statistical
     analysis supporting the association between gene expression and cytosine DNA
     methylation at gene-body is provided.
 vignette: >
@@ -120,7 +120,6 @@ You can install usefr package from GitHub typing the following command in the R 
 
 ```{r packages, message=FALSE}
 library( GenomicRanges )
-library( DESeq2 )
 library( ggplot2 )
 library( edgeR )
 library( usefr )
@@ -610,7 +609,7 @@ existent relationship between $|logFC|$ and $MD$.
 
 ```{r spineplot, fig.height=6, fig.width=8}
 par( mar = c(5, 7, 4, 4), family = "Serif", font = 2, cex = 0.8, las = 1, lwd = 0.2 )
-tb <- spineplot(m, col = c( "blue", "dodgerblue","deepskyblue" ),
+tb <- spineplot(m[, c(3,2,1)], col = c( "blue", "dodgerblue","deepskyblue" ),
                 xlab = "", ylab = "")
 mtext(side = 1, text = expression(italic(abs(logFC))), 
       line = 2.5, cex = 1, font = 3)
@@ -1063,7 +1062,7 @@ existent relationship between $|logFC|$ and $MD$.
 
 ```{r spineplot_2}
 par( mar = c(5, 7, 4, 4), family = "Serif", font = 2, cex = 0.8, las = 1, lwd = 0.2 )
-tb <- spineplot(m, col = c( "blue", "dodgerblue","deepskyblue" ),
+tb <- spineplot(m[, c(3,2,1)], col = c( "blue", "dodgerblue","deepskyblue" ),
                 xlab = "", ylab = "")
 mtext(side = 1, text = expression(italic(logFC)), 
       line = 2.5, cex = 1, font = 3)

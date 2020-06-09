@@ -11,6 +11,7 @@ dmpClusters(
   maxClustDist = NULL,
   method = c("relaxed", "fixed.int"),
   chromosomes = NULL,
+  columns = 9L,
   ignore.strand = TRUE,
   num.cores = 1L,
   tasks = 0L,
@@ -49,6 +50,10 @@ the first step.}
 \item{chromosomes}{vector of characters labeling the chromosomes included in
 the analysis. Default: chromosomes = NULL (all chromosomes are included).}
 
+\item{columns}{An integer number corresponding to the specific column(s) to
+use from the meta-column of each GRanges. Default values is 9 (the column
+carrying to the Hellinger divergence values).}
+
 \item{ignore.strand}{Same as in
 \code{\link[GenomicRanges]{findOverlaps-methods}.}}
 
@@ -60,17 +65,18 @@ package).The number of tasks per job. value must be a scalar integer >=
 
 \item{verbose}{if TRUE, prints the function log to stdout.}
 
-\item{...}{Further parameters for uniqueGRanges function.}
+\item{...}{Further parameters for \code{\link{uniqueGRanges}} function.}
 }
 \value{
 A GRanges object with the numbers of positions inside each cluster,
 where DMPs were reported in at least one of the samples.
 }
 \description{
-Given a 'pDMP' object carrying DMPs obtained in Methyl-IT
-downstream analysis, function \strong{\emph{'dmpClusters'}} build
-clusters of DMPs, which can be further tested to identify differentially
-methylated regions (DMRs) with \code{\link{countTest2}} function.
+Given a 'pDMP' (or 'InfDiv') object carrying DMPs (methylated
+cytosines) detected in Methyl-IT downstream analysis, function
+\strong{\emph{'dmpClusters'}} build clusters of DMPs, which can be further
+tested to identify differentially methylated regions (DMRs) with
+\code{\link{countTest2}} function.
 }
 \details{
 Two algorithmic approaches are implemented, named: "relaxed" and

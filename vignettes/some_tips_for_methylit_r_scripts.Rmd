@@ -1,0 +1,248 @@
+---
+title: "Some tips for Methyl-IT R scripts"
+author: |
+     | Robersy Sanchez
+     | rus547@psu.edu
+     | Mackenzie's lab
+     |
+     | Department of Biology and Plant Science. 
+     | Pennsylvania State University, University Park, PA 16802
+     | Maintainer: Robersy Sanchez
+date: "`r format(Sys.time(), '%d %B %Y')`"
+fontsize: 11pt
+fontfamily: "serif"
+output:
+    rmarkdown::word_document: 
+        toc: true
+        toc_depth: 3
+        keep_md: yes
+
+vignette: >
+    %\VignetteIndexEntry{Principal Components and Linear Discriminant Analyses with Methyl-IT}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}  
+
+---
+
+
+<style type="text/css">
+
+.list-group-item.active, .list-group-item.active:focus, 
+.list-group-item.active:hover {
+    z-index: 2;
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+}
+
+.tocify-subheader .tocify-item {
+    /* font-size: 0.80em; */ 
+    padding-left: 25px;
+    text-indent: 0;
+}
+
+.tocify-header .tocify-item {
+    /* font-size: 0.85em; */ 
+    padding-left: 20px;
+    text-indent: 0;
+}
+
+body{ /* Normal  */
+    /* font-size: 18px; */
+    font-family: "Times New Roman", Times, serif;
+    text-align: justify
+}
+td {  /* Table  */
+    /* font-size: 8px; */
+}
+
+h1.title {
+    /* font-size: 38px; */
+    font-family: "Times New Roman", Times, serif;
+    color: DarkRed;
+    .subTitle {
+        /* font-size: 24px; */
+        font-family: "Times New Roman", Times, serif;
+        color: DarkRed;
+    }
+}
+
+h1 { /* Header 1 */
+    /* font-size: 28px; */
+    font-family: "Times New Roman", Times, serif;
+    color: DarkBlue;
+}
+h2 { /* Header 2 */
+    /* font-size: 22px; */
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+h3 { /* Header 3 */
+    /* font-size: 18px; */
+    color: DarkBlue;
+    font-family: "Times New Roman", Times, serif;
+}
+code.r{ /* Code block */
+    font-size: 14px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading data sets
+
+Let's suppose that we have the following read-count data set obtained from 
+Bismark 'CX_report' files:
+
+```{r files, eval=FALSE}
+folder <- "~/data/"
+files <- list.files(path = folder)
+# [1] "~/data/Col_8-1a.fq_bismark_bt2.deduplicated.bismark.CX_report"
+# [2] "~/data/Col_8-1b.fq_bismark_bt2.deduplicated.bismark.CX_report"
+# [3] "~/data/Col_8-1c.fq_bismark_bt2.deduplicated.bismark.CX_report"
+
+```
+
+This data set can be read with the following code:
+
+```{r reading, eval=FALSE}
+library(MethylIT)
+col0 <- readCounts2GRangesList(filenames = paste0(folder, files),
+                               sample.id = c("col1", "col2", "col3"),
+                               pattern = "^[1-5]",
+                               columns = c(seqnames = 1, start = 2,
+                                           strand = 3, mC = 4, uC = 5,
+                                           context = 6))
+```
+
+Since the methylome data are from Arabidopsis thaliana (a plant), we have added
+the column 6 from each Bismark 'CX_report' file, which for each cytosine site
+carries the information of its corresponding methylation context: CG, CHG, or 
+CHH. Users familiar with Linux OS can easily check which is the number of each 
+required column by using Linux command line ‘head’ function.
+ 
+```{bash linux, eval=FALSE}
+head BS-10.CX_report.txt
+1       1       +       0       0       CHH     CCC
+1       2       +       0       0       CHH     CCT
+1       3       +       0       0       CHH     CTA
+1       8       +       0       0       CHH     CCC
+1       9       +       0       0       CHH     CCT
+1       10      +       0       0       CHH     CTA
+1       15      +       0       0       CHH     CCC
+1       16      +       0       0       CHH     CCT
+1       17      +       0       0       CHH     CTA
+1       22      +       0       0       CHH     CCC
+```
+
+Plants methylome contains chloroplast and mitochondrial chromosomes, which are not
+included in methylome analysis. In the current case, we can exclude these 
+chromosomes by setting pattern = "^[1-5]". That is, only rows starting with any 
+of the integer numbers from 1 to 5 are read.
+
+Notice that [readCounts2GRangesList](https://is.gd/5pyk1N) function is able to
+deal with different file formats. The user just need to provide the number of
+the specified columns, which for aligner programs can be different.
+
+It is very important to notice that Methyl-IT pipeline assumes that all the data
+provided have aceptable quality. It is up to the user to guaranty the quality of 
+its methylome data set. For example, to include chloroplast chromosome, will 
+artificially decrease the levels of noise in the treatment and control group of
+samples, which definitely will lead to a wrong estimation of the cutpoints in 
+the signal detection step.
+
+### Analysis per methylation context
+
+Usually, in plant epigenomic field, the methylation analysis is performed by
+methylation context. After apply the script above, the three methylation 
+contexts were included in each sample. The 
+[readCounts2GRangesList](https://is.gd/5pyk1N) function can be used to read only
+one specified methylation context, but it also increase the number of files per
+sample.
+
+The next code will select the methylation context that want, say "CHG", from
+the above samples:
+
+```{r chg, eval=FALSE}
+col0_chg <- lapply(col0, function(s) s[s$context == "CHG"], keep.attr = TRUE)
+```
+
+Next, to compute the reference sample, keep in mind that we have two columns
+carrying integer numbers and third column carrying a character vector, which 
+will be not included in the computation. To prevent error we use 'columns = 1:2'
+
+```{r ref, eval=FALSE}
+ref_chg <- poolFromGRlist(LR = col0_chg, stat = "sum", columns = 1:2,
+                          num.cores = 10L)
+
+```
+
+## DMPs
+
+Let's suppose that we have set of DMPs estimated for each methylation context:
+dmps_cg, dmp_chg, and dmps_chh. For DMG or DMR analyses we usually include all
+the methylation contexts.
+
+```{r dmps, eval=FALSE}
+nams <- names(dmps_cg)
+dmps <- dmps_cg
+for (k in 1:length(nams)) {
+  dmps[[k]] <- c(dmps_cg[[k]], dmps_chg[[k]], dmps_chh[[k]])
+}
+names(dmps) <- nams
+```
+## Annotation file 
+
+Gene annotation is needed for DMG estimation. Some organisms (not well annotated
+yet) reports several "contig" sequences which are not included between the known
+chromosomes. In the most frequent case, as in the case of Arabidopsis, we do
+not include chloroplast and mitochondrial chromosomes. For Arabidopsis,
+following code does job when the "gtf" is used:
+
+```{r annot, eval=FALSE}
+library(rtracklayer)
+AG = import("~/data/TAIR10_gff3/Arabidopsis_thaliana.TAIR10.46.gtf.gz")
+gene = AG[ AG$type == "gene", c( "gene_id", "gene_biotype", "gene_name" ) ]
+gene = gene[ gene$gene_biotype == "protein_coding", c("gene_id", "gene_name") ]
+seqlevels(gene, pruning.mode = "coarse") <- c("1", "2", "3", "4", "5")
+gene = sortBySeqnameAndStart(gene)
+```
+
+In fact, the critical step in the above code is:
+
+```{r crit, eval=FALSE}
+seqlevels(gene, pruning.mode = "coarse") <- c("1", "2", "3", "4", "5")
+```
+
+
+## General suggestions
+
+1. Theoretically, the nonlinear fit to estimate the probability distribution of 
+   the information divergence and the cutpoint estimation must be done per
+   chromosome. However, for organisms with small methylome, as in the case of
+   Arbidosis, we have not detected significant differences, so far, when the 
+   methylome reprogramming is genome-wide. Nevertheless, if you suspect that the
+   methylation reprograming is affecting specific chromosomes, then we strongly
+   suggest to perform the analysis per chromosome. In the case of human 
+   methylome, the analysis per chromosome is the right way to proceed.
+   
+2. The cutpoint estimation step is critical. The evaluation of the 
+   classification performance is a very important step. Typically, a 
+   classification performance with accuracy below 95% would indicate that 
+   either something is wrong in some previous step (not necessarily in 
+   Methyl-IT steps) or that really there are not too much difference between 
+   your control and treatment groups, as would be the case, for example, in the 
+   analysis of different seed development stages. Please read and be familiar 
+   with the vignette:  
+   [Simple cutpoint estimation for Gamma3P model](https://is.gd/WoYFUe).
+   
+   
+
+
+
+

@@ -28,13 +28,10 @@
 #' between the methylation levels \eqn{p_{ij}} and the methylation levels
 #' \eqn{q_i}, used as reference, corresponds to the divergence between the
 #' probability vectors \eqn{p^{ij}} and \eqn{q^i = (q_i, 1 - q_i)}. \emph{JD}
-#' is computed as in reference (1), adapted here for discrete probability
-#' distributions:
+#' is computed as in reference (1-2):
 #'
-#' \deqn{JD(p^{ij}, q^i) = (p_{ij} * log(p_{ij}/q_i) +
-#'                         (1 - p_{ij}) * log((1 - p_{ij})/(1 - q_i)) +
-#'                 q_i * log(q_i/p_ij) +
-#'                 (1 - q_i) * log((1 - q_i)/(1 - p_{ij})))/2}.
+#' \deqn{JD(p^{ij}, q^i) = ((p_{ij} - q_i) * log(p_{ij}/q_i) +
+#'                         (q_i - p_{ij}) * log((1 - p_{ij})/(1 - q_i)))/2}
 #'
 #' @param p A numerical vector of the methylation levels p = c(p1, p2) from
 #'     individuals 1 and 2.
@@ -61,6 +58,9 @@
 #'
 #' @references
 #' \enumerate{
+#'     \item J. K. Chung, P. L. Kannappan, C. T. Ng, P. K. Sahoo, Measures of
+#'           distance between probability distributions. J. Math. Anal. Appl.
+#'           138, 280–292 (1989).
 #'     \item Lin J. Divergence Measures Based on the Shannon Entropy. IEEE
 #'           Trans Inform Theory, 1991, 37:145–51.
 #'     \item Sanchez R, Mackenzie SA. Information thermodynamics of cytosine

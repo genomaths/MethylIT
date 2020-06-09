@@ -153,8 +153,7 @@ uniqueGRanges <- function(ListOfGranges, ncols = NULL,
     }
 
     if (is.null(chromosomes)) {
-        chromosomes <- try(lapply(ListOfGranges, seqlevels),
-            silent = TRUE)
+        chromosomes <- try(lapply(ListOfGranges, seqlevels), silent = TRUE)
         if (inherits(chromosomes, "try-error")) {
             warning("* Chromosome labels could not be determined. \n",
                 "Arbitrary Arabidopsis thaliana labels are used instead \n")

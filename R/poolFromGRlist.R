@@ -9,8 +9,16 @@
 #'     at least each GRanges must have the columns named 'mC' and 'uC', for the
 #'     read counts of methylated and unmethylated cytosines, respectively.
 #'
-#' @param LR  list of GRanges objects to build a virtual individual (methylation
-#'     pool)
+#' @param LR  List of GRanges objects to build a virtual individual (methylation
+#'     pool). It is assumed that the list of GRanges was obtained with
+#'     \code{\link{readCounts2GRangesList}}. That is, the metacolumn from each
+#'     GRanges object must contain the columns named 'mC' (number of reads
+#'     signaling methylated cytosine) and 'uC' (number of reads signaling
+#'     non-methylated cytosine). If more than two columns are carried on each
+#'     GRanges object, then the parameter "columns" denoting the column numbers
+#'     where "uC" and "mC" are located must be passed to
+#'     \code{\link{uniqueGRanges}} function.
+#'
 #' @param stat statistic used to estimate the methylation pool: row 'mean', row
 #'     'median', row 'sum', or Jacknife row mean ('jackmean') of methylated and
 #'     unmethylated read counts across individuals. Notice that, for only two
@@ -43,7 +51,7 @@
 #'     site, the Jacknife vector of the selected statistics and then to
 #'     compute the corresponding mean. Default is jstat = 'sum'.
 #' @param verbose If TRUE, prints the function log to stdout
-#' @param ... Additional parameters for 'uniqueGRanges' function.
+#' @param ... Additional parameters for \code{\link{uniqueGRanges}} function.
 #'
 #' @return A GRanges object
 #'
@@ -63,10 +71,10 @@
 #' @importFrom methods as
 #'
 #' @export
-poolFromGRlist <- function(LR, stat = c("mean", "median",
-    "jackmean", "sum"), num.cores = 1, tasks = 0L,
-    prob = FALSE, column = 1L, jstat = c("sum", "mean",
-        "median"), verbose = TRUE, ...) {
+poolFromGRlist <- function(LR, stat = c("mean", "median", "jackmean", "sum"),
+                        num.cores = 1, tasks = 0L, prob = FALSE, column = 1L,
+                        jstat = c("sum", "mean", "median"),
+                        verbose = TRUE, ...) {
     stat <- match.arg(stat)
     jstat <- match.arg(jstat)
     jstat <- eval(parse(text = jstat))
@@ -87,7 +95,7 @@ poolFromGRlist <- function(LR, stat = c("mean", "median",
             })
         }
         x0 <- uniqueGRanges(LR, num.cores = num.cores,
-            tasks = tasks, verbose = verbose, ...)
+                            tasks = tasks, verbose = verbose, ...)
     } else {
         if (inherits(LR, "GRanges")) {
             x0 <- LR

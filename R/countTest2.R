@@ -132,8 +132,13 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
         dc <- DS$counts
         g1 <- which(lev[1] == group)
         g2 <- which(lev[2] == group)
-        m1 <- rowMeans(data.frame(dc[, g1]))
-        m2 <- rowMeans(data.frame(dc[, g2]))
+        if (!is.null(dim(dc)) && nrow(dc) > 1) {
+            m1 <- rowMeans(data.frame(dc[, g1]))
+            m2 <- rowMeans(data.frame(dc[, g2]))
+        } else {
+            m1 <- mean(dc[g1])
+            m2 <- mean(dc[g2])
+        }
         idx <- which(m1 >= minCountPerIndv | m2 >= minCountPerIndv)
         res <- NULL
 
@@ -152,8 +157,14 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
             ## For each group the count per bp must be equal or
             ## greater than CountPerBp
             size <- width(DS$GR)
-            idx <- which((unname((rowMeans(dc[, g1]))/size) >= CountPerBp) |
+            if (!is.null(dim(dc)) && nrow(dc) > 1) {
+                idx <- which((unname((rowMeans(dc[, g1]))/size) >= CountPerBp) |
                             (unname((rowMeans(dc[, g2]))/size) >= CountPerBp))
+            } else {
+                idx <- which((unname((mean(dc[g1]))/size) >= CountPerBp) |
+                            (unname((mean(dc[g2]))/size) >= CountPerBp))
+            }
+
             if (length(idx) == 0) {
                 warning("* No genomic region passed the 'CountPerBp' \n",
                         "filtering conditions")
@@ -174,7 +185,7 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
             if (any(dc == 0))
                 dc <- dc + 1
 
-            if (nrow(dc) > 1) {
+            if (!is.null(dim(dc)) && nrow(dc) > 1) {
                 g1 <- which(lev[1] == group)
                 g2 <- which(lev[2] == group)
                 m1 <- rowMeans(dc[, g1])
@@ -187,8 +198,8 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
             } else {
                 m1 <- max(mean(dc[g1]), 1)
                 m2 <- max(mean(dc[g2]), 1)
-                cv1 <- sd(dc[, g1])/m1
-                cv2 <- sd(dc[, g2])/m2
+                cv1 <- sd(dc[g1])/m1
+                cv2 <- sd(dc[g2])/m2
             }
             idx <- intersect(which(cv1 <= maxGrpCV[1]),
                 which(cv2 <= maxGrpCV[2]))
@@ -309,8 +320,13 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
             g1 <- which(lev[1] == group)
             g2 <- which(lev[2] == group)
             size <- width(GR)
-            CT.CountPerBp <- unname((rowSums(dc[, g1])/length(g1))/size)
-            TT.CountPerBp <- unname((rowSums(dc[, g2])/length(g2))/size)
+            if (!is.null(dim(dc)) && nrow(dc) > 1) {
+                CT.CountPerBp <- unname((rowSums(dc[, g1])/length(g1))/size)
+                TT.CountPerBp <- unname((rowSums(dc[, g2])/length(g2))/size)
+            } else {
+              CT.CountPerBp <- unname((sum(dc[g1])/length(g1))/size)
+              TT.CountPerBp <- unname((sum(dc[g2])/length(g2))/size)
+            }
             mcols(GR) <- data.frame(DS$counts, DS$optionData,
                 CT.SignalDensity = (scaling * CT.CountPerBp),
                 TT.SignalDensity = (scaling * TT.CountPerBp),

@@ -20,7 +20,7 @@ estimateCutPoint(
   post.cut = 0.5,
   prop = 0.6,
   n.pc = 1,
-  interaction = NULL,
+  interactions = NULL,
   cut.values = NULL,
   stat = 1,
   cutp_data = FALSE,
@@ -88,7 +88,7 @@ testing.}
 \item{n.pc}{Number of principal components (PCs) to use if the classifier is
 not 'logistic'. In the current case, the maximun number of PCs is 4.}
 
-\item{interaction}{If a logistic classifier is used. Variable interactions to
+\item{interactions}{If a logistic classifier is used. Variable interactions to
 consider in a logistic regression model. Any pairwise combination of the
 variable 'hdiv', 'TV', 'wprob', and 'pos' can be provided. For example:
 'hdiv:TV', 'wprob:pos', 'wprob:TV', etc.}

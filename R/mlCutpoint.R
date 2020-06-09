@@ -9,7 +9,12 @@
 #'  \code{\link{estimateCutPoint}}
 #' @param classifier1,classifier2,n.pc,prop,post.cut Same as in
 #'  \code{\link{estimateCutPoint}}
+#' @param interactions If a logistic classifier is used. Variable interactions to
+#'     consider in a logistic regression model. Any pairwise combination of the
+#'     variable 'hdiv', 'TV', 'wprob', and 'pos' can be provided. For example:
+#'     'hdiv:TV', 'wprob:pos', 'wprob:TV', etc.
 #' @param cutp_data,num.cores,tasks Same as in \code{\link{estimateCutPoint}}
+#' @param ... Additional arguments for \code{\link{evaluateDIMPclass}} function
 #'
 #' @return Specified in function \code{\link{estimateCutPoint}} for parameter
 #'  setting \emph{simple = FALSE}
@@ -30,9 +35,13 @@
 #'                  div.col = 9L)
 #' cutp
 
-mlCutpoint <- function(LR, control.names, treatment.names,
-                    column, div.col, tv.col = NULL, tv.cut, post.cut = 0.5,
-                    classifier1, classifier2 = NULL, n.pc, prop = 0.6,
+mlCutpoint <- function(LR,
+                    control.names, treatment.names,
+                    column, div.col, tv.col = NULL,
+                    tv.cut, post.cut = 0.5,
+                    classifier1, classifier2 = NULL,
+                    interactions = NULL,
+                    n.pc, prop = 0.6,
                     stat = 0L,  cut.values = NULL,
                     num.cores = 1L, tasks = 0L, ...) {
 
@@ -50,10 +59,10 @@ mlCutpoint <- function(LR, control.names, treatment.names,
                                 control.names = "ctrl",
                                 treatment.names = "treat",
                                 classifier = classifier1,
+                                interactions = interactions,
                                 prop = prop,  output = "conf.mat",
-                                n.pc = n.pc, interaction = interaction,
-                                num.cores = num.cores, tasks = tasks,
-                                ...)
+                                n.pc = n.pc, num.cores = num.cores,
+                                tasks = tasks, ...)
     post <- predict(object = conf.mat$model, newdata = LR, type = "posterior")
 
     if (classifier1[1] == "logistic" || classifier1[1] == "pca.logistic")
@@ -81,8 +90,11 @@ mlCutpoint <- function(LR, control.names, treatment.names,
         cut_search <- cutpoint_search(LR = LR, column = column,
                                 div.col = div.col, cuts = cuts,
                                 tv.col = tv.col, tv.cut = tv.cut,
-                                classifier = classifier2[1], prop = prop,
-                                n.pc = n.pc, st = st, num.cores = num.cores,
+                                classifier = classifier2[1],
+                                interactions = interactions,
+                                prop = prop,
+                                n.pc = n.pc, st = st,
+                                num.cores = num.cores,
                                 tasks = tasks, stat = stat, ...)
 
         dmps <- cut_search$dmps
@@ -97,9 +109,10 @@ mlCutpoint <- function(LR, control.names, treatment.names,
                                     column = column, control.names = "ctrl",
                                     treatment.names = "treat",
                                     classifier = classifier2[1],
+                                    interactions = interactions,
                                     prop = prop, output = "conf.mat",
-                                    n.pc = n.pc, interaction = interaction,
-                                    num.cores = num.cores, tasks = tasks, ...)
+                                    n.pc = n.pc, num.cores = num.cores,
+                                    tasks = tasks, ...)
         if (stat == 0)  st <- conf.mat$Performance$overall[1]
         if (stat %in% seq_len(11)) st <- conf.mat$Performance$byClass[stat]
     }
@@ -134,7 +147,7 @@ mlCutpoint <- function(LR, control.names, treatment.names,
 
 cutpoint_search <- function(LR, column, div.col, cuts, tv.col, tv.cut,
                             classifier, prop, n.pc, st, num.cores, tasks,
-                            stat, ...) {
+                            interactions, stat, ...) {
     k = 1
     opt <- FALSE
     overcut <- FALSE
@@ -156,11 +169,12 @@ cutpoint_search <- function(LR, column, div.col, cuts, tv.col, tv.cut,
                                         control.names = "ctrl",
                                         treatment.names = "treat",
                                         classifier = classifier[1],
+                                        interactions = interactions,
                                         prop = prop,
                                         output = "conf.mat",
                                         n.pc = n.pc,
                                         num.cores = num.cores,
-                                        tasks = tasks
+                                        tasks = tasks, ...
             )
             if (stat == 0) {
                 st0 <- conf.mat$Performance$overall[1]

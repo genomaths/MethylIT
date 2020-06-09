@@ -44,6 +44,9 @@ navbar:
       - text: ------
       - text: "DMR detection with Methyl-IT"
         href: articles/dmr_at_memory.html
+      - text: ------
+      - text: "Some tips for Methyl-IT R scripts"
+        href: articles/some_tips_for_methylit_r_scripts.html
     news:
       text: News
       href: news/index.html
@@ -138,5 +141,6 @@ articles:
   - '`pca_lda_with_methylit`'
   - '`GenExp_Methylation_association_hyper_down-regulated`'
   - '`dmr_at_memory`'
+  - '`some_tips_for_methylit_r_scripts`'
 
 

@@ -18,8 +18,15 @@ poolFromGRlist(
 )
 }
 \arguments{
-\item{LR}{list of GRanges objects to build a virtual individual (methylation
-pool)}
+\item{LR}{List of GRanges objects to build a virtual individual (methylation
+pool). It is assumed that the list of GRanges was obtained with
+\code{\link{readCounts2GRangesList}}. That is, the metacolumn from each
+GRanges object must contain the columns named 'mC' (number of reads
+signaling methylated cytosine) and 'uC' (number of reads signaling
+non-methylated cytosine). If more than two columns are carried on each
+GRanges object, then the parameter "columns" denoting the column numbers
+where "uC" and "mC" are located must be passed to
+\code{\link{uniqueGRanges}} function.}
 
 \item{stat}{statistic used to estimate the methylation pool: row 'mean', row
 'median', row 'sum', or Jacknife row mean ('jackmean') of methylated and
@@ -60,7 +67,7 @@ compute the corresponding mean. Default is jstat = 'sum'.}
 
 \item{verbose}{If TRUE, prints the function log to stdout}
 
-\item{...}{Additional parameters for 'uniqueGRanges' function.}
+\item{...}{Additional parameters for \code{\link{uniqueGRanges}} function.}
 }
 \value{
 A GRanges object
