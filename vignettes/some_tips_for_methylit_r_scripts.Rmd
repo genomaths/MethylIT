@@ -140,20 +140,25 @@ head BS-10.CX_report.txt
 1       22      +       0       0       CHH     CCC
 ```
 
-Plants methylome contains chloroplast and mitochondrial chromosomes, which are not
-included in methylome analysis. In the current case, we can exclude these 
-chromosomes by setting pattern = "^[1-5]". That is, only rows starting with any 
-of the integer numbers from 1 to 5 are read.
+Plants methylome contains chloroplast and mitochondrial chromosomes, which are
+not included in methylome analysis. In the current case, we can exclude these
+chromosomes by setting:
 
-Notice that [readCounts2GRangesList](https://is.gd/5pyk1N) function is able to
-deal with different file formats. The user just need to provide the number of
-the specified columns, which for aligner programs can be different.
+```{r p}
+pattern = "^[1-5]"
+```
+
+That is, only rows starting with any of the integer numbers from 1 to 5 are
+read. Notice that [readCounts2GRangesList](https://is.gd/5pyk1N) function is
+able to deal with different file formats. The user just need to provide the
+number of the specified columns, which for different aligner programs can be
+different.
 
 It is very important to notice that Methyl-IT pipeline assumes that all the data
-provided have aceptable quality. It is up to the user to guaranty the quality of 
-its methylome data set. For example, to include chloroplast chromosome, will 
+provided have acceptable quality. It is up to the user to guaranty the quality
+of its methylome data set. For example, to include chloroplast chromosome, will
 artificially decrease the levels of noise in the treatment and control group of
-samples, which definitely will lead to a wrong estimation of the cutpoints in 
+samples, which definitely will lead to a wrong estimation of the cutpoints in
 the signal detection step.
 
 ### Analysis per methylation context
@@ -225,9 +230,9 @@ seqlevels(gene, pruning.mode = "coarse") <- c("1", "2", "3", "4", "5")
 1. Theoretically, the nonlinear fit to estimate the probability distribution of 
    the information divergence and the cutpoint estimation must be done per
    chromosome. However, for organisms with small methylome, as in the case of
-   Arbidosis, we have not detected significant differences, so far, when the 
+   Arbidopsis, we have not detected significant differences, so far, when the 
    methylome reprogramming is genome-wide. Nevertheless, if you suspect that the
-   methylation reprograming is affecting specific chromosomes, then we strongly
+   methylation reprogramming is affecting specific chromosomes, then we strongly
    suggest to perform the analysis per chromosome. In the case of human 
    methylome, the analysis per chromosome is the right way to proceed.
    
@@ -239,7 +244,7 @@ seqlevels(gene, pruning.mode = "coarse") <- c("1", "2", "3", "4", "5")
    your control and treatment groups, as would be the case, for example, in the 
    analysis of different seed development stages. Please read and be familiar 
    with the vignette:  
-   [Simple cutpoint estimation for Gamma3P model](https://is.gd/WoYFUe).
+   [Optimal cutpoint for the methylation signal](https://is.gd/WoYFUe).
    
    
 
