@@ -70,7 +70,9 @@ methylation induced by thermal fluctuations [@Sanchez2016].
 Methyl-IT uses the read counts of methylation called derived from whole-genome
 bisulfite sequencing (WGBS). Methylome datasets of WGBS are available at Gene
 Expression Omnibus (GEO DataSets). For the current example, we just load RData
-files containing the read-counts from several samples. 
+files containing the read-counts from several samples. Please, notice that we
+are using here just a toy data set, which permits us to move us fast on
+Methyl-IT pipeline.
 
 ```{r reads, message=FALSE}
 ## ===== Download methylation data from PSU's GitLab ========
@@ -108,10 +110,14 @@ respect to the same reference resides in that even sibling individuals follow an
 independent ontogenetic development and, consequently, their developments follow
 independent stochastic processes. The reference individual is estimated with 
 function [poolFromGRlist](https://is.gd/qR79kW):
+
+The centroid (of methylation levels) of the group control is used as reference
+samples. Notice that [poolFromGRlist](https://is.gd/qR79kW) function only uses
+numerical data. Hence, we must specify the columns carrying the read-count data.
+
 ```{r ref}
-ref <- poolFromGRlist(list(meth_samples$W_3_1, meth_samples$W_3_2,
-                        meth_samples$W_3_3), stat = "mean", num.cores = 4L
-)
+idx <- grep("W", names(meth_samples))
+ref <- poolFromGRlist(meth_samples[idx], stat = "mean", num.cores = 4L)
 ```
 
 # Estimation of information divergences
@@ -121,12 +127,12 @@ divergence between the methylation levels of each individual is estimated with
 respect to the reference sample.
 
 ```{r div}
-ml_samples <- meth_samples[c("W_3_3", "W_3_4","W_3_5",
-                            "M_3_1","M_3_2","M_3_3","M_3_4")]
+ml_samples <- meth_samples[c("W_3_1","W_3_2","W_3_3","W_3_4","W_3_5", 
+                             "M_3_1","M_3_2","M_3_3","M_3_4","M_3_5")]
 ml_hd <- estimateDivergence(ref = ref,
                             indiv = ml_samples,
                             Bayesian = TRUE,
-                            min.coverage = 4,
+                            min.coverage = c(4,4),
                             min.meth = 1,
                             high.coverage = 500,
                             percentile = 0.999,
@@ -153,11 +159,19 @@ which is known as total variation distance (widely used in information theory).
 
 ## _Descriptive statistical analysis_
 A descriptive analysis on the distribution of Hellinger divergences of
-methylation levels is recommended. Like in any other statistical analysis,
-descriptive statistical analysis help us to detect potential issues in the raw
-data. It is the user responsibility to perform quality check of his/her dataset
-before start to apply Methyl-IT. Nevertheless, the quality checking of the raw
-data is not perfect. So, it is healthy to sees for potential issues.
+methylation levels is recommended. After the raw data filtering introduced with
+[estimateDivergence](https://is.gd/0ViBO9) function, some coverage issue could
+be detected. Notice that Methyl-IT pipeline assumes that the data quality is
+good enough.
+
+Like in any other statistical analysis, descriptive statistical analysis help us
+to detect potential issues in the raw data. It is the user responsibility to
+perform quality check of his/her dataset before start to apply Methyl-IT.
+Nevertheless, the quality checking of the raw data is not perfect. So, it is
+healthy to sees for potential issues.
+
+This is an optional step not included in Methyl-IT. It is up to the user to
+verify the data quality.
 
 ```{r crit}
 ## Critical values
@@ -165,11 +179,8 @@ critical.val <- do.call(rbind, lapply(ml_hd, function(x) {
     hd.95 = quantile(x$hdiv, 0.95)
     tv.95 = quantile(abs(x$bay.TV), 0.95)
     btv.95 = quantile(abs(x$TV), 0.95)
-    return(c(tv = tv.95, hd = hd.95, TTV = btv.95,
-            num.sites.hd95 = sum(x$hdiv > hd.95),
-            num.sites.tv95 = sum(x$bay.TV > tv.95),
-            num.sites.btv.95 = sum(x$TV > btv.95)
-    ))})
+    return(c(tv = tv.95, hd = hd.95, bay.TV = btv.95)
+    )})
 )
 critical.val
 
@@ -252,7 +263,8 @@ the previous step.
 ps <- getPotentialDIMP(LR = ml_hd,
                         nlms = gof$nlms,
                         div.col = 9L,
-                        tv.col = 0.25,
+                        tv.col = 8L,
+                        tv.cut = 0.25,
                         dist.name = gof$bestModel)
 ps$M_3_1
 ```
@@ -293,9 +305,10 @@ information divergences: *Hellinger divergence* (*div.col* = 9) or the *total*
 cutpoint <- estimateCutPoint(LR = ps,
                             simple = FALSE,
                             div.col = 9,
-                            control.names = c("W_3_3", "W_3_4", "W_3_5"),
-                            treatment.names = c("M_3_1", "M_3_2", "M_3_3",
-                                                "M_3_4", "M_3_5"),
+                            control.names = c("W_3_1","W_3_2","W_3_3",
+                                              "W_3_4","W_3_5"),
+                            treatment.names = c("M_3_1","M_3_2","M_3_3",
+                                                "M_3_4","M_3_5"),
                             column = c(hdiv = TRUE, bay.TV = TRUE,
                                         wprob = TRUE, pos = TRUE),
                             classifier1 = "pca.qda", n.pc = 4,
@@ -356,8 +369,8 @@ The experimental design is set with
 [glmDataSet](https://genomaths.github.io/methylit/reference/glmDataSet.html) 
 function
 ```{r exper}
-colData <- data.frame(condition = factor(c("WT", "WT", "WT",
-                                            "ML", "ML", "ML", "ML"),
+colData <- data.frame(condition = factor(c("WT", "WT", "WT", "WT", "WT",
+                                            "ML", "ML", "ML", "ML", "ML"),
                                         levels = c("WT", "ML")),
                     nams,
                     row.names = 2)
@@ -372,8 +385,8 @@ DMGs are detected using function
 dmgs <- countTest2(DS = ds, num.cores = 4L,
                     tasks = 2L,
                     minCountPerIndv = 7,
-                    maxGrpCV = c(1.2, 1.2),
-                    Minlog2FC = 0.5,
+                    maxGrpCV = c(1, 1),
+                    Minlog2FC = 1,
                     CountPerBp = 0.001,
                     test = "LRT",
                     verbose = TRUE)

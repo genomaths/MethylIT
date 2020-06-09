@@ -1,7 +1,13 @@
-# MethylIT 0.3.2
+# MethylIT 0.3.2.1
 * Current version 
 * Actively used in methylome analysis
 * In development     
+   * 06-09-20:    
+         1) Upgrading corresponding to R version 4.0.0.     
+              - Prevent potential crash originated by changes in some 
+                R packages internally used by Methyl-IT.
+
+# MethylIT 0.3.2
    * 04-17-20:    
          1) A new vignette added:      
               - DMR detection with Methyl-IT

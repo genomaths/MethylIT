@@ -136,7 +136,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
                         num.cores = 1L, tasks = 0L,
                         verbose = TRUE, ...) {
     validateClass(GR)
-    if (!inherits(GR, "pDMP") || !inherits(GR, "InfDiv"))
+    if (!inherits(GR, c("pDMP", "InfDiv")))
         stop("*** GR object must inherits from 'pDMP' class",
             " which is returned by calling 'selectDMP' function. \n",
             "Or it must inherits from 'InfDiv' class")

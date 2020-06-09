@@ -1,6 +1,6 @@
 Package: MethylIT
 Title: Methylation Analysis Based on Signal Detection
-Version: 0.3.2
+Version: 0.3.2.1
 Encoding: UTF-8
 Authors@R: c(person("Robersy", "Sanchez", email = "rus547@psu.edu",
                   role = c("aut", "cre"),
