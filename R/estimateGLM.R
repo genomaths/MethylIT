@@ -100,7 +100,6 @@
     # mdl <- list(Eval = FALSE)
     mdl <- list()
     if (baseMV$baseMean >= baseMV$baseVar * MVrate) {
-        mdls <- c("Poisson", "QuasiPoisson", "Neg.Binomial", "Neg.Binomial.W")
 
         mdl$P <- .evaluateModel(model(dat, "Poisson"), test = test,
                                 p.value = p.value)
@@ -114,16 +113,23 @@
         mdl$NBW <- .evaluateModel(model(dat, "Neg.Binomial.W", weights = w),
                                 test = test, p.value = p.value)
 
-        aic <- c(mdl$P$AIC, mdl$Q$AIC, mdl$NB$AIC, mdl$NBW$AIC)
-        aic <- aic[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+        if (any(unlist(lapply(mdl, function(m) {m$Eval})))) {
 
-        pval <- c(mdl$P$coef.pval, mdl$Q$coef.pval, mdl$NB$coef.pval,
-                    mdl$NBW$coef.pval)
-        pval <- pval[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+            mdls <- c("Poisson", "QuasiPoisson", "Neg.Binomial",
+                        "Neg.Binomial.W")
 
-        mdls <- mdls[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+            aic <- c(mdl$P$AIC, mdl$Q$AIC, mdl$NB$AIC, mdl$NBW$AIC)
+            aic <- aic[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
 
-        mdl <- mdl[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+            pval <- c(mdl$P$coef.pval, mdl$Q$coef.pval, mdl$NB$coef.pval,
+                      mdl$NBW$coef.pval)
+            pval <- pval[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
+            mdls <- mdls[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
+            mdl <- mdl[c(mdl$P$Eval, mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+
+        } else mdl <- c()
 
     } else {
         mdls <- c("QuasiPoisson", "Neg.Binomial", "Neg.Binomial.W")
@@ -137,24 +143,28 @@
         mdl$NBW <- .evaluateModel(model(dat, "Neg.Binomial.W", weights = w),
                                 test = test, p.value = p.value)
 
-        aic <- c(mdl$Q$AIC, mdl$NB$AIC, mdl$NBW$AIC)
-        aic <- aic[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+        if (any(unlist(lapply(mdl, function(m) {m$Eval})))) {
+            aic <- c(mdl$Q$AIC, mdl$NB$AIC, mdl$NBW$AIC)
+            aic <- aic[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
 
-        pval <- c(mdl$Q$coef.pval, mdl$NB$coef.pval, mdl$NBW$coef.pval)
-        pval <- pval[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+            pval <- c(mdl$Q$coef.pval, mdl$NB$coef.pval, mdl$NBW$coef.pval)
+            pval <- pval[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
 
-        mdls <- mdls[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
-        mdl <- mdl[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+            mdls <- mdls[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+            mdl <- mdl[c(mdl$Q$Eval, mdl$NB$Eval, mdl$NBW$Eval)]
+        } else mdl <- c()
+
     }
+
     if (length(mdl) > 0) {
         Eval <- TRUE
-        if (length(mdls) > 1) {
+        if (length(mdl) > 1) {
             ind <- which.min(pval)
             mdl <- mdl[ind][[1]]
             mdls <- mdls[ind][1]
             if (length(mdls) > 1) {
                 ind <- which.min(aic)
-                mdl <- mdl[ind][[1]]
+                if (length(mdl) > 1) mdl <- mdl[ind][[1]]
                 mdls <- mdls[ind][1]
             }
         } else mdl <- mdl[[1]]
@@ -167,7 +177,7 @@
                         pvalue = mdl$coef.pval, model = mdls)
     } else {
         res <- data.frame(log2FC = NA, scaled.deviance = NA,
-            pvalue = NA, model = NA)
+                        pvalue = NA, model = NA)
     }
     return(res)
 }
