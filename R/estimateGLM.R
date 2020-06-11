@@ -162,12 +162,10 @@
             ind <- which.min(pval)
             mdl <- mdl[ind][[1]]
             mdls <- mdls[ind][1]
-            if (length(mdls) > 1) {
-                ind <- which.min(aic)
-                if (length(mdl) > 1) mdl <- mdl[ind][[1]]
-                mdls <- mdls[ind][1]
-            }
-        } else mdl <- mdl[[1]]
+        } else {
+            mdl <- mdl[[1]]
+            mdls <- mdls[1]
+        }
     } else Eval <- FALSE
     if (Eval) {
         m <- mdl$mdl
