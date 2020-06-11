@@ -103,12 +103,21 @@
 #' @importFrom genefilter rowVars
 #' @seealso \code{\link{glmDataSet}}
 #' @export
-countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
-                CountPerBp = NULL, minCountPerIndv = 3, maxGrpCV = NULL,
-                FilterLog2FC = TRUE, pAdjustMethod = "BH", pvalCutOff = 0.05,
-                MVrate = 0.98, Minlog2FC = 0.5, test = c("Wald", "LRT"),
-                scaling = 1L, tasks = 0L, saveAll = FALSE,
-                verbose = TRUE) {
+countTest2 <- function(DS, num.cores = 1,
+                        countFilter = TRUE,
+                        CountPerBp = NULL,
+                        minCountPerIndv = 3,
+                        maxGrpCV = NULL,
+                        FilterLog2FC = TRUE,
+                        pAdjustMethod = "BH",
+                        pvalCutOff = 0.05,
+                        MVrate = 0.98,
+                        Minlog2FC = 0.5,
+                        test = c("Wald", "LRT"),
+                        scaling = 1L,
+                        tasks = 0L,
+                        saveAll = FALSE,
+                        verbose = TRUE) {
 
     group <- DS$colData$condition
     lev <- DS$levels
@@ -263,9 +272,11 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
             for (k in seq_len(nrow(X))) {
                 if (verbose)
                     message("*** Processing sample", k, "\n")
-                tests <- rbind(tests, .estimateGLM(x = X[k,], groups = group,
+                tests <- rbind(tests, .estimateGLM(x = X[k,],
+                                                groups = group,
                                                 baseMV = baseMeanAndVar[k,],
-                                                w = w[k, ], MVrate = MVrate,
+                                                w = w[k, ],
+                                                MVrate = MVrate,
                                                 test = test,
                                                 p.value = pvalCutOff))
             }
@@ -280,8 +291,10 @@ countTest2 <- function(DS, num.cores = 1, countFilter = TRUE,
                                 function(k) .estimateGLM(x = X[k, ],
                                                     groups = group,
                                                     baseMV = baseMeanAndVar[k,],
-                                                    w = w[k, ], MVrate = MVrate,
-                                                    test = test),
+                                                    w = w[k, ],
+                                                    MVrate = MVrate,
+                                                    test = test,
+                                                    p.value = pvalCutOff),
                                 BPPARAM = bpparam)
             tests = do.call(rbind, tests)
         }

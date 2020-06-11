@@ -51,10 +51,10 @@
                 coef.pval = coef.pval, AIC = AICs,
                 mdl = model)
         } else {
-            res <- list(Eval = FALSE, AIC = 1e+16)
+            res <- list(Eval = FALSE, AIC = 1e+16, coef.pval = 1)
         }
     } else {
-        res <- list(Eval = FALSE, AIC = 1e+16)
+        res <- list(Eval = FALSE, AIC = 1e+16, coef.pval = 1)
     }
     return(res)
 }
