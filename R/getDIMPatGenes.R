@@ -9,8 +9,8 @@
 #'     GRangesList, GRanges or a list of GRanges.
 #' @param GENES A GRanges object with gene coordinates and gene IDs. A
 #'     column named \strong{'gene_id'} carrying the gene ids should be
-#'     included in the metacolumns. If the meta-column named 'gene_id' 
-#' is not provided, then gene (region) ids will be created using the 
+#'     included in the metacolumns. If the meta-column named 'gene_id'
+#' is not provided, then gene (region) ids will be created using the
 #' gene (region) coordinates.
 #' @param output Class of the object to be returned, a "list", or a "GRanges"
 #'  object.
@@ -96,7 +96,6 @@ getDIMPatGenes.default <- function(GR, GENES, type = "within",
 
 #' @rdname getDIMPatGenes
 #' @importFrom S4Vectors mcols
-#' @exportMethod getDIMPatGenes.GRanges
 #' @export
 getDIMPatGenes.GRanges <- function(GR, GENES, type = "within",
                                     ignore.strand = TRUE, ...) {

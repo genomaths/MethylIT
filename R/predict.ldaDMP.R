@@ -14,7 +14,8 @@
 #' @param ... arguments passed to or from other methods.
 #' @seealso \code{\link[MethylIT]{estimateCutPoint}}, \code{\link[MASS]{lda}}
 #' @keywords internal
-#' @exportMethod predict.ldaDMP
+#' @export
+predict.ldaDMP <- function(object, ...) UseMethod("predict")
 predict.ldaDMP <- function(object, newdata,
                         type = c("class", "posterior", "scores", "lda.pred"),
                         ...) {
