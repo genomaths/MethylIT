@@ -203,18 +203,13 @@ estimateDivergence <- function(ref, indiv, Bayesian = FALSE,
     tasks = 0L, meth.level = FALSE, logbase = 2, verbose = TRUE,
     ...) {
 
-    if (is.null(columns) && (!meth.level))
-        columns <- c(1, 2)
-    if (meth.level && (is.null(columns)))
-        columns <- 1
+    if (is.null(columns) && (!meth.level)) columns <- c(1, 2)
+    if (meth.level && (is.null(columns))) columns <- 1
     sn <- names(indiv)
 
-    if (Sys.info()["sysname"] == "Linux") {
-        bpparam <- MulticoreParam(workers = num.cores,
-            tasks = tasks)
-    } else {
-        bpparam <- SnowParam(workers = num.cores, type = "SOCK")
-    }
+    if (Sys.info()["sysname"] == "Linux")
+        bpparam <- MulticoreParam(workers = num.cores, tasks = tasks)
+    else bpparam <- SnowParam(workers = num.cores, type = "SOCK")
     if (ncol(mcols(ref)) > 2)
         ref <- ref[, columns]
     indiv <- lapply(indiv, function(x) x[, columns])
@@ -227,13 +222,13 @@ estimateDivergence <- function(ref, indiv, Bayesian = FALSE,
             x <- indv[[k]]
             x <- x[, columns]
             x <- uniqueGRanges(list(ref, x), num.cores = 1L,
-                tasks = tasks, verbose = verbose, ...)
+                                tasks = tasks, verbose = verbose, ...)
             x = estimateBayesianDivergence(x, Bayesian = Bayesian,
-                num.cores = 1L, tasks = tasks, meth.level = meth.level,
-                verbose = verbose)
+                                        num.cores = 1L, tasks = tasks,
+                                        meth.level = meth.level,
+                                        verbose = verbose)
             return(x)
-        }, BPPARAM = bpparam, ref = ref, indv = indiv,
-            sn = sn)
+        }, BPPARAM = bpparam, ref = ref, indv = indiv, sn = sn)
     } else {
         x = bplapply(seq_len(length(indiv)), function(k,
             ref, indv, sn) {

@@ -133,8 +133,7 @@ uniqueGRfilterByCov <- function(x, y = NULL, min.coverage = 4,
         q <- min(q1, q2)
     } else q <- high.coverage
 
-    idx1 <- which((cov1 >= min.coverage[1]) | (cov2 >=
-        min.coverage[2]))
+    idx1 <- which((cov1 >= min.coverage[1]) | (cov2 >= min.coverage[2]))
     if (!(length(idx1) > 0))
         stop("*** Some filtering condition from min.coverage = c(",
             paste(min.coverage, collapse = ","), ") is not hold by the sample")

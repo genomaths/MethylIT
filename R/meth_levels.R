@@ -97,21 +97,16 @@ setMethod("meth_levels", signature(x = "data.frame"),
             p1 <- meth.level(x[, 1:2], Bayesian = FALSE, verbose = verbose)
             p2 <- meth.level(x[, 3:4], Bayesian = FALSE, verbose = verbose)
             if (tv) TV <- p2 - p1
-        } else {
-            if (Bayesian) {
-                p1 <- meth.level(x[, 1:2], Bayesian = Bayesian,
-                                verbose = verbose)
-                p2 <- meth.level(x[, 3:4], Bayesian = Bayesian,
-                                verbose = verbose)
-                if (bay.tv) bay.TV <- p2 - p1
-            }
-
+        }
+        if (Bayesian) {
+            p1 <- meth.level(x[, 1:2], Bayesian = Bayesian, verbose = verbose)
+            p2 <- meth.level(x[, 3:4], Bayesian = Bayesian, verbose = verbose)
+            if (bay.tv) bay.TV <- p2 - p1
         }
         if (preserve.dt) x <- data.frame(y, p1, p2)
         else x <- data.frame(p1, p2)
     } else {
-        p1 <- meth.level(x[, 1:2], Bayesian = Bayesian,
-                        verbose = verbose)
+        p1 <- meth.level(x[, 1:2], Bayesian = Bayesian, verbose = verbose)
         if (preserve.dt) x <- data.frame(x, p1)
         else x <- data.frame(p1)
     }
