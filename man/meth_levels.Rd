@@ -116,3 +116,26 @@ for Linux OS). These parameters will be passed to
 \description{
 This function computes the
 }
+\examples{
+## The read count data are created
+num.samples <- 250
+s <- 1:num.samples
+gr <- data.frame(chr = 'chr1', start = s, end = s,
+                strand = sample(c("+", "-"), num.samples, replace = TRUE),
+                mCc = rnbinom(size = num.samples, mu = 4, n = 500),
+                uCc = rnbinom(size = num.samples, mu = 4, n = 500),
+                mCt = rnbinom(size = num.samples, mu = 4, n = 500),
+                uCt = rnbinom(size = num.samples, mu = 4, n = 500))
+
+gr <- makeGRangesFromDataFrame(gr, keep.extra.columns = TRUE)
+
+gr <- meth_levels(GR = gr,
+                columns = c(mC1 = 1, uC1 = 2,
+                            mC2 = 3, uC2 = 4),
+                preserve.dt = TRUE,
+                Bayesian = TRUE, tv = TRUE, bay.tv = TRUE,
+                num.cores = 1)
+}
+\author{
+Robersy Sanchez (\url{https://genomaths.com})
+}

@@ -136,12 +136,12 @@ estimateBayesianDivergence <- function(x, Bayesian = FALSE,
         uC1 = 2, mC2 = 3, uC2 = 4), meth.level = FALSE,
     preserve.gr = FALSE, logbase = 2, verbose = TRUE) {
 
-    if (Sys.info()["sysname"] == "Linux") {
-        bpparam <- MulticoreParam(workers = num.cores,
-            tasks = tasks)
-    } else {
-        bpparam <- SnowParam(workers = num.cores, type = "SOCK")
-    }
+    if (verbose) progressbar <- TRUE
+    if (Sys.info()["sysname"] == "Linux")
+        bpparam <- MulticoreParam(workers = num.cores, tasks = tasks,
+                                progressbar = progressbar)
+    else bpparam <- SnowParam(workers = num.cores, type = "SOCK",
+                            progressbar = progressbar)
     ismatrix <- TRUE
     if (!is(x, "matrix")) {
         HDiv <- x
