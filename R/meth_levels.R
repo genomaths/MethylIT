@@ -95,11 +95,11 @@ setMethod("meth_levels", signature(x = "data.frame"),
     }
 
     if (filter) {
-        r1 <- rowSums(x[, 1:2])
+        r1 <- rowSums(x[, 1:2], na.rm = TRUE)
         ind1 <- which(r1 > min.coverage)
 
         if (colm[3] && colm[4]) {
-            r2 <- rowSums(x[, 3:4])
+            r2 <- rowSums(x[, 3:4], na.rm = TRUE)
             ind2 <- which(r2 > min.coverage)
             ind <- union(ind1, ind2)
             rm(ind1, ind2, r1, r2)
@@ -157,11 +157,11 @@ setMethod("meth_levels", signature(GR = "GRanges"),
             colm <- is.element(c("mC1", "uC1", "mC2", "uC2"), names(columns))
             x <- data.matrix(mcols(GR)[, columns])
             if (filter) {
-                r1 <- rowSums(x[, 1:2])
+                r1 <- rowSums(x[, 1:2], na.rm = TRUE)
                 ind1 <- which(r1 > min.coverage)
 
                 if (colm[3] && colm[4]) {
-                    r2 <- rowSums(x[, 3:4])
+                    r2 <- rowSums(x[, 3:4], na.rm = TRUE)
                     ind2 <- which(r2 > min.coverage)
                     ind <- union(ind1, ind2)
                     rm(ind1, ind2, r1, r2, x); gc()
@@ -171,7 +171,7 @@ setMethod("meth_levels", signature(GR = "GRanges"),
 
             if (preserve.dt) {
                 mcols(GR) <- data.frame(mcols(GR),
-                                    meth_levels(GR = NULL,
+                                        meth_levels(GR = NULL,
                                         x = data.frame(mcols(GR)[, columns]),
                                         Bayesian = Bayesian,
                                         columns = columns,
@@ -238,7 +238,7 @@ setMethod("meth_levels", signature(GR = "list"),
 
 meth.level <- function(x, Bayesian, verbose) {
 
-    n <- rowSums(x)
+    n <- rowSums(x, na.rm = TRUE)
 
     if (Bayesian) {
         if (nrow(x) < 10)
