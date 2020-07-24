@@ -38,6 +38,8 @@ formula from Theorem 1 from reference 1. Otherwise:
 
 \deqn{hdiv = (sqrt(p_1j) - sqrt(p_2j))^2 + (sqrt(1 - p_1j) -
 sqrt(1 - p_2j))^2}
+
+Missing methylation levels, reported as NA or NaN, are replaced with zero.
 }
 \examples{
     p <- c(0.5, 0.5)

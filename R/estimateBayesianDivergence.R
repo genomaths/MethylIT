@@ -131,10 +131,16 @@
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom S4Vectors mcols<-
 #' @export
-estimateBayesianDivergence <- function(x, Bayesian = FALSE,
-    JD = FALSE, num.cores = 1, tasks = 0L, columns = c(mC1 = 1,
-        uC1 = 2, mC2 = 3, uC2 = 4), meth.level = FALSE,
-    preserve.gr = FALSE, logbase = 2, verbose = TRUE) {
+estimateBayesianDivergence <- function(x,
+                                      Bayesian = FALSE,
+                                      JD = FALSE,
+                                      num.cores = 1,
+                                      tasks = 0L,
+                                      columns = c(mC1 = 1,uC1 = 2,
+                                                mC2 = 3, uC2 = 4),
+                                      meth.level = FALSE,
+                                      preserve.gr = FALSE,
+                                      logbase = 2, verbose = TRUE) {
 
     if (verbose) progressbar <- TRUE
     if (Sys.info()["sysname"] == "Linux")
@@ -239,8 +245,8 @@ estimateBayesianDivergence <- function(x, Bayesian = FALSE,
         if (verbose)
             cat("*** Estimating Hellinger divergence... \n")
         hdiv <- bplapply(seq_len(nrow(x)), function(i) {
-            estimateHellingerDiv(p = as.numeric(x[i,]))
-        }, BPPARAM = bpparam)
+                                estimateHellingerDiv(p = as.numeric(x[i,]))},
+                        BPPARAM = bpparam)
         if (verbose)
             cat("* Coercing from list to vector...\n")
         hdiv <- unlist(hdiv)
@@ -248,9 +254,9 @@ estimateBayesianDivergence <- function(x, Bayesian = FALSE,
         colnames(x) <- c("p1", "p2", "TV", "hdiv")
         if (JD) {
             jdiv <- bplapply(seq_len(nrow(x)), function(i) {
-                estimateJDiv(p = as.numeric(x[i, c("p1", "p2")]),
-                            logbase = logbase)
-            }, BPPARAM = bpparam)
+                            estimateJDiv(p = as.numeric(x[i, c("p1", "p2")]),
+                                        logbase = logbase)
+                        }, BPPARAM = bpparam)
             x$jdiv <- unlist(jdiv)
         }
     }

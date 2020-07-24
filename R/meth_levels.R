@@ -127,7 +127,7 @@ setMethod("meth_levels", signature(x = "data.frame"),
         else x <- data.frame(p1, p2)
     } else {
         p1 <- meth.level(x[, 1:2], Bayesian = Bayesian, verbose = verbose)
-        if (preserve.dt) x <- data.frame(x, p1)
+        if (preserve.dt) x <- data.frame(y, p1)
         else x <- data.frame(p1)
     }
 
@@ -225,9 +225,11 @@ setMethod("meth_levels", signature(GR = "list"),
               bpparam <- SnowParam(workers = num.cores, type = "SOCK",
                                    progressbar = progressbar)
             }
-            GR <- bplapply(GR, meth_levels, Bayesian, columns, min.coverage,
-                           tv, bay.tv, filter, preserve.dt, num.cores, tasks,
-                           verbose, BPPARAM = bpparam)
+            GR <- bplapply(GR, meth_levels, Bayesian = Bayesian,
+                           columns = columns, min.coverage = min.coverage,
+                           tv = tv, bay.tv = bay.tv, filter = filter,
+                           preserve.dt = preserve.dt, num.cores = num.cores,
+                           tasks = tasks, verbose, BPPARAM = bpparam)
             return(GR)
 })
 

@@ -215,17 +215,16 @@ estimateDivergence <- function(ref, indiv, Bayesian = FALSE,
     indiv <- lapply(indiv, function(x) x[, columns])
 
     if (meth.level) {
-        x = bplapply(seq_len(length(indiv)), function(k,
-            ref, indv, sn) {
+        x = bplapply(seq_len(length(indiv)), function(k, ref, indv, sn) {
             if (verbose)
                 message("*** Processing sample #", k, " ", sn[k])
             x <- indv[[k]]
             x <- x[, columns]
             x <- uniqueGRanges(list(ref, x), num.cores = 1L,
                                 tasks = tasks, verbose = verbose, ...)
-            x = estimateBayesianDivergence(x, Bayesian = Bayesian,
+            x = estimateBayesianDivergence(x, Bayesian = FALSE,
+                                        JD = JD, meth.level = meth.level,
                                         num.cores = 1L, tasks = tasks,
-                                        meth.level = meth.level,
                                         verbose = verbose)
             return(x)
         }, BPPARAM = bpparam, ref = ref, indv = indiv, sn = sn)
