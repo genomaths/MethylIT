@@ -115,10 +115,10 @@ poolFromGRlist <- function(LR, stat = c("mean", "median", "jackmean", "sum"),
     cn <- colnames(mcols(x0))
     statist <- function(x, stat) {
         x <- switch(stat,
-                    sum = rowSums(x),
-                    mean = round(rowMeans(x)),
-                    median = round(rowMedians(x)), jackmean = round(rowJMean(x,
-                stat = jstat)))
+                    sum = rowSums(x, na.rm = TRUE),
+                    mean = round(rowMeans(x, na.rm = TRUE)),
+                    median = round(rowMedians(x, na.rm = TRUE)),
+                    jackmean = round(rowJMean(x, stat = jstat)))
     }
 
     if (prob) {
