@@ -137,7 +137,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
                         verbose = TRUE, ...) {
     validateClass(GR)
     if (!inherits(GR, c("pDMP", "InfDiv")))
-        stop("*** GR object must inherits from 'pDMP' class",
+        stop("\n*** GR object must inherits from 'pDMP' class",
             " which is returned by calling 'selectDMP' function. \n",
             "Or it must inherits from 'InfDiv' class")
     GR <- structure(GR, class = "list")
@@ -174,7 +174,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
         colnames(mcols(GR)) <- "signal"
     }
 
-    if (verbose) message("\n *** Building clusters ...")
+    if (verbose) message("\n *** Building clusters ...\n")
 
     GR = sortBySeqnameAndStart(GR)
     signals <- GR[, "signal"]
@@ -195,7 +195,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
         }
     }
 
-    if (verbose) message("*** Counting DMPs in clusters ...")
+    if (verbose) message("\n*** Counting DMPs in clusters ...\n")
 
     if (!is.null(maxClustDist) && is.numeric(maxClustDist)) {
 
@@ -213,7 +213,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
             if (sum(idx) > 0) GR <- GR[idx]
             else
                 stop("\n*** No intervals holding the condition '>= minNumDMPs'",
-                    " were found ")
+                    " were found")
         }
     }
     return(GR[, "dmps"])

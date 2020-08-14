@@ -229,7 +229,7 @@ setMethod("meth_levels", signature(GR = "list"),
                            columns = columns, min.coverage = min.coverage,
                            tv = tv, bay.tv = bay.tv, filter = filter,
                            preserve.dt = preserve.dt, num.cores = num.cores,
-                           tasks = tasks, verbose, BPPARAM = bpparam)
+                           tasks = tasks, verbose = FALSE, BPPARAM = bpparam)
             return(GR)
 })
 
@@ -242,11 +242,11 @@ meth.level <- function(x, Bayesian, verbose) {
 
     if (Bayesian) {
         if (nrow(x) < 10)
-            stop(paste("*** You must provide at least 10 cytosine sites ",
+            stop(paste("\n*** You must provide at least 10 cytosine sites ",
                         "to apply a Bayessian approach \n",
-                        "using beta distributed priors"))
+                        "using beta distributed priors\n"))
         if (verbose)
-            cat("*** Estimating betaBinomial-posteriors... \n")
+            cat("\n*** Estimating betaBinomial-posteriors... \n")
 
         ## Naive distribution q (methylation levels).  In a
         ## Bayesian framework with uniform priors, the
@@ -259,8 +259,10 @@ meth.level <- function(x, Bayesian, verbose) {
         ## Assuming beta priors
         n[n == 0] <- 2
         p <- .betaBinPosteriors(x[, 1], n, a = beta[1], b = beta[2])
-        return(p)
     }
+    else p <- x[, 1]/n
 
-    return(x[, 1]/n)
+    p[is.na(p)] <- 0
+
+    return(p)
 }

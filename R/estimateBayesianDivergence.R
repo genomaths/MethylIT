@@ -142,7 +142,7 @@ estimateBayesianDivergence <- function(x,
                                       preserve.gr = FALSE,
                                       logbase = 2, verbose = TRUE) {
 
-    if (verbose) progressbar <- TRUE
+    if (verbose) progressbar <- TRUE else progressbar <- FALSE
     if (Sys.info()["sysname"] == "Linux")
         bpparam <- MulticoreParam(workers = num.cores, tasks = tasks,
                                 progressbar = progressbar)
@@ -192,7 +192,7 @@ estimateBayesianDivergence <- function(x,
                         "to apply a Bayessian approach \n",
                         "using beta distributed priors"))
             if (verbose)
-                cat("*** Estimating betaBinomial-posteriors... \n")
+                cat("\n*** Estimating betaBinomial-posteriors... \n")
             ## Naive distribution q (methylation levels).  In a
             ## Bayesian framework with uniform priors, the
             ## methylation level can be defined as: meth_level =
