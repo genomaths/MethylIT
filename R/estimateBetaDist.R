@@ -19,12 +19,13 @@
 #' @importFrom stats ecdf optim nlm pbeta
 #' @keywords internal
 .estimateBetaDist <- function(q, init.pars = c(1, 1)) {
-    ## q: prior probabilities init.pars: initial
-    ## parameter values. Defaults to alpha = 1 & beta =
-    ## 1, which the parsimony pseudo-counts greater than
-    ## zero.
+    ## q: prior probabilities
+    ## init.pars: initial parameter values. Defaults to alpha = 1 & beta = 1,
+    ## which the parsimony pseudo-counts greater than zero.
+
     Q <- ecdf(q)  ## Empirical Cumulative Distribution Function
     dat <- data.frame(Q = Q(q), q = q)
+
     #### Beta fitting In order to obtain the estimates for
     #### shape paramaters the squared of the difference
     #### between the ecdf & the theoretical cdf is
@@ -37,18 +38,18 @@
         ## minimizes a function, the
         with(data, sum((Q - pbeta(q, alpha, beta))^2))
     }
-    pars <- try(suppressWarnings(nlm(min.RSS, p = init.pars, 
+    pars <- try(suppressWarnings(nlm(min.RSS, p = init.pars,
         data = dat)), silent = TRUE)
     ## print(pars$minimum) print(pars$estimate)
-    
+
     if (inherits(pars, "try-error")) {
-        pars <- try(suppressWarnings(optim(par = init.pars, 
-            min.RSS, data = dat, method = "BFGS", control = list(maxit = 500, 
+        pars <- try(suppressWarnings(optim(par = init.pars,
+            min.RSS, data = dat, method = "BFGS", control = list(maxit = 500,
                 abstol = (10^-8)))), silent = TRUE)
         par <- pars$par
         ## print(pars$value) print(pars$par)
     } else par <- pars$estimate
-    
+
     if (inherits(pars, "try-error")) {
         par <- c(0, 0)
     }
