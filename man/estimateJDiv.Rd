@@ -50,6 +50,8 @@ is computed as in reference (1-2):
 
 \deqn{JD(p^{ij}, q^i) = ((p_{ij} - q_i) * log(p_{ij}/q_i) +
                         (q_i - p_{ij}) * log((1 - p_{ij})/(1 - q_i)))/2}
+
+Missing methylation levels, reported as NA or NaN, are replaced with zero.
 }
 \examples{
 p <- c(0.5, 0.5)

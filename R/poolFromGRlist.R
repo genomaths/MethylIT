@@ -99,6 +99,10 @@ poolFromGRlist <- function(LR, stat = c("mean", "median", "jackmean", "sum"),
     } else {
         if (inherits(LR, "GRanges")) {
             x0 <- LR
+            if (prob) {
+                ## Apply Fisher transformation
+                mcols(x0) <- atanh(as.vector(mcols(x0)[, column]))
+            }
         } else {
             stop(paste0("Object LR is neither a list of GRanges objects,",
                 " a 'GRangesList' object or a GRanges object"))
@@ -110,15 +114,18 @@ poolFromGRlist <- function(LR, stat = c("mean", "median", "jackmean", "sum"),
     x1 <- as.matrix(mcols(x0))
     cn <- colnames(mcols(x0))
     statist <- function(x, stat) {
-        x <- switch(stat, sum = rowSums(x), mean = round(rowMeans(x)),
-            median = round(rowMedians(x)), jackmean = round(rowJMean(x,
-                stat = jstat)))
+        x <- switch(stat,
+                    sum = rowSums(x, na.rm = TRUE),
+                    mean = round(rowMeans(x, na.rm = TRUE)),
+                    median = round(rowMedians(x, na.rm = TRUE)),
+                    jackmean = round(rowJMean(x, stat = jstat)))
     }
 
     if (prob) {
         ## Apply inverse of Fisher transformation
         prob <- statist(x1, stat = "mean")
         mcols(x0) <- data.frame(prob = tanh(prob))
+        x0$prob[is.na(x0$prob)] <- 0
     } else {
         idx <- grep("mC", cn)
         mC <- statist(x1[, idx], stat = stat)
@@ -129,8 +136,7 @@ poolFromGRlist <- function(LR, stat = c("mean", "median", "jackmean", "sum"),
     return(x0)
 }
 
-# ============== Auxiliary function for Jacknife
-# mean estimation ============= #
+# ============== Auxiliary function for Jacknife mean estimation ============= #
 
 jackstat <- function(x, stat = mean) {
     ## x is a vector

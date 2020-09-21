@@ -210,7 +210,7 @@ nonlinearFitDist <- function(LR, column = 9, dist.name = "Weibull",
     if (is.null(num.cores)) {
         x <- mapply(toFit, seq_along(LR), dist.name,
             MoreArgs = list(sample.size = sample.size,
-                        columnn = column, npoints = npoints,
+                        column = column, npoints = npoints,
                         maxiter = maxiter, tol = tol,
                         ftol = ftol, ptol = ptol,
                         minFactor = minFactor,

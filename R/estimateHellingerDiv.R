@@ -11,14 +11,16 @@
 #' (p_2j, 1 - p_2j)}. If the vector of coverage is supplied, then the
 #' information divergence is estimated according to the formula:
 #'
-#'\deqn{hdiv = 2*(n_1 + 1)*(n_2 + 1)*((sqrt(p_1j) - sqrt(p_2j))^2 +
-#'(sqrt(1 - p_1j) - sqrt(1 - p_2j))^2)/(n_1 + n_2 + 2)}
+#' \deqn{hdiv = 2*(n_1 + 1)*(n_2 + 1)*((sqrt(p_1j) - sqrt(p_2j))^2 +
+#' (sqrt(1 - p_1j) - sqrt(1 - p_2j))^2)/(n_1 + n_2 + 2)}
 #'
-#'This formula corresponds to Hellinger divergence as given in the first
-#'formula from Theorem 1 from reference 1. Otherwise:
+#' This formula corresponds to Hellinger divergence as given in the first
+#' formula from Theorem 1 from reference 1. Otherwise:
 #'
-#'\deqn{hdiv = (sqrt(p_1j) - sqrt(p_2j))^2 + (sqrt(1 - p_1j) -
-#'sqrt(1 - p_2j))^2}
+#' \deqn{hdiv = (sqrt(p_1j) - sqrt(p_2j))^2 + (sqrt(1 - p_1j) -
+#' sqrt(1 - p_2j))^2}
+#'
+#' Missing methylation levels, reported as NA or NaN, are replaced with zero.
 #'
 #' @param p A numerical vector of the methylation levels p = c(p1, p2) of
 #'     individuals 1 and 2.
@@ -37,6 +39,7 @@
 #'
 #' @export
 estimateHellingerDiv <- function(p, n = NULL) {
+    p[is.na(p)] <- 0
     if (any(p > 1) | any(p < 0))
         stop("*** Vector p has values out of the range [0, 1]")
 

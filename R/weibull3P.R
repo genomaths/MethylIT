@@ -263,27 +263,39 @@ weibull3P <- function(X, sample.size = 20, model = c("all",
                                                                 length(p.FIT2))
             }
 
-            if (m > 2) {
-                stats <- data.frame(summary(FIT)$parameters[c(1, 2, 3), ],
-                                    Adj.R.Square = c(Adj.R.Square,"", ""),
-                                    rho = c(rho, "", ""),
-                                    R.Cross.val = c(R.cross.FIT, "", ""),
-                                    DEV = c(deviance(FIT), "", ""),
-                                    AIC = c(AIC(FIT), "", ""),
-                                    BIC = c(BIC(FIT), "", ""),
-                                    COV = vcov(FIT), n = c(N, n, n),
-                                    model = c("Weibull3P", "", ""),
-                                    stringsAsFactors = FALSE)
+            fit_summary <- try(summary(FIT), silent = TRUE)
+
+            if (!inherits(fit_summary, "try-error")) {
+                if (m > 2) {
+                    stats <- data.frame(fit_summary$parameters[c(1, 2, 3), ],
+                                        Adj.R.Square = c(Adj.R.Square,"", ""),
+                                        rho = c(rho, "", ""),
+                                        R.Cross.val = c(R.cross.FIT, "", ""),
+                                        DEV = c(deviance(FIT), "", ""),
+                                        AIC = c(AIC(FIT), "", ""),
+                                        BIC = c(BIC(FIT), "", ""),
+                                        COV = vcov(FIT), n = c(N, n, n),
+                                        model = c("Weibull3P", "", ""),
+                                        stringsAsFactors = FALSE)
+                } else {
+                    stats = data.frame(fit_summary$parameters[c(1, 2),],
+                                       Adj.R.Squar = c(Adj.R.Square, ""),
+                                       rho = c(rho, ""),
+                                       R.Cross.val = c(R.cross.FIT, ""),
+                                       DEV = c(deviance(FIT), ""),
+                                       AIC = c(AIC(FIT), ""),
+                                       BIC = c(BIC(FIT), ""),
+                                       COV = vcov(FIT), COV.mu = c(NA,NA),
+                                       n = c(N, n), model = c("Weibull2P", ""),
+                                       stringsAsFactors = FALSE)
+                }
             } else {
-                stats = data.frame(summary(FIT)$parameters[c(1, 2),],
-                                Adj.R.Squar = c(Adj.R.Square, ""),
-                                rho = c(rho, ""),
-                                R.Cross.val = c(R.cross.FIT, ""),
-                                DEV = c(deviance(FIT), ""),
-                                AIC = c(AIC(FIT), ""), BIC = c(BIC(FIT), ""),
-                                COV = vcov(FIT), COV.mu = c(NA,NA),
-                                n = c(N, n), model = c("Weibull2P", ""),
-                                stringsAsFactors = FALSE)
+                warning(paste("\nThe estimation of the regression statistics",
+                    "was not possible.\n Probably the Choleski decomposition",
+                    "of the covariance matrix was not possible.\n",
+                    "Returning empty coefficient table."))
+                stats <- data.frame(NA, NA, NA, NA, NA,
+                                    NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
             }
         } else {
             ## TODO log error in screen / file

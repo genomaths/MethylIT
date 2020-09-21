@@ -174,8 +174,10 @@ gofReport <- function(HD,
     }
     close(pb)
     if (length(HD) > 1)
-        nlms <- unlist(nlms, recursive = FALSE) else {
-        nms <- vapply(nlms, function(x) names(x[1]))
+        nlms <- unlist(nlms, recursive = FALSE)
+    else {
+        nms <- vapply(nlms, function(x) names(x[1]),
+                    FUN.VALUE = character(1))
         nlms <- lapply(nlms, function(x) x[[1]])
         names(nlms) <- nms
     }

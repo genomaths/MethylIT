@@ -314,33 +314,52 @@ fitGammaDist <- function(x, probability.x, parameter.values,
         }
         res <- pX - getPreds(coef(FIT), x)
 
-        if (m > 2) {
-            COV = try(vcov(FIT), silent = TRUE)
-            if (inherits(COV, "try-error"))
-                COV = matrix(NA, nrow = 3, ncol = 3)
+        fit_summary <- try(summary(FIT), silent = TRUE)
 
-            stats <- data.frame(summary(FIT)$coefficients,
-                Adj.R.Square = c(Adj.R.Square, "", ""), rho = c(rho, "", ""),
-                R.Cross.val = c(R.cross.FIT, "", ""),
-                DEV = c(deviance(FIT), "", ""),
-                AIC = c(AICmodel(FIT, residuals = res, np = 4), "", ""),
-                BIC = c(BICmodel(FIT, residuals = res, np = 4), "", ""),
-                COV = COV, n = c(N - 3, n - 3, n - 3),
-                model = c("Gamma3P", "", ""),
-                stringsAsFactors = FALSE)
+        if (!inherits(fit_summary, "try-error")) {
+            if (m > 2) {
+                COV = try(vcov(FIT), silent = TRUE)
+                if (inherits(COV, "try-error"))
+                    COV = matrix(NA, nrow = 3, ncol = 3)
+
+                stats <- data.frame(fit_summary$coefficients,
+                                    Adj.R.Square = c(Adj.R.Square, "", ""),
+                                                    rho = c(rho, "", ""),
+                                    R.Cross.val = c(R.cross.FIT, "", ""),
+                                    DEV = c(deviance(FIT), "", ""),
+                                    AIC = c(AICmodel(FIT, residuals = res,
+                                                    np = 4), "", ""),
+                                    BIC = c(BICmodel(FIT, residuals = res,
+                                                    np = 4), "", ""),
+                                    COV = COV, n = c(N - 3, n - 3, n - 3),
+                                    model = c("Gamma3P", "", ""),
+                                    stringsAsFactors = FALSE)
+            } else {
+                COV = try(vcov(FIT), silent = TRUE)
+                if (inherits(COV, "try-error"))
+                    COV = matrix(NA, nrow = 2, ncol = 2)
+                stats <- data.frame(fit_summary$coefficients,
+                                    Adj.R.Square = c(Adj.R.Square, ""),
+                                    rho = c(rho, ""),
+                                    R.Cross.val = c(R.cross.FIT, ""),
+                                    DEV = c(deviance(FIT), ""),
+                                    AIC = c(AICmodel(FIT, residuals = res,
+                                                    np = 3), ""),
+                                    BIC = c(BICmodel(FIT, residuals = res,
+                                                    np = 3), ""), COV = COV,
+                                    COV.mu = c(NA, NA), n = c(N - 2, n - 2),
+                                    model = c("Gamma2P", ""),
+                                    stringsAsFactors = FALSE)
+            }
         } else {
-            COV = try(vcov(FIT), silent = TRUE)
-            if (inherits(COV, "try-error"))
-                COV = matrix(NA, nrow = 2, ncol = 2)
-            stats <- data.frame(summary(FIT)$coefficients,
-                Adj.R.Square = c(Adj.R.Square, ""),
-                rho = c(rho, ""), R.Cross.val = c(R.cross.FIT, ""),
-                DEV = c(deviance(FIT), ""),
-                AIC = c(AICmodel(FIT, residuals = res, np = 3), ""),
-                BIC = c(BICmodel(FIT, residuals = res, np = 3), ""), COV = COV,
-                COV.mu = c(NA, NA), n = c(N - 2, n - 2),
-                model = c("Gamma2P", ""), stringsAsFactors = FALSE)
+            warning(paste("\nThe estimation of the regression statistics",
+                    "was not possible.\n Probably the Choleski decomposition",
+                    "of the covariance matrix was not possible.\n",
+                          "Returning empty coefficient table."))
+            stats <- data.frame(NA, NA, NA, NA, NA, NA,
+                                NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
         }
+
     } else {
         warning(paste("Data did not fit to the model.",
             "Returning empty coefficient table."))

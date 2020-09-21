@@ -300,38 +300,55 @@ fitGGammaDist <- function(x, parameter.values, location.par = FALSE,
         res <- Y - getPreds(coef(FIT), x)
         options(stringsAsFactors = FALSE)
 
-        if (length(coef(FIT)) > 3) {
-            COV = try(vcov(FIT), silent = TRUE)
-            if (inherits(COV, "try-error"))
-                COV = matrix(NA, nrow = 4, ncol = 4)
+        fit_summary <- try(summary(FIT), silent = TRUE)
 
-            stats <- data.frame(summary(FIT)$coefficients,
-                                Adj.R.Square = c(Adj.R.Square, "", "", ""),
-                                rho = c(rho, "", "", ""),
-                                R.Cross.val = c(R.cross.FIT, "", "", ""),
-                                DEV = c(deviance(FIT), "", "", ""),
-                                AIC = c(AICmodel(FIT, residuals = res, np = 4),
-                                        "", "", ""),
-                                BIC = c(BICmodel(FIT, residuals = res, np = 4),
-                                        "", "", ""),
-                                COV = COV, n = c(N, n, n, n),
-                                model = c("GGamma4P", "", "", ""),
-                                stringsAsFactors = FALSE)
+        if (!inherits(fit_summary, "try-error")) {
+            if (length(coef(FIT)) > 3) {
+                COV = try(vcov(FIT), silent = TRUE)
+                if (inherits(COV, "try-error"))
+                    COV = matrix(NA, nrow = 4, ncol = 4)
+
+                stats <- data.frame(fit_summary$coefficients,
+                                    Adj.R.Square = c(Adj.R.Square, "", "", ""),
+                                    rho = c(rho, "", "", ""),
+                                    R.Cross.val = c(R.cross.FIT, "", "", ""),
+                                    DEV = c(deviance(FIT), "", "", ""),
+                                    AIC = c(AICmodel(FIT,
+                                                    residuals = res, np = 4),
+                                            "", "", ""),
+                                    BIC = c(BICmodel(FIT,
+                                                    residuals = res, np = 4),
+                                            "", "", ""),
+                                    COV = COV, n = c(N, n, n, n),
+                                    model = c("GGamma4P", "", "", ""),
+                                    stringsAsFactors = FALSE)
+            } else {
+                COV = try(vcov(FIT), silent = TRUE)
+                if (inherits(COV, "try-error"))
+                    COV = matrix(NA, nrow = 3, ncol = 3)
+                stats <- data.frame(fit_summary$coefficients,
+                                    Adj.R.Square = c(Adj.R.Square, "", ""),
+                                    rho = c(rho, "", ""),
+                                    R.Cross.val = c(R.cross.FIT, "", ""),
+                                    DEV = c(deviance(FIT), "", ""),
+                                    AIC = c(AICmodel(FIT,
+                                                    residuals = res, np = 3),
+                                            "", ""),
+                                    BIC = c(BICmodel(FIT, residuals = res,
+                                                    np = 3),
+                                            "", ""),
+                                    COV = COV, COV.mu = c(NA, NA, NA),
+                                    n = c(N, n, n),
+                                    model = c("GGamma3P", "", ""),
+                                    stringsAsFactors = FALSE)
+            }
         } else {
-            COV = try(vcov(FIT), silent = TRUE)
-            if (inherits(COV, "try-error")) COV = matrix(NA, nrow = 3, ncol = 3)
-            stats <- data.frame(summary(FIT)$coefficients,
-                                Adj.R.Square = c(Adj.R.Square, "", ""),
-                                rho = c(rho, "", ""),
-                                R.Cross.val = c(R.cross.FIT, "", ""),
-                                DEV = c(deviance(FIT), "", ""),
-                                AIC = c(AICmodel(FIT, residuals = res, np = 3),
-                                        "", ""),
-                                BIC = c(BICmodel(FIT, residuals = res, np = 3),
-                                        "", ""),
-                                COV = COV, COV.mu = c(NA, NA, NA),
-                                n = c(N, n, n), model = c("GGamma3P", "", ""),
-                                stringsAsFactors = FALSE)
+            warning(paste("\nThe estimation of the regression statistics",
+                    "was not possible.\n Probably the Choleski decomposition",
+                    "of the covariance matrix was not possible.\n",
+                    "Returning empty coefficient table."))
+            stats <- data.frame(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+                                NA, NA, NA, NA, NA, NA)
         }
     } else {
         warning(paste("Data did not fit to the model.",

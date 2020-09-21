@@ -54,9 +54,10 @@ getDIMPatGenes(
 GRangesList, GRanges or a list of GRanges.}
 
 \item{GENES}{A GRanges object with gene coordinates and gene IDs. A
-meta-column named \strong{'gene_id'} carying the gene ids should be
-included. If the meta-column named 'gene_id' is not provided, then gene
-(region) ids will be created using the gene (region) coordinates.}
+column named \strong{'gene_id'} carrying the gene ids should be
+included in the metacolumns. If the meta-column named 'gene_id'
+is not provided, then gene (region) ids will be created using the
+gene (region) coordinates.}
 
 \item{ignore.strand, type}{Same as for
 \code{\link[GenomicRanges]{findOverlaps-methods}}.}

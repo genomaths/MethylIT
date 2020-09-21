@@ -33,6 +33,7 @@
 #' \deqn{JD(p^{ij}, q^i) = ((p_{ij} - q_i) * log(p_{ij}/q_i) +
 #'                         (q_i - p_{ij}) * log((1 - p_{ij})/(1 - q_i)))/2}
 #'
+#' Missing methylation levels, reported as NA or NaN, are replaced with zero.
 #' @param p A numerical vector of the methylation levels p = c(p1, p2) from
 #'     individuals 1 and 2.
 #' @param logbase Logarithm base used to compute the JD. Logarithm base 2 is
@@ -69,6 +70,7 @@
 #'
 #' @export
 estimateJDiv <- function(p, logbase = 2) {
+    p[is.na(p)] <- 0
     if (any(p > 1) | any(p < 0))
         stop("*** Vector p has values out of the range [0, 1]")
 
