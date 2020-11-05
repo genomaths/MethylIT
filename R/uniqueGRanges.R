@@ -186,6 +186,7 @@ uniqueGRanges <- function(ListOfGranges, ncols = NULL,
     }
 
     granges <- unique(unname(unlist(ListOfGranges)))
+    seqlevels(granges, pruning.mode = "coarse") <- chromosomes
 
     if (cond1 && cond2) {
         ## This assigns the data values to the GRanges
@@ -211,6 +212,7 @@ uniqueGRanges <- function(ListOfGranges, ncols = NULL,
                 snames <- colnames(mcols(seq))[seq_len(ncol)]
             }
         }
+        seqlevels(seq, pruning.mode = "coarse") <- chromosomes
 
         Hits <- findOverlaps(seq, granges, maxgap = maxgap,
                             minoverlap = minoverlap, type = type,
@@ -241,6 +243,8 @@ uniqueGRanges <- function(ListOfGranges, ncols = NULL,
             snames <- c(snames, nam)
             if (verbose)
                 message(" *** Processing GRanges for sample: #", k, "...")
+            seqlevels(seq, pruning.mode = "coarse") <- chromosomes
+
             Hits <- findOverlaps(seq, granges, maxgap = maxgap,
                                 minoverlap = minoverlap, type = type,
                                 select = select, ignore.strand = ignore.strand)
