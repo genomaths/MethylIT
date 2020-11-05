@@ -435,9 +435,10 @@ histogram and boxplot graphics for these data.
 Finally, the data included in the graphic are:
 
 ```{r fig_data}
-# Define an auxiliar function
+# Define an auxiliary function
 fun_length <- function(x){
-    return(data.frame(y = median(x) + 1, label = paste0("n = ", length(x))))
+    return(data.frame(y = median(x, na.rm = TRUE) + 1,
+                      label = paste0("n = ", length(x))))
 }
 
 data <- data.frame(normal = hd$normal, normal1 = hd$normal1,
