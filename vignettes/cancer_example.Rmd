@@ -437,10 +437,9 @@ Finally, the data included in the graphic are:
 ```{r fig_data}
 # Define an auxiliary function
 fun_length <- function(x){
-    return(data.frame(y = median(x, na.rm = TRUE) + 1,
+    return(data.frame(y = median(x, na.rm = TRUE) + 1, 
                       label = paste0("n = ", length(x))))
 }
-
 data <- data.frame(normal = hd$normal, normal1 = hd$normal1,
                     cancer = hd$cancer, metastasis = hd$metastasis)
 data = suppressMessages(melt(data))
