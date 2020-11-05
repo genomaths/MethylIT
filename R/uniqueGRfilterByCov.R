@@ -49,7 +49,7 @@
 #' higher coverage than this are discarded. Default is NULL. If
 #' \strong{high.coverage} is not NULL, then the \strong{percentile} argument is
 #' disregarded and \strong{high.coverage} is used as threshold to remove the
-#' PCR bias.
+#' PCR bias. If percentile is not null, then q = max(q, high.coverage).
 #' @param columns Vector of integer numbers of the columns (from each GRanges
 #'     meta-column) where the methylated and unmethylated counts are provided.
 #'     If not provided, then the methylated and unmethylated counts are assumed
@@ -131,7 +131,14 @@ uniqueGRfilterByCov <- function(x, y = NULL, min.coverage = 4,
         q1 <- quantile(cov1, probs = percentile)
         q2 <- quantile(cov2, probs = percentile)
         q <- min(q1, q2)
-    } else q <- high.coverage
+    } else {
+        if (!is.null(percentile)) {
+            q1 <- quantile(cov1, probs = percentile)
+            q2 <- quantile(cov2, probs = percentile)
+            q <- min(q1, q2)
+            q <- max(q, high.coverage)
+        } else q <- high.coverage
+    }
 
     idx1 <- which((cov1 >= min.coverage[1]) | (cov2 >= min.coverage[2]))
     if (!(length(idx1) > 0))

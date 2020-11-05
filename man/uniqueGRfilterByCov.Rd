@@ -70,7 +70,7 @@ and 2, respectively.
 higher coverage than this are discarded. Default is NULL. If
 \strong{high.coverage} is not NULL, then the \strong{percentile} argument is
 disregarded and \strong{high.coverage} is used as threshold to remove the
-PCR bias.}
+PCR bias. If percentile is not null, then q = max(q, high.coverage).}
 
 \item{columns}{Vector of integer numbers of the columns (from each GRanges
 meta-column) where the methylated and unmethylated counts are provided.
