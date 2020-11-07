@@ -50,9 +50,11 @@
 #' @param output If output == 'all', the table with the GoF statistics is
 #'     returned in a list together with the best fitted model and the
 #'     corresponding statistics. Default is 'best.model'
-#' @param confl_model Logic. If TRUE, then the best model based on highest
+#' @param alt_models Logic. If TRUE, then the best model based on highest
 #'     R.Cross.val is returned for those samples where the model(s) with lowest
 #'     AIC has not the highest R.Cross.val.
+#' @param r.cv logical(1). Whether to select the best model based on the highest
+#' R.Cross.val (2) (see details section).
 #' @param npoints number of points to be used in the fit. Default is NULL.
 #' @param num.cores The number of cores to use in the nonlinear fit step, i.e.
 #'     at most how many child processes will be run simultaneously (see
@@ -67,16 +69,19 @@
 #' \code{\link{getPotentialDIMP}}. Otherwise, it will return a list with the
 #' table carrying the GoF values and the previously mentioned data.
 #'
-#' The best model selection is based on the lowest AIC. However, if 'confl_model
-#' = TRUE', then the returned list will contain a sublist named 'confl_model'
-#' with the best model selected based on the highest R.Cross.val. This sublist
-#' is returned only if at least there is one sample where the model with the
-#' lowest AIC has not the highest R.Cross.val. This report is useful to analyze
-#' any conflict between models. For example, some times the best model selected
+#' The best model selection is based on the lowest AIC. However, if
+#' \eqn{alt_models = TRUE} and \eqn{r.cv = FALSE}, then the returned list will
+#' contain two sublists named 'alt_models'  and 'alt_nlms' with the best model
+#' selected based on the highest R.Cross.val. If \eqn{r.cv = TRUE}, best model
+#' selection is based on the highest R.Cross.val and sublist named 'alt_models'
+#' will carry the model selected based on the lowest AIC. This sublist is
+#' returned only if at least there is one sample where the model with the lowest
+#' AIC has not the highest R.Cross.val. This report is useful to analyze any
+#' conflict between models. For example, some times the best model selected
 #' based on AIC has a R.Cross.val = 0.99945, while the highest R.Cross.val is
 #' 0.99950. In such a situation the model with lowest AIC is still fine.
 #' However, some times the model with the best AIC has some meaningless
-#' parameter value. For example,  scale = 0.0000000001 in 'GGamma3P' or in
+#' parameter value. For example, scale = 0.0000000001 in 'GGamma3P' or in
 #' 'Weibull2P' models. This last situation can result from the numerical
 #' algorithm used in the parameter estimation. The numerical algorithms for
 #' nonlinear fit estimation are not perfect!
@@ -100,9 +105,8 @@
 #' ## The GoF report
 #' dt <- gofReport(hd)
 #'
-#' ## To get the potential DMPs
-#' ps_dmp <- getPotentialDIMP(LR = hd, nlms = dt$nlms, div.col = 9L,
-#'                             dist.name = dt$bestModel)
+#' ## Report the model where AIC and R.Cross.val are in conflict.
+#' dt <- gofReport(HD = hd, output = "all", alt_models = TRUE)
 #'
 #' @references
 #' \enumerate{
@@ -116,16 +120,20 @@
 
 gofReport <- function(HD,
                     model = c("Weibull2P", "Weibull3P", "Gamma2P", "Gamma3P"),
-                    column = 9, absolute = FALSE,
+                    column = 9,
+                    absolute = FALSE,
                     output = c("best.model", "all"),
-                    confl_model = FALSE, npoints = NULL,
-                    num.cores = 1L, verbose = FALSE, ...) {
+                    alt_models = FALSE,
+                    r.cv = FALSE,
+                    npoints = NULL,
+                    num.cores = 1L,
+                    verbose = FALSE, ...) {
     validateClass(HD)
     output <- match.arg(output)
     model <- unique(model)  # just in case
 
     idx <- match(model, c("Weibull2P", "Weibull3P",
-        "Gamma2P", "Gamma3P", "GGamma3P", "GGamma4P"))
+                            "Gamma2P", "Gamma3P", "GGamma3P", "GGamma4P"))
 
     if (any(is.na(idx))) {
         stop("*** At least one of the requested models is not valid \n",
@@ -146,7 +154,7 @@ gofReport <- function(HD,
                                                 num.cores = num.cores,
                                                 dist.name = model[k],
                                                 npoints = npoints,
-                                                verbose = verbose, ...))
+                                                verbose = verbose))
         names(mdl) <- paste(names(mdl), nams[k], sep = "_")
         stat <- vapply(mdl, function(x) {
             AIC <- as.numeric(x$AIC[1])
@@ -199,44 +207,55 @@ gofReport <- function(HD,
 
     conflict <- (inherits(mdl, "list"))
     if (conflict) {
-        issue <- unlist(lapply(mdl, function(x) length(x) >
-            1))
-        if (confl_model) {
+        issue <- unlist(lapply(mdl, function(x) length(x) > 1))
+        if (alt_models) {
             mdl2 <- mdl
-            mdl2[issue] <- vapply(mdl[issue], function(x) x[2],
-                character(1))
-            mdl2 <- unlist(mdl2)
-            mdl2 <- mdl2[issue]
-            issuekey <- paste(names(mdl2), mdl2, sep = "_")
-            issue_nlms <- nlms[match(issuekey, names(nlms))]
+            if (r.cv) {
+                mdl2[issue] <- vapply(mdl[issue],
+                                    function(x) x[1], character(1))
+            } else
+                mdl2[issue] <- vapply(mdl[issue],
+                                    function(x) x[2], character(1))
         }
-        mdl[issue] <- vapply(mdl[issue], function(x) x[1], character(1))
 
-        bestAIC <- unlist(mdl)
+        if (r.cv) {
+            mdl[issue] <- vapply(mdl[issue], function(x) x[2], character(1))
+        } else
+            mdl[issue] <- vapply(mdl[issue], function(x) x[1], character(1))
+
+        bestModel <- unlist(mdl)
         mdl[issue] <- "Needs revision"
         mdl <- unlist(mdl)
         warning("\n The best fitted model for sample(s) ",
             paste(sn[issue], collapse = ", "),
                 " require(s) for further analysis. \n",
             "The model with the lowest AIC must have the highest R.Cross.val")
-    } else bestAIC <- unlist(mdl)
+    } else bestModel <- unlist(mdl)
 
-    modelkey <- paste(names(bestAIC), bestAIC, sep = "_")
-    nlms <- nlms[match(modelkey, names(nlms))]
-    names(nlms) <- sn
-    nlms <- structure(nlms, class = c("ProbDistrList", "list"))
+    modelkey <- paste(names(bestModel), bestModel, sep = "_")
+    models <- nlms[match(modelkey, names(nlms))]
+    names(models) <- sn
+    models <- structure(models, class = c("ProbDistrList", "list"))
 
-    bestModel <- model[match(bestAIC, nams)]
+    bestModel <- model[match(bestModel, nams)]
     names(bestModel) <- names(HD)
     stats$bestModel <- mdl
     if (output == "best.model") {
         print(stats)
         cat("\n")
-        res <- list(bestModel = bestModel, nlms = nlms)
+        res <- list(bestModel = bestModel, nlms = models)
     } else res <- list(stats = stats, bestModel = bestModel,
-        nlms = nlms)
-    if (confl_model && conflict)
-        res$confl_model <- issue_nlms
+        nlms = models)
+    if (alt_models && conflict) {
+        bestModel <- unlist(mdl2)
+        modelkey <- paste(names(bestModel), bestModel, sep = "_")
+        nlms <- nlms[match(modelkey, names(nlms))]
+        names(nlms) <- sn
+        bestModel <- model[match(bestModel, nams)]
+        names(bestModel) <- names(HD)
+        res$alt_models <- bestModel
+        res$alt_nlms <- structure(nlms, class = c("ProbDistrList", "list"))
+    }
     return(res)
 }
 

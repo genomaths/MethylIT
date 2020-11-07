@@ -10,7 +10,8 @@ gofReport(
   column = 9,
   absolute = FALSE,
   output = c("best.model", "all"),
-  confl_model = FALSE,
+  alt_models = FALSE,
+  r.cv = FALSE,
   npoints = NULL,
   num.cores = 1L,
   verbose = FALSE,
@@ -39,9 +40,12 @@ is an information divergence that can be fitted as well.}
 returned in a list together with the best fitted model and the
 corresponding statistics. Default is 'best.model'}
 
-\item{confl_model}{Logic. If TRUE, then the best model based on highest
+\item{alt_models}{Logic. If TRUE, then the best model based on highest
 R.Cross.val is returned for those samples where the model(s) with lowest
 AIC has not the highest R.Cross.val.}
+
+\item{r.cv}{logical(1). Whether to select the best model based on the highest
+R.Cross.val (2) (see details section).}
 
 \item{npoints}{number of points to be used in the fit. Default is NULL.}
 
@@ -60,16 +64,19 @@ next step to get the potential DMPs with function
 \code{\link{getPotentialDIMP}}. Otherwise, it will return a list with the
 table carrying the GoF values and the previously mentioned data.
 
-The best model selection is based on the lowest AIC. However, if 'confl_model
-= TRUE', then the returned list will contain a sublist named 'confl_model'
-with the best model selected based on the highest R.Cross.val. This sublist
-is returned only if at least there is one sample where the model with the
-lowest AIC has not the highest R.Cross.val. This report is useful to analyze
-any conflict between models. For example, some times the best model selected
+The best model selection is based on the lowest AIC. However, if
+\eqn{alt_models = TRUE} and \eqn{r.cv = FALSE}, then the returned list will
+contain two sublists named 'alt_models'  and 'alt_nlms' with the best model
+selected based on the highest R.Cross.val. If \eqn{r.cv = TRUE}, best model
+selection is based on the highest R.Cross.val and sublist named 'alt_models'
+will carry the model selected based on the lowest AIC. This sublist is
+returned only if at least there is one sample where the model with the lowest
+AIC has not the highest R.Cross.val. This report is useful to analyze any
+conflict between models. For example, some times the best model selected
 based on AIC has a R.Cross.val = 0.99945, while the highest R.Cross.val is
 0.99950. In such a situation the model with lowest AIC is still fine.
 However, some times the model with the best AIC has some meaningless
-parameter value. For example,  scale = 0.0000000001 in 'GGamma3P' or in
+parameter value. For example, scale = 0.0000000001 in 'GGamma3P' or in
 'Weibull2P' models. This last situation can result from the numerical
 algorithm used in the parameter estimation. The numerical algorithms for
 nonlinear fit estimation are not perfect!
@@ -125,9 +132,8 @@ hd <- lapply(HD, function(x) x[seq_len(100)], keep.attr = TRUE)
 ## The GoF report
 dt <- gofReport(hd)
 
-## To get the potential DMPs
-ps_dmp <- getPotentialDIMP(LR = hd, nlms = dt$nlms, div.col = 9L,
-                            dist.name = dt$bestModel)
+## Report the model where AIC and R.Cross.val are in conflict.
+dt <- gofReport(HD = hd, output = "all", alt_models = TRUE)
 
 }
 \references{
