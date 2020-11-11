@@ -7,21 +7,20 @@
 #'     original GRanges objects. Otherwise, a unique GRanges object will be
 #'     created  without metadata columns. Additionally, all metadata must be the
 #'     same class, e.g. all numeric or all characters, or all factor
-#' @param ListOfGranges Objects to combine. A list of GRanges object or a
-#'     GRangesList object.
+#' @param ListOfGranges Objects to combine. A list of 
+#' \code{\link[GenomicRanges]{GRanges-class}} object or a 
+#' \code{\link[GenomicRanges]{GRangesList-class}} object.
 #' @param ncols integer. Number of columns to use from the meta-column of each
-#'     GRanges object. Default value: NULL. If NULL, all the columns (from
-#'     column 1 to ncols) from each GRanges will be present in the uniqueGRanges
-#'     output.
+#' GRanges object. Default value: NULL. If NULL, all the columns (from
+#' column 1 to ncols) from each GRanges will be present in the 
+#' \eqn{uniqueGRanges} output.
 #' @param columns integer number(s) corresponding to the specific column(s) to
 #'     use from the meta-column of each GRanges. Default value: NULL. if
 #'     provided, the metacolumn from the uniqueGRanges output will contain the
 #'     specified columns.
 #' @param chromosomes Chromosomes used Default value: NULL
-#' @param maxgap See GenomicRanges::findOverlaps in the IRanges package for a
-#'     description of these arguments Default value: -1L
-#' @param minoverlap See GenomicRanges::findOverlaps in the IRanges package for
-#'     a description of these arguments Default value: 1L
+#' @param maxgap,minoverlap,ignore.strand,select,type The same as in
+#' \code{\link[GenomicRanges]{findOverlaps-methods}}.
 #' @param missing A numerical value (default 0) or NA to write in ranges with
 #'     missing values. For example, suppose that we want to build a
 #'     uniqueGRanges object from the GRanges objects X and Y. If a given range
@@ -29,27 +28,6 @@
 #'     GRanges object Y, then the metacolumn of range k from
 #'     uniqueGRanges(list(X,Y)) object will be the row vector (x,0) or (x,NA)
 #'     if missing = NA.
-#' @param type By default, any overlap is accepted. By specifying the type
-#'     parameter, one can select for specific types of overlap. The types
-#'     correspond to operations in Allen's Interval Algebra (see references).
-#'     If type is start or end, the intervals are required to have matching
-#'     starts or ends, respectively. While this operation seems trivial, the
-#'     naive implementation using outer would be much less efficient. Specifying
-#'     equal as the type returns the intersection of the start and end matches.
-#'     If  type is within, the query interval must be wholly contained within
-#'     the subject interval. Note that all matches must additionally satisfy the
-#'     minoverlap constraint described above. The maxgap parameter has special
-#'     meaning with the special overlap types. For start, end, and equal, it
-#'     specifies the maximum difference in the starts, ends or both,
-#'     respectively. For within, it is the maximum amount by which the subject
-#'     may be wider than the query.
-#' @param select When select is 'all' (the default), the results are returned as
-#'     a Hits object. Otherwise the returned value is an integer vector parallel
-#'     to query (i.e. same length) containing the first, last, or arbitrary
-#'     overlapping interval in subject, with NA indicating intervals that did
-#'     not overlap any intervals in subject.
-#' @param ignore.strand When set to TRUE, the strand information is ignored in
-#'     the overlap calculations. Default value: TRUE
 #' @param keep.strand When set to TRUE, the strand information is preserved on
 #'     the objects even if ignore.strand is set to TRUE.  This makes it possible
 #'     to ignore the strand during overlap calculations but to preserve the

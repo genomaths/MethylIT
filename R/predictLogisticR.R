@@ -94,8 +94,7 @@ predict.LogisticR <- function(object, newdata = NULL,
         }
     }
     # ---------------------------------------------------------------------#
-    object$modeling <- structure(object$modeling, class = c("glm",
-        "lm"))
+    object$modeling <- structure(object$modeling, class = c("glm", "lm"))
     if (is.null(newdata))
         dt <- NULL
 

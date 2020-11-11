@@ -145,9 +145,13 @@ pcaLogisticR <- function(formula = NULL,
 #' @importFrom BiocGenerics start
 #' @importFrom GenomeInfoDb seqnames
 #' @export
-predict.pcaLogisticR <- function(object, ...) UseMethod("predict")
-predict.pcaLogisticR <- function(object, newdata, type = c("class",
-    "posterior", "pca.ind.coord", "all"), ...) {
+predict.pcaLogisticR <- function(object, ...) UseMethod("predict", object)
+predict.pcaLogisticR <- function(
+                                object,
+                                newdata,
+                                type = c("class", "posterior",
+                                         "pca.ind.coord", "all"),
+                                ...) {
 
     if (!is(object, "pcaLogisticR")) {
         stop("* Parameter 'object' must be a model from class 'pcaLogisticR'")
@@ -156,8 +160,7 @@ predict.pcaLogisticR <- function(object, newdata, type = c("class",
     ## predictor names
     vn <- rownames(object$pca$rotation)
 
-    if (!is.null(newdata) && inherits(newdata, c("pDMP",
-        "InfDiv")))
+    if (!is.null(newdata) && inherits(newdata, c("pDMP", "InfDiv")))
         newdata <- unlist(newdata)
     if (inherits(newdata, "GRanges")) {
         if (is.element("pos", vn)) {
@@ -207,19 +210,24 @@ predict.pcaLogisticR <- function(object, newdata, type = c("class",
 
     predictClass <- function(object, dt) {
         pred <- predict(object$logistic, newdata = dt,
-            type = "response")
+                        type = "response")
         PredClass <- rep(object$reference.level, nrow(newdata))
         PredClass[pred > 0.5] <- object$positive.level
         return(PredClass)
     }
 
-    pred <- switch(type, posterior = predict(object$logistic,
-        newdata = ind.coord, type = "response"),
-        class = predictClass(object = object,
-        dt = ind.coord), pca.ind.coord = ind.coord,
-        all = list(class = predictClass(object = object,
-            dt = ind.coord), posterior = predict(object$logistic,
-            newdata = ind.coord, type = "response"),
-            pca.ind.coord = ind.coord))
+    pred <- switch(type,
+                posterior = predict(object$logistic,
+                                    newdata = ind.coord,
+                                    type = "response"),
+                class = predictClass(object = object,
+                                    dt = ind.coord),
+                pca.ind.coord = ind.coord,
+                all = list( class = predictClass(object = object,
+                                                dt = ind.coord),
+                            posterior = predict(object$logistic,
+                                                newdata = ind.coord,
+                                                type = "response"),
+                            pca.ind.coord = ind.coord))
     return(pred)
 }
