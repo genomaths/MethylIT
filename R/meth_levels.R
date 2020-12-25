@@ -23,6 +23,8 @@
 #' cytosine site. That is, the difference of methylation levels.
 #' @param bay.tv logical(1). Whether to compute the total variation distance at
 #' each cytosine site based on Bayesian estimation of methylation levels.
+#' @param filter logical(1). Optional. If TRUE, then only cytosine sites with
+#' \eqn{coverages > min.coverage} are including in the computation.
 #' @param preserve.dt logical(1). Option of whether to preserve all
 #' the metadata from the original 'data.frame' or
 #' \code{\link[GenomicRanges]{GRanges-class}} object.
