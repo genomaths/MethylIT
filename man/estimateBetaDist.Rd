@@ -4,13 +4,25 @@
 \alias{.estimateBetaDist}
 \title{Select the beta distribution that fit specified quantiles}
 \usage{
-.estimateBetaDist(q, init.pars = c(1, 1))
+.estimateBetaDist(
+  q,
+  init.pars = NULL,
+  maxiter = 1024,
+  ftol = 1e-12,
+  ptol = 1e-12,
+  gradtol = 1e-08
+)
 }
 \arguments{
 \item{q}{prior probabilities}
 
-\item{init.pars}{initial parameter values. Defaults to alpha = 1 &
+\item{init.pars}{initial parameter values. Defaults is NULL and an initial
+guess is estimated using \code{\link[stats]{optim}} function. If the initial
+guessing fails initial parameter values are to alpha = 1 &
 beta = 1, which imply the parsimony pseudo-counts greater than zero.}
+
+\item{maxiter, ftol, ptol, gradtol}{Optional parameters for
+\code{\link[minpack.lm]{nlsLM}} and \code{\link[stats]{nlm}} functions.}
 }
 \value{
 the estimated values of the shape parameters of the selected beta
@@ -22,9 +34,8 @@ parameters of beta distribution
 }
 \details{
 In order to obtain the estimates for shape parameters of beta
-distribution, the squared of the difference between the empirical
-cumulative distribution function (ecdf) & the theoretical cdf is
-minimized using the Non-Linear Minimization function of 'stats'
-package.
+distribution, the squared of the difference between the empirical cumulative
+distribution function (ecdf) & the theoretical cdf is minimized using the
+Non-Linear Minimization function of 'stats' package.
 }
 \keyword{internal}

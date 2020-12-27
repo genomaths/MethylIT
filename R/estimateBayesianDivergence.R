@@ -37,6 +37,11 @@
 #'     and unmethylated counts for treatment sample, respectively.
 #' @param Bayesian logical. Whether to perform the estimations based on
 #'     posterior estimations of methylation levels.
+#' @param init.pars  initial parameter values. Defaults is NULL and an initial
+#' guess is estimated using \code{\link[stats]{optim}} function. If the initial
+#' guessing fails initial parameter values are to alpha = 1 &
+#' beta = 1, which imply the parsimony pseudo-counts greater than zero.
+#'
 #' @param JD Logic (Default:FALSE). Option on whether to add a column with
 #'     values of J-information divergence (see \code{\link{estimateJDiv}}).
 #'     It is only compute if JD = TRUE and meth.level = FALSE.
@@ -61,7 +66,14 @@
 #' @param logbase Logarithm base used to compute the JD (if JD = TRUE).
 #'     Logarithm base 2 is used as default (bit unit). Use logbase = exp(1) for
 #'     natural logarithm.
+#' @param init.pars  initial parameter values. Defaults is NULL and an initial
+#' guess is estimated using \code{\link[stats]{optim}} function. If the initial
+#' guessing fails initial parameter values are to alpha = 1 &
+#' beta = 1, which imply the parsimony pseudo-counts greater than zero.
+#'
 #' @param verbose if TRUE, prints the function log to stdout
+#' @param ... Optional parameter values for: maxiter, ftol, ptol, and gradtol
+#' from \code{\link[minpack.lm]{nlsLM}} and \code{\link[stats]{nlm}} functions.
 #'
 #' @return The input matrix or GRanges object with the four columns of counts
 #' and additional columns. If Bayessian = TRUE, the results are based on
@@ -132,15 +144,18 @@
 #' @importFrom S4Vectors mcols<-
 #' @export
 estimateBayesianDivergence <- function(x,
-                                      Bayesian = FALSE,
-                                      JD = FALSE,
-                                      num.cores = 1,
-                                      tasks = 0L,
-                                      columns = c(mC1 = 1,uC1 = 2,
+                                    Bayesian = FALSE,
+                                    init.pars = NULL,
+                                    JD = FALSE,
+                                    num.cores = 1,
+                                    tasks = 0L,
+                                    columns = c(mC1 = 1,uC1 = 2,
                                                 mC2 = 3, uC2 = 4),
-                                      meth.level = FALSE,
-                                      preserve.gr = FALSE,
-                                      logbase = 2, verbose = TRUE) {
+                                    meth.level = FALSE,
+                                    preserve.gr = FALSE,
+                                    logbase = 2,
+                                    verbose = TRUE,
+                                    ...) {
 
     if (verbose) progressbar <- TRUE else progressbar <- FALSE
     if (Sys.info()["sysname"] == "Linux")
@@ -201,8 +216,8 @@ estimateBayesianDivergence <- function(x,
             q2 <- (x[, 3] + 1)/(n2 + 2)
 
             ## The shape parameters estimated with 'nlm'
-            beta1 <- .estimateBetaDist(q1)
-            beta2 <- .estimateBetaDist(q2)
+            beta1 <- .estimateBetaDist(q1, init.pars = init.pars, ...)
+            beta2 <- .estimateBetaDist(q2, init.pars = init.pars, ...)
             ## Assuming beta priors
             n1[n1 == 0] <- 2
             n2[n2 == 0] <- 2
@@ -216,7 +231,8 @@ estimateBayesianDivergence <- function(x,
         if (verbose)
             cat("*** Estimating Hellinger divergence... \n")
         hdiv <- bplapply(seq_len(nrow(x)), function(i) {
-            estimateHellingerDiv(p = as.numeric(x[i, ]), n = as.numeric(n[i, ]))
+            estimateHellingerDiv(p = as.numeric(x[i, ]),
+                                n = as.numeric(n[i, ]))
         }, BPPARAM = bpparam)
         if (verbose)
             cat("* Coercing from list to vector...\n")

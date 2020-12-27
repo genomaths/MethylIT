@@ -7,6 +7,7 @@
 estimateBayesianDivergence(
   x,
   Bayesian = FALSE,
+  init.pars = NULL,
   JD = FALSE,
   num.cores = 1,
   tasks = 0L,
@@ -14,7 +15,8 @@ estimateBayesianDivergence(
   meth.level = FALSE,
   preserve.gr = FALSE,
   logbase = 2,
-  verbose = TRUE
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
@@ -27,6 +29,11 @@ and unmethylated counts for treatment sample, respectively.}
 
 \item{Bayesian}{logical. Whether to perform the estimations based on
 posterior estimations of methylation levels.}
+
+\item{init.pars}{initial parameter values. Defaults is NULL and an initial
+guess is estimated using \code{\link[stats]{optim}} function. If the initial
+guessing fails initial parameter values are to alpha = 1 &
+beta = 1, which imply the parsimony pseudo-counts greater than zero.}
 
 \item{JD}{Logic (Default:FALSE). Option on whether to add a column with
 values of J-information divergence (see \code{\link{estimateJDiv}}).
@@ -60,6 +67,9 @@ Logarithm base 2 is used as default (bit unit). Use logbase = exp(1) for
 natural logarithm.}
 
 \item{verbose}{if TRUE, prints the function log to stdout}
+
+\item{...}{Optional parameter values for: maxiter, ftol, ptol, and gradtol
+from \code{\link[minpack.lm]{nlsLM}} and \code{\link[stats]{nlm}} functions.}
 }
 \value{
 The input matrix or GRanges object with the four columns of counts

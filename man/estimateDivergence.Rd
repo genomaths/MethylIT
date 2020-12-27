@@ -8,6 +8,7 @@ estimateDivergence(
   ref,
   indiv,
   Bayesian = FALSE,
+  init.pars = NULL,
   columns = NULL,
   min.coverage = 4,
   min.meth = 4,
@@ -33,6 +34,11 @@ used in the estimation of the information divergence.}
 
 \item{Bayesian}{logical(1). Whether to perform the estimations based on
 posterior estimations of methylation levels.}
+
+\item{init.pars}{initial parameter values. Defaults is NULL and an initial
+guess is estimated using \code{\link[stats]{optim}} function. If the initial
+guessing fails initial parameter values are to alpha = 1 &
+beta = 1, which imply the parsimony pseudo-counts greater than zero.}
 
 \item{columns}{Vector of one or two integer numbers denoting the indexes of
 the columns where the methylated and unmethylated read counts are found
@@ -96,7 +102,7 @@ logbase = \eqn{exp(1)} for natural logarithm.}
 
 \item{verbose}{if TRUE, prints the function log to stdout}
 
-\item{...}{Additional parameters for 'uniqueGRanges' function.}
+\item{...}{Optional parameters for \code{\link{uniqueGRanges}} function.}
 }
 \value{
 An object from 'infDiv' class with the four columns of counts, the

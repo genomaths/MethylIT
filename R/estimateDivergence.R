@@ -83,6 +83,11 @@
 #'     used in the estimation of the information divergence.
 #'@param Bayesian logical(1). Whether to perform the estimations based on
 #'     posterior estimations of methylation levels.
+#' @param init.pars  initial parameter values. Defaults is NULL and an initial
+#' guess is estimated using \code{\link[stats]{optim}} function. If the initial
+#' guessing fails initial parameter values are to alpha = 1 &
+#' beta = 1, which imply the parsimony pseudo-counts greater than zero.
+#'
 #' @param columns Vector of one or two integer numbers denoting the indexes of
 #'     the columns where the methylated and unmethylated read counts are found
 #'     or, if meth.level = TRUE, the columns corresponding to the methylation
@@ -132,7 +137,7 @@
 #'     Logarithm base 2 is used as default (bit unit). Use
 #'     logbase = \eqn{exp(1)} for natural logarithm.
 #' @param verbose if TRUE, prints the function log to stdout
-#' @param ... Additional parameters for 'uniqueGRanges' function.
+#' @param ... Optional parameters for \code{\link{uniqueGRanges}} function.
 #'
 #' @return An object from 'infDiv' class with the four columns of counts, the
 #' information divergence, and additional columns:
@@ -196,35 +201,57 @@
 #' @importFrom GenomicRanges GRanges GRangesList
 #' @seealso \code{\link{estimateBayesianDivergence}}
 #' @export
-estimateDivergence <- function(ref, indiv, Bayesian = FALSE,
-    columns = NULL, min.coverage = 4, min.meth = 4,
-    min.umeth = 0, min.sitecov = 4, high.coverage = NULL,
-    percentile = 0.999, JD = FALSE, num.cores = 1L,
-    tasks = 0L, meth.level = FALSE, logbase = 2, verbose = TRUE,
-    ...) {
+estimateDivergence <- function(
+                        ref,
+                        indiv,
+                        Bayesian = FALSE,
+                        init.pars = NULL,
+                        columns = NULL,
+                        min.coverage = 4,
+                        min.meth = 4,
+                        min.umeth = 0,
+                        min.sitecov = 4,
+                        high.coverage = NULL,
+                        percentile = 0.999,
+                        JD = FALSE, num.cores = 1L,
+                        tasks = 0L,
+                        meth.level = FALSE,
+                        logbase = 2,
+                        verbose = TRUE,
+                        ...) {
 
     if (is.null(columns) && (!meth.level)) columns <- c(1, 2)
     if (meth.level && (is.null(columns))) columns <- 1
     sn <- names(indiv)
 
+    progressbar = FALSE
+    if (verbose) progressbar = TRUE
     if (Sys.info()["sysname"] == "Linux")
-        bpparam <- MulticoreParam(workers = num.cores, tasks = tasks)
-    else bpparam <- SnowParam(workers = num.cores, type = "SOCK")
+        bpparam <- MulticoreParam(workers = num.cores, tasks = tasks,
+                                progressbar = progressbar)
+    else bpparam <- SnowParam(workers = num.cores, type = "SOCK",
+                            progressbar = progressbar)
     if (ncol(mcols(ref)) > 2)
         ref <- ref[, columns]
     indiv <- lapply(indiv, function(x) x[, columns])
 
     if (meth.level) {
         x = bplapply(seq_len(length(indiv)), function(k, ref, indv, sn) {
-            if (verbose)
-                message("*** Processing sample #", k, " ", sn[k])
             x <- indv[[k]]
             x <- x[, columns]
-            x <- uniqueGRanges(list(ref, x), num.cores = 1L,
-                                tasks = tasks, verbose = verbose, ...)
-            x = estimateBayesianDivergence(x, Bayesian = FALSE,
-                                        JD = JD, meth.level = meth.level,
-                                        num.cores = 1L, tasks = tasks,
+            x <- uniqueGRanges(
+                            ListOfGranges = list(ref, x),
+                            num.cores = num.cores,
+                            tasks = tasks, type = "equal",
+                            verbose = verbose, ...)
+            x = estimateBayesianDivergence(
+                                        x,
+                                        Bayesian = FALSE,
+                                        JD = JD,
+                                        logbase = logbase,
+                                        meth.level = meth.level,
+                                        num.cores = num.cores,
+                                        tasks = tasks,
                                         verbose = verbose)
             return(x)
         }, BPPARAM = bpparam, ref = ref, indv = indiv, sn = sn)
@@ -233,21 +260,35 @@ estimateDivergence <- function(ref, indiv, Bayesian = FALSE,
             ref, indv, sn) {
             if (verbose)
                 message("*** Processing sample #", k, " ", sn[k])
-            x = uniqueGRfilterByCov(x = ref, y = indv[[k]],
-                            min.coverage = min.coverage, min.meth = min.meth,
-                            min.umeth = min.umeth, min.sitecov = min.sitecov,
+            x = uniqueGRfilterByCov(
+                            x = ref,
+                            y = indv[[k]],
+                            min.coverage = min.coverage,
+                            min.meth = min.meth,
+                            min.umeth = min.umeth,
+                            min.sitecov = min.sitecov,
                             percentile = percentile,
-                            high.coverage = high.coverage, num.cores = 1L,
-                            tasks = tasks, verbose = verbose, ...)
+                            high.coverage = high.coverage,
+                            num.cores = 1L,
+                            tasks = tasks,
+                            verbose = verbose,
+                            type = "equal")
             if (length(x) < 2)
                 stop("*** At least two cytosine sites must pass the filtering",
                     " conditions to estimate informations divergences. \n",
                     "The issue was found at sample number: ",
                     k, ", id: ", names(indv)[k])
-            x = estimateBayesianDivergence(x, Bayesian = Bayesian,
-                                        JD = JD, num.cores = 1L, tasks = tasks,
+            x = estimateBayesianDivergence(
+                                        x,
+                                        Bayesian = Bayesian,
+                                        JD = JD,
+                                        init.pars = init.pars,
+                                        num.cores = num.cores,
+                                        tasks = tasks,
                                         meth.level = meth.level,
-                                        logbase = logbase, verbose = verbose)
+                                        logbase = logbase,
+                                        verbose = verbose,
+                                        ...)
             return(x)
         }, BPPARAM = bpparam, ref = ref, indv = indiv, sn = sn)
     }

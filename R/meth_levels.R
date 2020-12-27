@@ -13,6 +13,11 @@
 #' counts for treatment sample, respectively.
 #' @param Bayesian logical(1). Whether to perform the estimations based on
 #' posterior estimations of methylation levels.
+#' @param init.pars  initial parameter values. Defaults is NULL and an initial
+#' guess is estimated using \code{\link[stats]{optim}} function. If the initial
+#' guessing fails initial parameter values are to alpha = 1 &
+#' beta = 1, which imply the parsimony pseudo-counts greater than zero.
+#'
 #' @param min.coverage An integer or an integer vector of length 2. Cytosine
 #' sites where the coverage in both samples, 'x' and 'y', are less than
 #' min.coverage' are discarded. The cytosine site is preserved, however, if the
@@ -28,14 +33,18 @@
 #' @param preserve.dt logical(1). Option of whether to preserve all
 #' the metadata from the original 'data.frame' or
 #' \code{\link[GenomicRanges]{GRanges-class}} object.
+#'
 #' @param num.cores,tasks Parameters for parallel computation using package
 #' \code{\link[BiocParallel]{BiocParallel-package}}: the number of cores to use,
 #' i.e. at most how many child processes will be run simultaneously (see
 #' \code{\link[BiocParallel]{bplapply}} and the number of tasks per job (only
 #' for Linux OS). These parameters will be passed to
 #' \code{\link{uniqueGRanges}}.
+#'
 #' @param verbose if TRUE, prints the function log to stdout
-
+#' @param ... Optional parameter values for: maxiter, ftol, ptol, and gradtol
+#' from \code{\link[minpack.lm]{nlsLM}} and \code{\link[stats]{nlm}} functions.
+#'
 #' @aliases meth_levels
 #' @export
 #' @author Robersy Sanchez (\url{https://genomaths.com})
@@ -63,6 +72,7 @@ setGeneric("meth_levels",
                     x,
                     columns = c(mC1 = 1, uC1 = 2, mC2 = NULL, uC2 = NULL),
                     Bayesian = FALSE,
+                    init.pars = NULL,
                     min.coverage = 4,
                     tv = FALSE,
                     bay.tv = FALSE,
@@ -70,7 +80,8 @@ setGeneric("meth_levels",
                     preserve.dt = FALSE,
                     num.cores = 1,
                     tasks = 0L,
-                    verbose = TRUE, ...) standardGeneric("meth_levels"))
+                    verbose = TRUE,
+                    ...) standardGeneric("meth_levels"))
 
 #' @aliases meth_levels
 #' @rdname meth_levels
@@ -80,16 +91,19 @@ setMethod("meth_levels", signature(x = "data.frame"),
                    x,
                    columns = c(mC1 = 1, uC1 = 2, mC2 = NULL, uC2 = NULL),
                    Bayesian = FALSE,
+                   init.pars = NULL,
                    min.coverage = 4,
                    tv = FALSE,
                    bay.tv = FALSE,
                    filter = FALSE,
                    preserve.dt = FALSE,
-                   verbose = TRUE, ...) {
+                   verbose = TRUE,
+                   ...) {
 
     colm <- is.element(c("mC1", "uC1", "mC2", "uC2"), names(columns))
 
-    if (preserve.dt) y <- x
+    if (preserve.dt)
+        y <- x
     x <- data.matrix(x[, columns])
     if (ncol(x) < 2) {
               stop("If counts are provided, then at least two columns must ",
@@ -116,20 +130,31 @@ setMethod("meth_levels", signature(x = "data.frame"),
 
     if (colm[3] && colm[4]) {
         if (tv || !Bayesian) {
-            p1 <- meth.level(x[, 1:2], Bayesian = FALSE, verbose = verbose)
-            p2 <- meth.level(x[, 3:4], Bayesian = FALSE, verbose = verbose)
+            p1 <- meth.level(x[, 1:2], Bayesian = FALSE,
+                            init.pars = init.pars,
+                            verbose = verbose)
+            p2 <- meth.level(x[, 3:4], Bayesian = FALSE,
+                            init.pars = init.pars,
+                            verbose = verbose)
             if (tv) TV <- p2 - p1
         }
         if (Bayesian) {
-            p1 <- meth.level(x[, 1:2], Bayesian = Bayesian, verbose = verbose)
-            p2 <- meth.level(x[, 3:4], Bayesian = Bayesian, verbose = verbose)
+            p1 <- meth.level(x[, 1:2], Bayesian = Bayesian,
+                            init.pars = init.pars,
+                            verbose = verbose, ...)
+            p2 <- meth.level(x[, 3:4], Bayesian = Bayesian,
+                            init.pars = init.pars,
+                            verbose = verbose, ...)
             if (bay.tv) bay.TV <- p2 - p1
         }
         if (preserve.dt) x <- data.frame(y, p1, p2)
         else x <- data.frame(p1, p2)
     } else {
-        p1 <- meth.level(x[, 1:2], Bayesian = Bayesian, verbose = verbose)
-        if (preserve.dt) x <- data.frame(y, p1)
+        p1 <- meth.level(x[, 1:2], Bayesian = Bayesian,
+                        init.pars = init.pars,
+                        verbose = verbose, ...)
+        if (preserve.dt)
+            x <- data.frame(y, p1)
         else x <- data.frame(p1)
     }
 
@@ -149,15 +174,18 @@ setMethod("meth_levels", signature(GR = "GRanges"),
             x = NULL,
             columns = c(mC1 = 1, uC1 = 2, mC2 = NULL, uC2 = NULL),
             Bayesian = FALSE,
+            init.pars = NULL,
             min.coverage = 4,
             tv = FALSE,
             bay.tv = FALSE,
             filter = FALSE,
             preserve.dt = FALSE,
-            verbose = TRUE, ...) {
+            verbose = TRUE,
+            ...) {
 
             colm <- is.element(c("mC1", "uC1", "mC2", "uC2"), names(columns))
             x <- data.matrix(mcols(GR)[, columns])
+
             if (filter) {
                 r1 <- rowSums(x[, 1:2], na.rm = TRUE)
                 ind1 <- which(r1 > min.coverage)
@@ -173,28 +201,32 @@ setMethod("meth_levels", signature(GR = "GRanges"),
 
             if (preserve.dt) {
                 mcols(GR) <- data.frame(mcols(GR),
-                                        meth_levels(GR = NULL,
-                                        x = data.frame(mcols(GR)[, columns]),
+                                meth_levels(GR = NULL,
+                                        x = data.frame(mcols(GR)),
                                         Bayesian = Bayesian,
+                                        init.pars = init.pars,
                                         columns = columns,
-                                        min.coverage = 4,
+                                        min.coverage = min.coverage,
                                         tv = tv,
                                         bay.tv = bay.tv,
                                         filter = FALSE,
                                         preserve.dt = FALSE,
-                                        verbose = verbose, ...))
+                                        verbose = verbose,
+                                        ...))
             }
             else
                 mcols(GR) <- meth_levels(GR = NULL,
-                                        x = data.frame(mcols(GR)[, columns]),
+                                        x = data.frame(mcols(GR)),
                                         Bayesian = Bayesian,
+                                        init.pars = init.pars,
                                         columns = columns,
-                                        min.coverage = 4,
+                                        min.coverage = min.coverage,
                                         tv = tv,
                                         bay.tv = bay.tv,
                                         filter = FALSE,
                                         preserve.dt = FALSE,
-                                        verbose = verbose, ...)
+                                        verbose = verbose,
+                                        ...)
             return(GR)
 })
 
@@ -208,6 +240,7 @@ setMethod("meth_levels", signature(GR = "list"),
             x = NULL,
             columns = c(mC1 = 1, uC1 = 2, mC2 = 0, uC2 = 0),
             Bayesian = FALSE,
+            init.pars = NULL,
             min.coverage = 4,
             tv = FALSE,
             bay.tv = FALSE,
@@ -215,7 +248,8 @@ setMethod("meth_levels", signature(GR = "list"),
             preserve.dt = FALSE,
             num.cores = 1,
             tasks = 0L,
-            verbose = TRUE, ...) {
+            verbose = TRUE,
+            ...) {
 
             progressbar <- FALSE
 
@@ -228,17 +262,19 @@ setMethod("meth_levels", signature(GR = "list"),
                                    progressbar = progressbar)
             }
             GR <- bplapply(GR, meth_levels, Bayesian = Bayesian,
-                           columns = columns, min.coverage = min.coverage,
-                           tv = tv, bay.tv = bay.tv, filter = filter,
-                           preserve.dt = preserve.dt, num.cores = num.cores,
-                           tasks = tasks, verbose = FALSE, BPPARAM = bpparam)
+                          columns = columns, min.coverage = min.coverage,
+                          init.pars = init.pars, tv = tv, bay.tv = bay.tv,
+                          filter = filter, preserve.dt = preserve.dt,
+                          num.cores = num.cores, tasks = tasks,
+                          verbose = FALSE, ...,
+                          BPPARAM = bpparam)
             return(GR)
 })
 
 
 ### ======================== Auxiliary function ============================
 
-meth.level <- function(x, Bayesian, verbose) {
+meth.level <- function(x, Bayesian, init.pars = NULL, verbose, ...) {
 
     n <- rowSums(x, na.rm = TRUE)
 
@@ -257,7 +293,7 @@ meth.level <- function(x, Bayesian, verbose) {
         q <- (x[, 1] + 1)/(n + 2)
 
         ## The shape parameters estimated with 'nlm'
-        beta <- .estimateBetaDist(q)
+        beta <- .estimateBetaDist(q, init.pars = init.pars, ...)
         ## Assuming beta priors
         n[n == 0] <- 2
         p <- .betaBinPosteriors(x[, 1], n, a = beta[1], b = beta[2])

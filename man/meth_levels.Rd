@@ -12,6 +12,7 @@ meth_levels(
   x,
   columns = c(mC1 = 1, uC1 = 2, mC2 = NULL, uC2 = NULL),
   Bayesian = FALSE,
+  init.pars = NULL,
   min.coverage = 4,
   tv = FALSE,
   bay.tv = FALSE,
@@ -28,6 +29,7 @@ meth_levels(
   x,
   columns = c(mC1 = 1, uC1 = 2, mC2 = NULL, uC2 = NULL),
   Bayesian = FALSE,
+  init.pars = NULL,
   min.coverage = 4,
   tv = FALSE,
   bay.tv = FALSE,
@@ -44,6 +46,7 @@ meth_levels(
   x,
   columns = c(mC1 = 1, uC1 = 2, mC2 = NULL, uC2 = NULL),
   Bayesian = FALSE,
+  init.pars = NULL,
   min.coverage = 4,
   tv = FALSE,
   bay.tv = FALSE,
@@ -60,6 +63,7 @@ meth_levels(
   x = NULL,
   columns = c(mC1 = 1, uC1 = 2, mC2 = 0, uC2 = 0),
   Bayesian = FALSE,
+  init.pars = NULL,
   min.coverage = 4,
   tv = FALSE,
   bay.tv = FALSE,
@@ -86,6 +90,11 @@ counts for treatment sample, respectively.}
 
 \item{Bayesian}{logical(1). Whether to perform the estimations based on
 posterior estimations of methylation levels.}
+
+\item{init.pars}{initial parameter values. Defaults is NULL and an initial
+guess is estimated using \code{\link[stats]{optim}} function. If the initial
+guessing fails initial parameter values are to alpha = 1 &
+beta = 1, which imply the parsimony pseudo-counts greater than zero.}
 
 \item{min.coverage}{An integer or an integer vector of length 2. Cytosine
 sites where the coverage in both samples, 'x' and 'y', are less than
@@ -115,6 +124,9 @@ for Linux OS). These parameters will be passed to
 \code{\link{uniqueGRanges}}.}
 
 \item{verbose}{if TRUE, prints the function log to stdout}
+
+\item{...}{Optional parameter values for: maxiter, ftol, ptol, and gradtol
+from \code{\link[minpack.lm]{nlsLM}} and \code{\link[stats]{nlm}} functions.}
 }
 \description{
 This function computes the
