@@ -10,7 +10,8 @@ readCounts2GRangesList(
   pattern = NULL,
   remove = FALSE,
   columns = c(seqnames = NULL, start = NULL, end = NULL, strand = NULL, fraction =
-    NULL, percent = NULL, mC = NULL, uC = NULL, coverage = NULL, context = NULL),
+    NULL, percent = NULL, mC = NULL, uC = NULL, coverage = NULL, context = NULL, signal =
+    NULL),
   chromosome.names = NULL,
   chromosomes = NULL,
   verbose = TRUE,
@@ -33,13 +34,14 @@ read. The decompressed files are removed after read if this is set
 'TRUE'.}
 
 \item{columns}{Vector of integer numbers denoting the table columns that
-must be read. The numbers for 'seqnames' (chromosomes), 'start', and
-'end' (if different from 'start') columns must be given. The possible
-fields are: 'seqnames' (chromosomes),'start', 'end', 'strand',
-'fraction', percent' (methylation percentage), 'mC' (methylates
-cytosine), 'uC' (non methylated cytosine), 'coverage', and 'context'
-(methylation context). These column headers are not required to be in the
-files.}
+must be read. The numbers for 'seqnames' (chromosomes), 'start', and 'end'
+(if different from 'start') columns must be given. The possible fields are:
+'seqnames' (chromosomes),'start', 'end', 'strand', 'fraction', percent'
+(methylation percentage), 'mC' (methylates cytosine), 'uC' (non methylated
+cytosine), 'coverage', and 'context' (methylation context). These column
+headers are not required to be in the files. An optional column named
+\emph{'signal'} can be used to include a relevant information about the
+methylation signal.}
 
 \item{chromosome.names}{If provided, for each GRanges object, chromosome
 names will be changed to those provided in 'chromosome.names' applying

@@ -345,7 +345,8 @@ countTest2 <- function(DS, num.cores = 1,
                 TT.SignalDensity = (scaling * TT.CountPerBp),
                 SignalDensityVariation = scaling *
                     (TT.CountPerBp - CT.CountPerBp))
-            res <- GR[order(as.factor(seqnames(GR)), start(GR)), ]
+            res <- GR[ order(as.factor(seqnames(GR)), start(GR)), ]
+            seqlevels(res, pruning.mode = "coarse") <- unique(seqnames(res))
         } else {
             res <- cbind(DS$counts, DS$optionData)
         }

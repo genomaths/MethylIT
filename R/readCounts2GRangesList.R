@@ -19,13 +19,15 @@
 #'     read. The decompressed files are removed after read if this is set
 #'     'TRUE'.
 #' @param columns Vector of integer numbers denoting the table columns that
-#'     must be read. The numbers for 'seqnames' (chromosomes), 'start', and
-#'     'end' (if different from 'start') columns must be given. The possible
-#'     fields are: 'seqnames' (chromosomes),'start', 'end', 'strand',
-#'     'fraction', percent' (methylation percentage), 'mC' (methylates
-#'     cytosine), 'uC' (non methylated cytosine), 'coverage', and 'context'
-#'     (methylation context). These column headers are not required to be in the
-#'     files.
+#' must be read. The numbers for 'seqnames' (chromosomes), 'start', and 'end'
+#' (if different from 'start') columns must be given. The possible fields are:
+#' 'seqnames' (chromosomes),'start', 'end', 'strand', 'fraction', percent'
+#' (methylation percentage), 'mC' (methylates cytosine), 'uC' (non methylated
+#' cytosine), 'coverage', and 'context' (methylation context). These column
+#' headers are not required to be in the files. An optional column named
+#' \emph{'signal'} can be used to include a relevant information about the
+#' methylation signal.
+#'
 #' @param chromosome.names If provided, for each GRanges object, chromosome
 #'     names will be changed to those provided in 'chromosome.names' applying
 #'     seqlevels(x) <- chromosome.names'. This option permits to use all the
@@ -69,13 +71,14 @@ readCounts2GRangesList <- function(filenames = NULL,
     sample.id = NULL, pattern = NULL, remove = FALSE,
     columns = c(seqnames = NULL, start = NULL, end = NULL,
         strand = NULL, fraction = NULL, percent = NULL,
-        mC = NULL, uC = NULL, coverage = NULL, context = NULL),
+        mC = NULL, uC = NULL, coverage = NULL, context = NULL,
+        signal = NULL),
     chromosome.names = NULL, chromosomes = NULL, verbose = TRUE,
     ...) {
 
     colns <- c("seqnames", "start", "end", "strand",
         "fraction", "percent", "mC", "uC", "coverage",
-        "context")
+        "context", "signal")
     Check <- ArgumentCheck::newArgCheck()
     if (is.null(filenames)) {
         ArgumentCheck::addError(msg = "No file names provided",
