@@ -91,3 +91,59 @@ selectDIMP <- function(LR, div.col = NULL, pval.col = NULL,
     }
     return(LR)
 }
+
+
+# ======================= Show method =================================
+
+
+#' @rdname selectDIMP
+#' @param object An object from 'InfDiv' class
+print.InfDiv <- function(object) {
+    cat(class(object)[1]," object of length: ",
+        length(object), "\n", sep = "")
+    cat("------- \n")
+    class(object) <- "GRangesList"
+    print(object[1])
+    cat("...\n")
+    cat("<",
+        length(object) - 1,
+        " more ", class(object[[1]]), " elements>\n",
+        sep = "")
+    cat("------- \n")
+    invisible(object)
+}
+
+
+#' @rdname selectDIMP
+#' @param object An object from 'pDMP' class
+print.pDMP <- function(object) {
+    cat(class(object)[1]," object of length: ",
+        length(object), "\n", sep = "")
+    cat("------- \n")
+    class(object) <- "GRangesList"
+    print(object[1])
+    cat("...\n")
+    cat("<",
+        length(object) - 1,
+        " more ", class(object[[1]]), " elements>\n",
+        sep = "")
+    cat("------- \n")
+    invisible(object)
+}
+
+#' @rdname selectDIMP
+#' @param object An object from 'pDMP_OR_InfDiv' class
+print.testDMP <- function(object) {
+    cat(class(object)[1]," object of length: ",
+        length(object), "\n", sep = "")
+    cat("------- \n")
+    class(object) <- "GRangesList"
+    print(object[1])
+    cat("...\n")
+    cat("<",
+        length(object) - 1,
+        " more ", class(object[[1]]), " elements>\n",
+        sep = "")
+    cat("------- \n")
+    invisible(object)
+}
