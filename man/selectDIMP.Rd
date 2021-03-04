@@ -2,6 +2,9 @@
 % Please edit documentation in R/selectDIMP.R
 \name{selectDIMP}
 \alias{selectDIMP}
+\alias{print.InfDiv}
+\alias{print.pDMP}
+\alias{print.testDMP}
 \title{Selection of DMPs}
 \usage{
 selectDIMP(
@@ -13,6 +16,12 @@ selectDIMP(
   tv.col = NULL,
   tv.cut = NULL
 )
+
+\method{print}{InfDiv}(object)
+
+\method{print}{pDMP}(object)
+
+\method{print}{testDMP}(object)
 }
 \arguments{
 \item{LR}{An object from 'pDMP' class.}
@@ -41,6 +50,8 @@ cytosine positions (if provided).}
 
 \item{tv.cut}{If tv.cut and tv.col are provided, then cytosine sites \eqn{k}
 with \eqn{|TV| < tv.cut} are removed.}
+
+\item{object}{An object from 'pDMP_OR_InfDiv' class}
 }
 \value{
 An object from 'pDMP' class containing only differentially

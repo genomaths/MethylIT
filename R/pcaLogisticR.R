@@ -12,7 +12,9 @@
 #'     mentioned functions. As shown in the example, 'pcaLogisticR' function
 #'     can be used in general classification problems.
 #'
-#' @param formula Same as in 'glm' from package 'stats'.
+#' @param formula Same as in 'glm' from package 'stats'. One term carrying
+#' interaction between two variables can be introduced (with notation as
+#' indicated in \code{\link[stats]{formula}} function).
 #' @param data Same as in 'glm' from package 'stats'.
 #' @param scale Same as in 'prcomp' from package 'prcomp'.
 #' @param center Same as in 'prcomp' from package 'prcomp'.
@@ -20,19 +22,20 @@
 #' @param n.pc Number of principal components to use in the logistic.
 #' @param max.pc Same as in parameter 'rank.' from package 'prcomp'.
 #' @return
-#'     Function 'pcaLogisticR' returns an object ('pcaLogisticR' class)
-#'     containing a list of two objects:
-#'     \enumerate{
-#'         \item 'logistic': an object of class 'glm' from package 'stats'.
-#'         \item 'pca': an object of class 'prcomp' from package 'stats'.
-#'         \item reference.level: response level used as reference.
-#'         \item positive.level: response level that corresponds to a 'positive'
-#'             result. When type = 'response', the probability vector returned
-#'             correspond to the probabilities of each individual to be a
-#'             result, i.e., the probability to belong to the class of positive
-#'             level.
-#'     }
-#'     For information on how to use these objects see ?glm and ?prcomp.
+#' Function 'pcaLogisticR' returns an object ('pcaLogisticR' class)
+#' containing a list of two objects:
+#' \enumerate{
+#'      \item 'logistic': an object of class 'glm' from package 'stats'.
+#'      \item 'pca': an object of class 'prcomp' from package 'stats'.
+#'      \item reference.level: response level used as reference.
+#'      \item positive.level: response level that corresponds to a 'positive'
+#'            result. When type = 'response', the probability vector returned
+#'            correspond to the probabilities of each individual to be a
+#'            result, i.e., the probability to belong to the class of positive
+#'            level.
+#' }
+#'
+#' For information on how to use these objects see ?glm and ?prcomp.
 #'
 #' @examples
 #' data(iris)
@@ -63,6 +66,7 @@ pcaLogisticR <- function(formula = NULL,
             "?pcaLogisticR or ?glm).", sep = "")
         ArgumentCheck::addError(msg = ans, argcheck = Check)
     }
+
     if (!is.null(formula) && is(formula, "formula")) {
         vn <- try(attr(terms(formula), "term.labels"),
             silent = TRUE)
@@ -79,10 +83,12 @@ pcaLogisticR <- function(formula = NULL,
                 ans1, n.pc), argcheck = Check)
         }
     }
+
     if (is.null(formula)) {
         ans <- "A formula or grouping variable must be provided."
         ArgumentCheck::addError(msg = ans, argcheck = Check)
     }
+
     ArgumentCheck::finishArgCheck(Check)
 
     m = nrow(data)
@@ -91,8 +97,26 @@ pcaLogisticR <- function(formula = NULL,
         ans1 <- " must be lower than the number of individuals N/3"
         warning(paste0(ans, n.pc, ans1))
     }
-    pc <- prcomp(x = data[vn], retx = TRUE, center = center,
-                scale. = scale, tol = tol, rank. = max.pc)
+
+    idx <- grep(":", vn)[1]
+    interactions <- FALSE
+    intr <- NA
+    if (!is.na(idx)) {
+        interactions <- TRUE
+        cnam <- colnames(data)
+        intr <- strsplit(vn[ idx ], ":")[[1]]
+        data$intr <- as.numeric(unname(data[, intr[1] ] * data[, intr[2] ]))
+        vn <- sub(":", "_", vn)
+        intr <- paste(intr, collapse = "_")
+        colnames(data) <- c(cnam, intr)
+
+        if (length(idx) > 1)
+            warnings("*** More than one interaction was requested.",
+                    "Only the first interaction was considered")
+    }
+
+    pc <- prcomp(x = data[ vn ], retx = TRUE, center = center,
+                 scale. = scale, tol = tol, rank. = max.pc)
 
     cn <- colnames(pc$x)
     if (ncol(pc$x) > n.pc) {
@@ -117,9 +141,16 @@ pcaLogisticR <- function(formula = NULL,
     model <- suppressWarnings(glm(formula = formula,
                             family = binomial(link = "logit"), data = data))
 
-    model <- structure(list(logistic = model, pca = pc,
-        reference.level = l[1], positive.level = l[2]),
-        class = "pcaLogisticR")
+    model <- structure(
+                list(
+                    logistic = model,
+                    pca = pc,
+                    reference.level = l[1],
+                    positive.level = l[2],
+                    interaction =   {if (interactions)
+                                        intr
+                                    else NULL}),
+                class = "pcaLogisticR")
     return(model)
 }
 #'
@@ -184,36 +215,57 @@ predict.pcaLogisticR <- function(
         newdata$logP <- log10(newdata$wprob + 2.2e-308)
         newdata <- mcols(newdata)
     }
-    newdata <- newdata[vn]
-    newdata <- as.matrix(newdata)
 
-    ## Centering and scaling new individuals
-    dt.scaled <- scale(newdata, center = object$pca$center,
-        scale = object$pca$scale)
-    ## Coordinates of the individuals
-    coord_func <- function(ind, loadings) {
-        x <- loadings * ind
-        return(apply(x, 2, sum))
-    }
-    nc <- ncol(object$pca$x)
-    loadings <- object$pca$rotation[, seq_len(nc)]
-    if (nc == 1)
-        loadings <- as.matrix(loadings)
+    if (!is.null(newdata)) {
+        if (!is.null(object$interaction)) {
+            idx <- match(object$interaction, vn)
+            cnam <- colnames(newdata)
+            intr <- strsplit(vn[ idx ], "_")[[1]]
+            newdata$intr <- as.numeric(
+                            unname(newdata[, intr[1] ] * newdata[, intr[2] ]))
+            vn <- sub(":", "_", vn)
+            colnames(newdata) <- c(cnam, paste(intr, collapse = "_"))
+        }
 
-    ind.coord <- data.frame(t(apply(dt.scaled, 1, coord_func,
-        loadings)))
-    if (nc == 1) {
-        ind.coord <- as.data.frame(t(ind.coord))
-        colnames(ind.coord) <- "PC1"
-        row.names(ind.coord) <- NULL
+        newdata <- newdata[vn]
+        newdata <- as.matrix(newdata)
+
+        ## Centering and scaling new individuals
+        dt.scaled <- scale(newdata, center = object$pca$center,
+                           scale = object$pca$scale)
+        ## Coordinates of the individuals
+        coord_func <- function(ind, loadings) {
+            x <- loadings * ind
+            return(apply(x, 2, sum))
+        }
+        nc <- ncol(object$pca$x)
+        loadings <- object$pca$rotation[, seq_len(nc)]
+        if (nc == 1)
+            loadings <- as.matrix(loadings)
+
+        ind.coord <- data.frame(t(apply(dt.scaled, 1, coord_func,
+                                        loadings)))
+        if (nc == 1) {
+            ind.coord <- as.data.frame(t(ind.coord))
+            colnames(ind.coord) <- "PC1"
+            row.names(ind.coord) <- NULL
+        }
+        rm(dt.scaled, loadings); gc()
     }
 
     predictClass <- function(object, dt) {
         pred <- predict(object$logistic, newdata = dt,
                         type = "response")
-        PredClass <- rep(object$reference.level, nrow(newdata))
+        PredClass <- rep(object$reference.level, nrow(dt))
         PredClass[pred > 0.5] <- object$positive.level
         return(PredClass)
+    }
+
+    if (is.null(newdata))
+        ind.coord <- object$pca$x
+    else {
+        rm(newdata)
+        gc()
     }
 
     pred <- switch(type,
