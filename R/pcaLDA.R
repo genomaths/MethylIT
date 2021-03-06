@@ -12,7 +12,8 @@
 #'      pcaLDA' function can be used in general classification problems.
 #'
 #' @param formula Same as in 'lda'from package 'MASS'.
-#' @param data Same as in 'lda'from package 'MASS'.
+#' @param data Same as in 'lda'from package 'MASS' or an object from "pDMP" or
+#' "InfDiv" class.
 #' @param grouping Same as in 'lda' from package 'MASS'.
 #' @param n.pc Number of principal components to use in the LDA.
 #' @param scale Same as in 'prcomp' from package 'prcomp'.
@@ -20,6 +21,10 @@
 #' @param tol Same as in 'prcomp' from package 'prcomp'.
 #' @param method Same as in 'lda'from package 'MASS'.
 #' @param max.pc Same as in parameter 'rank.' from package 'prcomp'.
+#' @param columns Optional. Only used if 'data' belong to the "pDMP" or "InfDiv"
+#' class. Default is 9L.
+#' @param ... Optinal further parameters for \code{\link{uniqueGRanges}}
+#' function. Only used if 'data' belong to the "pDMP" or "InfDiv" class.
 #' @return
 #' Function 'pcaLDA' returns an object ('pcaLDA' class) consisting of list
 #' with two objects:
@@ -53,9 +58,18 @@
 #' @importFrom MASS lda
 #' @importFrom stats prcomp terms
 #' @export
-pcaLDA <- function(formula = NULL, data = NULL, grouping = NULL,
-    n.pc = 1, scale = FALSE, center = FALSE, tol = 1e-04,
-    method = "moment", max.pc = NULL) {
+pcaLDA <- function(
+                    formula = NULL,
+                    data = NULL,
+                    grouping = NULL,
+                    n.pc = 1,
+                    scale = FALSE,
+                    center = FALSE,
+                    tol = 1e-04,
+                    method = "moment",
+                    max.pc = NULL,
+                    columns = 9L,
+                    ...) {
 
     Check <- ArgumentCheck::newArgCheck()
     if (!is.null(formula) && !is(formula, "formula")) {
@@ -63,6 +77,15 @@ pcaLDA <- function(formula = NULL, data = NULL, grouping = NULL,
             "(see ?pcaLDA or ?lda).")
         ArgumentCheck::addError(msg = ans, argcheck = Check)
     }
+
+    if (!is.null(data) && inherits(data, c("pDMP", "InfDiv"))) {
+        nams <- names(data)
+        data <- uniqueGRanges(data, columns = columns, verbose = FALSE, ...)
+        data <- t(as.matrix(mcols(data)))
+        rownames(data) <- nams
+        data <- data.frame(data)
+    }
+
     if (!is.null(formula) && is(formula, "formula")) {
         vn <- try(attr(terms(formula), "term.labels"),
             silent = TRUE)
@@ -79,10 +102,12 @@ pcaLDA <- function(formula = NULL, data = NULL, grouping = NULL,
                 ans1, n.pc), argcheck = Check)
         }
     }
+
     if (is.null(formula) && is.null(grouping)) {
         ans <- "A formula or grouping varible must be provided."
         ArgumentCheck::addError(msg = ans, argcheck = Check)
     }
+
     if (is.null(formula) && !is.null(grouping)) {
         vn <- setdiff(colnames(data), as.character(grouping))
         if (length(vn) < n.pc) {
@@ -92,6 +117,7 @@ pcaLDA <- function(formula = NULL, data = NULL, grouping = NULL,
                 ans1, n.pc), argcheck = Check)
         }
     }
+
     ArgumentCheck::finishArgCheck(Check)
     if (is.null(formula) && !is.null(grouping)) {
         m <- dim(data)
@@ -101,6 +127,8 @@ pcaLDA <- function(formula = NULL, data = NULL, grouping = NULL,
             warning(paste0(ans, n.pc, ans1))
         }
     }
+
+
     if (!is.null(formula)) {
         resp <- as.character(formula)[2]
         pc <- prcomp(x = data[vn], retx = TRUE, center = center,

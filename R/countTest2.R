@@ -340,14 +340,27 @@ countTest2 <- function(DS, num.cores = 1,
               CT.CountPerBp <- unname((sum(dc[g1])/length(g1))/size)
               TT.CountPerBp <- unname((sum(dc[g2])/length(g2))/size)
             }
-            mcols(GR) <- data.frame(DS$counts, DS$optionData,
-                CT.SignalDensity = (scaling * CT.CountPerBp),
-                TT.SignalDensity = (scaling * TT.CountPerBp),
-                SignalDensityVariation = scaling *
-                    (TT.CountPerBp - CT.CountPerBp))
+
+            if (length(GR) == 1) {
+                mcols(GR) <- DataFrame(
+                    c(  DS$counts, DS$optionData,
+                        CT.SignalDensity = (scaling * CT.CountPerBp),
+                        TT.SignalDensity = (scaling * TT.CountPerBp),
+                        SignalDensityVariation = scaling *
+                            (TT.CountPerBp - CT.CountPerBp)))
+            } else
+                mcols(GR) <- DataFrame(
+                                DS$counts, DS$optionData,
+                                CT.SignalDensity = (scaling * CT.CountPerBp),
+                                TT.SignalDensity = (scaling * TT.CountPerBp),
+                                SignalDensityVariation = scaling *
+                                    (TT.CountPerBp - CT.CountPerBp))
+
             res <- GR[ order(as.factor(seqnames(GR)), start(GR)), ]
-            chr <- unique(seqnames(res))
-            seqlevels(res, pruning.mode = "coarse") <- chr
+            if (length(res) > 0 ) {
+                chr <- as.character(unique(seqnames(res)))
+                seqlevels(res, pruning.mode = "coarse") <- chr
+            }
         } else {
             res <- cbind(DS$counts, DS$optionData)
         }

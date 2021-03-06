@@ -95,3 +95,4 @@ data(PS, cutpoint)
 DMPs <- selectDIMP(PS, div.col = 9L, cutpoint = cutpoint$cutpoint)
 
 }
+\keyword{internal}

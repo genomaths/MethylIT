@@ -15,7 +15,9 @@ pcaLDA(
   center = FALSE,
   tol = 1e-04,
   method = "moment",
-  max.pc = NULL
+  max.pc = NULL,
+  columns = 9L,
+  ...
 )
 
 \method{predict}{pcaLDA}(
@@ -28,7 +30,8 @@ pcaLDA(
 \arguments{
 \item{formula}{Same as in 'lda'from package 'MASS'.}
 
-\item{data}{Same as in 'lda'from package 'MASS'.}
+\item{data}{Same as in 'lda'from package 'MASS' or an object from "pDMP" or
+"InfDiv" class.}
 
 \item{grouping}{Same as in 'lda' from package 'MASS'.}
 
@@ -44,6 +47,11 @@ pcaLDA(
 
 \item{max.pc}{Same as in parameter 'rank.' from package 'prcomp'.}
 
+\item{columns}{Optional. Only used if 'data' belong to the "pDMP" or "InfDiv"
+class. Default is 9L.}
+
+\item{...}{Not in use.}
+
 \item{object}{To use with function 'predict'. A 'pcaLDA' object containing a
 list of two objects: 1) an object of class inheriting from 'lda' and 2)
 an object of class inheriting from 'prcomp'.}
@@ -57,8 +65,6 @@ classification probabilities. Option 'lda.pred' returns the
 object given by function 'predict.lda' from MASS package: 'class',
 'posterior', 'scores' (cases scores on discriminant variables,
 see \code{\link[MASS]{lda}}.}
-
-\item{...}{Not in use.}
 }
 \value{
 Function 'pcaLDA' returns an object ('pcaLDA' class) consisting of list

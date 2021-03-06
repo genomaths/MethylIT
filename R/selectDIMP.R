@@ -98,6 +98,8 @@ selectDIMP <- function(LR, div.col = NULL, pval.col = NULL,
 
 #' @rdname selectDIMP
 #' @param object An object from 'InfDiv' class
+#' @export
+#' @keywords internal
 print.InfDiv <- function(object) {
     cat(class(object)[1]," object of length: ",
         length(object), "\n", sep = "")
@@ -116,6 +118,8 @@ print.InfDiv <- function(object) {
 
 #' @rdname selectDIMP
 #' @param object An object from 'pDMP' class
+#' @export
+#' @keywords internal
 print.pDMP <- function(object) {
     cat(class(object)[1]," object of length: ",
         length(object), "\n", sep = "")
@@ -133,6 +137,8 @@ print.pDMP <- function(object) {
 
 #' @rdname selectDIMP
 #' @param object An object from 'pDMP_OR_InfDiv' class
+#' @export
+#' @keywords internal
 print.testDMP <- function(object) {
     cat(class(object)[1]," object of length: ",
         length(object), "\n", sep = "")
