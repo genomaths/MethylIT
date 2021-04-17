@@ -15,5 +15,5 @@ test_that(".estimateGLM test", {
                               w = c(1,1), MVrate = 0.95,
                               test = "LRT")
   expect_true(y$pvalue < 0.05)
-  expect_true(y$model == "QuasiPoisson")
+  expect_true(y$model == "Neg.Binomial")
 })

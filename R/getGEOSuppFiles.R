@@ -26,7 +26,7 @@
 #' ## in variable filename. The parameter 'pattern' permits us to download only
 #' ## the specified filesCG, in this case, CG and CHG methylation contexts.
 #'
-#' \donttest{
+#' \dontrun{
 #'  filenames <- getGEOSuppFiles(GEO = 'GSM881757',
 #'                 pattern = 'G_cytosine.txt.gz')
 #'

@@ -34,11 +34,19 @@
 #'
 #' cutp
 #'
-simpleCutPoint <- function(LR, control.names, treatment.names,
-                        column, div.col, tv.col = NULL, tv.cut, clas.perf,
-                        classifier, interactions = NULL,
-                        n.pc, prop, cutp_data = FALSE, num.cores,
-                        tasks, ...) {
+simpleCutPoint <- function( LR,
+                            control.names,
+                            treatment.names,
+                            column, div.col,
+                            tv.col = NULL,
+                            tv.cut,
+                            clas.perf,
+                            classifier,
+                            interactions = NULL,
+                            n.pc, prop,
+                            cutp_data = FALSE,
+                            num.cores,
+                            tasks, ...) {
 
     LR = list(unlist(LR[control.names]), unlist(LR[treatment.names]))
     names(LR) <- c("ctrl", "treat")

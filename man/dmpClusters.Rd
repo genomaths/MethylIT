@@ -30,9 +30,9 @@ same cluster can be separated. Default: \eqn{maxDist = 3}.}
 Default: \eqn{minNumDMPs = 1}.}
 
 \item{maxClustDist}{Clusters separated by a distance lesser than
-'maxClustDist' positions are merged. Default: \eqn{maxClustDist = NULL}. If
-\eqn{0 < maxClustDist < maxDist}, then maxClustDist will be recalculated as
-\eqn{maxClustDist = maxDist + 1}.}
+maxClustDist' positions are merged. Default: \eqn{maxClustDist = NULL}. If
+\eqn{0 < maxClustDist < maxDist} or \eqn{maxClustDist = NULL}, then
+maxClustDist will be recalculated as \eqn{maxClustDist = maxDist + 1}.}
 
 \item{method}{Two different approaches are implemented to clustering DMPs:
 \describe{
@@ -97,21 +97,21 @@ considered in the computation.
 data(dmps)
 
 ## Build clusters of DMPs taking into account the DNA strand
-x1 = dmpClusters2(GR = dmps, maxDist = 7, minNumDMPs = 6,
+x1 = dmpClusters(GR = dmps, maxDist = 7, minNumDMPs = 6,
                  method = "fixed.int", ignore.strand = FALSE,
                  verbose = FALSE)
 data.frame(x1)
 
-\donttest{
+\dontrun{
 ## Build clusters of DMPs ignoring DNA strand and maxClustDist = 7
-x2 = dmpClusters2(GR = dmps, maxDist = 7, minNumDMPs = 6,
+x2 = dmpClusters(GR = dmps, maxDist = 7, minNumDMPs = 6,
                   maxClustDist = 7, method = "fixed.int",
                   num.cores=2L, ignore.strand = TRUE,
                   verbose = FALSE)
 DataFrame(data.frame(x2))
 
 ## The relaxed approach with method = "relaxed"
-x3 = dmpClusters2(GR = dmps, minNumDMPs = 6, method = "relaxed",
+x3 = dmpClusters(GR = dmps, minNumDMPs = 6, method = "relaxed",
                   maxClustDist = 10, ignore.strand = TRUE,
                   verbose = FALSE)
 DataFrame(data.frame(x3))

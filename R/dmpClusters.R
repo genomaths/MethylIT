@@ -25,11 +25,11 @@
 #' @param maxDist maximum distance at which two reported bases sites from the
 #'     same cluster can be separated. Default: \eqn{maxDist = 3}.
 #' @param minNumDMPs Minimum number of DMPs inside of each cluster.
-#'     Default: \eqn{minNumDMPs = 1}.
+#' Default: \eqn{minNumDMPs = 1}.
 #' @param maxClustDist Clusters separated by a distance lesser than
-#'   'maxClustDist' positions are merged. Default: \eqn{maxClustDist = NULL}. If
-#'   \eqn{0 < maxClustDist < maxDist}, then maxClustDist will be recalculated as
-#'   \eqn{maxClustDist = maxDist + 1}.
+#' maxClustDist' positions are merged. Default: \eqn{maxClustDist = NULL}. If
+#' \eqn{0 < maxClustDist < maxDist} or \eqn{maxClustDist = NULL}, then
+#' maxClustDist will be recalculated as \eqn{maxClustDist = maxDist + 1}.
 #' @param method Two different approaches are implemented to clustering DMPs:
 #' \describe{
 #'   \item{\strong{"relaxed":}}{DMP ranges which are separated by a distance
@@ -83,21 +83,21 @@
 #' data(dmps)
 #'
 #' ## Build clusters of DMPs taking into account the DNA strand
-#' x1 = dmpClusters2(GR = dmps, maxDist = 7, minNumDMPs = 6,
+#' x1 = dmpClusters(GR = dmps, maxDist = 7, minNumDMPs = 6,
 #'                  method = "fixed.int", ignore.strand = FALSE,
 #'                  verbose = FALSE)
 #' data.frame(x1)
 #'
-#'\donttest{
+#'\dontrun{
 #' ## Build clusters of DMPs ignoring DNA strand and maxClustDist = 7
-#' x2 = dmpClusters2(GR = dmps, maxDist = 7, minNumDMPs = 6,
+#' x2 = dmpClusters(GR = dmps, maxDist = 7, minNumDMPs = 6,
 #'                   maxClustDist = 7, method = "fixed.int",
 #'                   num.cores=2L, ignore.strand = TRUE,
 #'                   verbose = FALSE)
 #' DataFrame(data.frame(x2))
 #'
 #' ## The relaxed approach with method = "relaxed"
-#' x3 = dmpClusters2(GR = dmps, minNumDMPs = 6, method = "relaxed",
+#' x3 = dmpClusters(GR = dmps, minNumDMPs = 6, method = "relaxed",
 #'                   maxClustDist = 10, ignore.strand = TRUE,
 #'                   verbose = FALSE)
 #' DataFrame(data.frame(x3))
@@ -145,7 +145,6 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
     if (length(GR) == 1) GR <- unlist(GR, use.names = FALSE)
 
     method <- match.arg(method)
-
     if (method == "fixed.int") {
 
         GR <- meth_status(gr = GR, chromosomes = chromosomes,
@@ -157,8 +156,7 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
     }
     if (method == "relaxed") {
         if (is.null(maxClustDist))
-            stop('\n*** If method = "relaxed", then a value for "maxClustDist"',
-                ' must be provided')
+            maxClustDist = maxDist + 1
         # if gr is a GRangesList object
         if (inherits(GR, "GRangesList")) {
             if (verbose)
@@ -198,8 +196,8 @@ dmpClusters <- function(GR, maxDist = 3, minNumDMPs = 1,
     if (verbose) message("\n*** Counting DMPs in clusters ...\n")
 
     if (!is.null(maxClustDist) && is.numeric(maxClustDist)) {
-
-        if (maxClustDist < maxDist) maxClustDist <- maxDist + 1
+        if (maxClustDist < maxDist)
+            maxClustDist <- maxDist + 1
         if (verbose)
             message("\n *** Joining clusters separated by a distance < ",
                     maxClustDist, " bp")

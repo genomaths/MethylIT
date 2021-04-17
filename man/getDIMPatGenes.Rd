@@ -15,12 +15,29 @@ getDIMPatGenes(
   type = "within",
   ignore.strand = TRUE,
   output = c("list", "GRanges"),
+  by.coord = FALSE,
   ...
 )
 
-\method{getDIMPatGenes}{default}(GR, GENES, type = "within", ignore.strand = TRUE, ...)
+\method{getDIMPatGenes}{default}(
+  GR,
+  GENES,
+  type = "within",
+  ignore.strand = TRUE,
+  output = NULL,
+  by.coord = FALSE,
+  ...
+)
 
-\method{getDIMPatGenes}{GRanges}(GR, GENES, type = "within", ignore.strand = TRUE, ...)
+\method{getDIMPatGenes}{GRanges}(
+  GR,
+  GENES,
+  type = "within",
+  ignore.strand = TRUE,
+  output = NULL,
+  by.coord = FALSE,
+  ...
+)
 
 \method{getDIMPatGenes}{pDMP}(
   GR,
@@ -28,6 +45,7 @@ getDIMPatGenes(
   type = "within",
   ignore.strand = TRUE,
   output = c("list", "GRanges"),
+  by.coord = FALSE,
   ...
 )
 
@@ -37,6 +55,7 @@ getDIMPatGenes(
   type = "within",
   ignore.strand = TRUE,
   output = c("list", "GRanges"),
+  by.coord = FALSE,
   ...
 )
 
@@ -46,6 +65,7 @@ getDIMPatGenes(
   type = "within",
   ignore.strand = TRUE,
   output = c("list", "GRanges"),
+  by.coord = FALSE,
   ...
 )
 }
@@ -54,16 +74,18 @@ getDIMPatGenes(
 GRangesList, GRanges or a list of GRanges.}
 
 \item{GENES}{A GRanges object with gene coordinates and gene IDs. A
-column named \strong{'gene_id'} carrying the gene ids should be
-included in the metacolumns. If the meta-column named 'gene_id'
-is not provided, then gene (region) ids will be created using the
-gene (region) coordinates.}
+column named \strong{'gene_id'} carrying the gene ids should be included in
+the metacolumns. If the meta-column named 'gene_id' is not provided, then
+gene (region) ids will be created using the gene (region) coordinates.}
 
 \item{ignore.strand, type}{Same as for
 \code{\link[GenomicRanges]{findOverlaps-methods}}.}
 
 \item{output}{Class of the object to be returned, a "list", or a "GRanges"
 object.}
+
+\item{by.coord}{logical(1). If TRUE, then the DMP are count per coordinate
+and not per gene id.}
 
 \item{...}{optional arguments for
 \code{\link[GenomicRanges]{findOverlaps-methods}}. Users must evaluate
@@ -76,6 +98,12 @@ A a list GRanges object.
 The function counts DMPs overlapping with gene-body. In fact,
 this function also can be used to count DMPs overlapping with any set of
 regions given in a GRanges object.
+}
+\details{
+If \strong{\emph{by.coord == FALSE}} and "gene_id" is provided
+in \strong{\emph{GENES}} argument, then DMP counts are made per gene-id.
+Hence, DMPs from different regions with the same gene-id, say e.g. exons,
+will be pooled in the count as they bear the same id.
 }
 \examples{
 ## Gene annotation

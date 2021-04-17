@@ -116,12 +116,9 @@ testing when \emph{simple} = FALSE The mapping for statistic names are:
 \item 12 = FDR
 }}
 
-\item{cutp_data}{Logic (optional). If TRUE, and simple = TRUE, then a
+\item{cutp_data}{logical(1) (optional). If TRUE, and simple = TRUE, then a
 data frame for further analysis or estimation of the optimal cutpoint
-based  only on the selected divergence is provided. A further analysis
-for the estimation of an “optimal” cutpoints can be accomplish, for
-example with function \code{\link[cutpointr]{cutpointr}} from the R
-package \strong{cutpointr}.}
+based  only on the selected divergence is provided.}
 
 \item{num.cores, tasks}{Parameters for parallel computation using package
 \code{\link[BiocParallel]{BiocParallel-package}}: the number of cores to

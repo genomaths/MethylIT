@@ -116,12 +116,9 @@
 #'          \item 11 = 'Balanced Accuracy'
 #'          \item 12 = FDR
 #' }
-#' @param cutp_data Logic (optional). If TRUE, and simple = TRUE, then a
-#'     data frame for further analysis or estimation of the optimal cutpoint
-#'     based  only on the selected divergence is provided. A further analysis
-#'     for the estimation of an “optimal” cutpoints can be accomplish, for
-#'     example with function \code{\link[cutpointr]{cutpointr}} from the R
-#'     package \strong{cutpointr}.
+#' @param cutp_data logical(1) (optional). If TRUE, and simple = TRUE, then a
+#' data frame for further analysis or estimation of the optimal cutpoint
+#' based  only on the selected divergence is provided.
 #' @param ... arguments passed to or from other methods.
 #' @return Depending the parameter setting will return the following list with
 #'     elements:

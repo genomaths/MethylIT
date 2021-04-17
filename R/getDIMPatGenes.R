@@ -4,18 +4,22 @@
 #' @description The function counts DMPs overlapping with gene-body. In fact,
 #'     this function also can be used to count DMPs overlapping with any set of
 #'     regions given in a GRanges object.
-#'
+#' @details If \strong{\emph{by.coord == FALSE}} and "gene_id" is provided
+#' in \strong{\emph{GENES}} argument, then DMP counts are made per gene-id.
+#' Hence, DMPs from different regions with the same gene-id, say e.g. exons,
+#' will be pooled in the count as they bear the same id.
 #' @param GR An objects object from the any of the classes: 'pDMP', 'InfDiv',
-#'     GRangesList, GRanges or a list of GRanges.
+#' GRangesList, GRanges or a list of GRanges.
 #' @param GENES A GRanges object with gene coordinates and gene IDs. A
-#'     column named \strong{'gene_id'} carrying the gene ids should be
-#'     included in the metacolumns. If the meta-column named 'gene_id'
-#' is not provided, then gene (region) ids will be created using the
-#' gene (region) coordinates.
+#' column named \strong{'gene_id'} carrying the gene ids should be included in
+#' the metacolumns. If the meta-column named 'gene_id' is not provided, then
+#' gene (region) ids will be created using the gene (region) coordinates.
 #' @param output Class of the object to be returned, a "list", or a "GRanges"
 #'  object.
 #' @param ignore.strand,type Same as for
 #'  \code{\link[GenomicRanges]{findOverlaps-methods}}.
+#' @param by.coord logical(1). If TRUE, then the DMP are count per coordinate
+#' and not per gene id.
 #' @param ... optional arguments for
 #'  \code{\link[GenomicRanges]{findOverlaps-methods}}. Users must evaluate
 #'  whether specific setting makes sense on each particular context.
@@ -48,36 +52,78 @@
 #' @importFrom data.table data.table
 #' @importFrom rtracklayer import
 #' @export
-getDIMPatGenes <- function(GR, GENES, type = "within",
+getDIMPatGenes <- function( GR,
+                            GENES,
+                            type = "within",
                             ignore.strand = TRUE,
-                            output = c("list", "GRanges"), ...)
+                            output = c("list", "GRanges"),
+                            by.coord = FALSE,
+                            ...)
                         UseMethod("getDIMPatGenes")
 
 #' @rdname getDIMPatGenes
 #' @importFrom S4Vectors mcols
 #' @export
-getDIMPatGenes.default <- function(GR, GENES, type = "within",
-                                    ignore.strand = TRUE, ...) {
+getDIMPatGenes.default <- function( GR,
+                                    GENES,
+                                    type = "within",
+                                    ignore.strand = TRUE,
+                                    output = NULL,
+                                    by.coord = FALSE,
+                                    ...) {
+    coord_id <- NULL
     gene_id <- GENES$gene_id
     if (any(is.na(gene_id))) {
         warnings("At least one gene ID is NA. Using gene coordinates as IDs")
         gene_id <- NULL
     }
-    if (is.null(gene_id)) {
+    if ((is.null(gene_id) || all(is.na(gene_id))) && !by.coord) {
         chr = seqnames(GENES)
         starts = start(GENES)
         ends = end(GENES)
         strands = strand(GENES)
-        GENES$gene_id <- paste(chr, starts, ends, strands, sep = "_")
+        if (ignore.strand)
+            GENES$gene_id <- paste(chr, starts, ends, sep = "_")
+        else
+            GENES$gene_id <- paste(chr, starts, ends, strands, sep = "_")
     }
+
+    if (by.coord) {
+        if (ignore.strand)
+            GENES$coord_id <- paste(seqnames(GENES),
+                                    start(GENES),
+                                    end(GENES),
+                                    sep = "_")
+        else
+            GENES$coord_id <- paste(seqnames(GENES),
+                                    start(GENES),
+                                    end(GENES),
+                                    strand(GENES),
+                                    sep = "_")
+    }
+
     Hits <- findOverlaps(GR, GENES, type = type,
                         ignore.strand = ignore.strand, ...)
     if (length(Hits) > 0) {
         DIMP <- GENES[subjectHits(Hits)]
-        DIMP <- data.table(as.data.frame(DIMP))
-        DIMP <- DIMP[, list(seqnames = unique(seqnames), start = min(start),
-                            end = max(end), DIMPs = length(start)),
-                    by = gene_id]
+        names(DIMP) <- NULL
+        if (by.coord) {
+            DIMP <- data.table(as.data.frame(DIMP))
+            DIMP <- DIMP[, list(seqnames = unique(seqnames),
+                                start = min(start),
+                                end = max(end),
+                                DIMPs = length(start)),
+                         by = coord_id]
+        }
+        else {
+            DIMP <- data.table(as.data.frame(DIMP))
+            DIMP <- DIMP[, list(seqnames = unique(seqnames),
+                                start = min(start),
+                                end = max(end),
+                                DIMPs = length(start)),
+                         by = gene_id]
+        }
+
         DIMP <- data.frame(DIMP)
         DIMP <- makeGRangesFromDataFrame(DIMP, keep.extra.columns = TRUE)
         Hits <- findOverlaps(DIMP, GENES, type = type,
@@ -97,8 +143,13 @@ getDIMPatGenes.default <- function(GR, GENES, type = "within",
 #' @rdname getDIMPatGenes
 #' @importFrom S4Vectors mcols
 #' @export
-getDIMPatGenes.GRanges <- function(GR, GENES, type = "within",
-                                    ignore.strand = TRUE, ...) {
+getDIMPatGenes.GRanges <- function( GR,
+                                    GENES,
+                                    type = "within",
+                                    ignore.strand = TRUE,
+                                    output = NULL,
+                                    by.coord = FALSE,
+                                    ...) {
     vn <- c("hdiv", "TV", "wprob")
     ns <- colnames(mcols(GR))
     nams <- sum(is.element(vn, ns))
@@ -109,22 +160,36 @@ getDIMPatGenes.GRanges <- function(GR, GENES, type = "within",
             " named columns to be used as an argument for 'getDIMPatGenes'")
     }
 
-    GR <- getDIMPatGenes.default(GR, GENES = GENES, type = type,
-                                ignore.strand = ignore.strand, ...)
+    GR <- getDIMPatGenes.default(
+                                GR,
+                                GENES = GENES,
+                                type = type,
+                                ignore.strand = ignore.strand,
+                                by.coord = by.coord,
+                                ...)
     return(GR)
 }
 
 #' @rdname getDIMPatGenes
 #' @export
-getDIMPatGenes.pDMP <- function(GR, GENES, type = "within",
+getDIMPatGenes.pDMP <- function(GR,
+                                GENES,
+                                type = "within",
                                 ignore.strand = TRUE,
-                                output = c("list", "GRanges"), ...) {
+                                output = c("list", "GRanges"),
+                                by.coord = FALSE,
+                                ...) {
     output <- match.arg(output)
     gene_id <- GENES$gene_id
     if (any(is.na(gene_id))) gene_id <- NULL
 
-    dmps <- lapply(GR, getDIMPatGenes.default, GENES = GENES, type = type,
-                    ignore.strand = ignore.strand, ...)
+    dmps <- lapply( GR,
+                    getDIMPatGenes.default,
+                    GENES = GENES,
+                    type = type,
+                    ignore.strand = ignore.strand,
+                    by.coord = by.coord,
+                    ...)
 
     if (output == "GRanges") {
         nams <- names(dmps)
@@ -146,15 +211,25 @@ getDIMPatGenes.pDMP <- function(GR, GENES, type = "within",
 
 #' @rdname getDIMPatGenes
 #' @export
-getDIMPatGenes.InfDiv <- function(GR, GENES, type = "within",
-                                ignore.strand = TRUE,
-                                output = c("list", "GRanges"), ...) {
+getDIMPatGenes.InfDiv <- function(
+                                  GR,
+                                  GENES,
+                                  type = "within",
+                                  ignore.strand = TRUE,
+                                  output = c("list", "GRanges"),
+                                  by.coord = FALSE,
+                                  ...) {
     output <- match.arg(output)
     gene_id <- GENES$gene_id
     if (any(is.na(gene_id))) gene_id <- NULL
 
-    dmps <- lapply(GR, getDIMPatGenes.default, GENES = GENES, type = type,
-                    ignore.strand = ignore.strand, ...)
+    dmps <- lapply( GR,
+                    getDIMPatGenes.default,
+                    GENES = GENES,
+                    type = type,
+                    ignore.strand = ignore.strand,
+                    by.coord = by.coord,
+                    ...)
 
     if (output == "GRanges") {
         nams <- names(dmps)
@@ -175,15 +250,25 @@ getDIMPatGenes.InfDiv <- function(GR, GENES, type = "within",
 
 #' @rdname getDIMPatGenes
 #' @export
-getDIMPatGenes.list <- function(GR, GENES, type = "within",
+getDIMPatGenes.list <- function(
+                                GR,
+                                GENES,
+                                type = "within",
                                 ignore.strand = TRUE,
-                                output = c("list", "GRanges"), ...) {
+                                output = c("list", "GRanges"),
+                                by.coord = FALSE,
+                                ...) {
     output <- match.arg(output)
     gene_id <- GENES$gene_id
     if (any(is.na(gene_id))) gene_id <- NULL
 
-    dmps <- lapply(GR, getDIMPatGenes.default, GENES = GENES, type = type,
-                    ignore.strand = ignore.strand, ...)
+    dmps <- lapply( GR,
+                    getDIMPatGenes.default,
+                    GENES = GENES,
+                    type = type,
+                    ignore.strand = ignore.strand,
+                    by.coord = by.coord,
+                    ...)
 
     if (output == "GRanges") {
         nams <- names(dmps)

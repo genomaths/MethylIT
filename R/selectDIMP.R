@@ -97,59 +97,59 @@ selectDIMP <- function(LR, div.col = NULL, pval.col = NULL,
 
 
 #' @rdname selectDIMP
-#' @param object An object from 'InfDiv' class
+#' @param x An object from 'InfDiv' class
 #' @export
 #' @keywords internal
-print.InfDiv <- function(object) {
-    cat(class(object)[1]," object of length: ",
-        length(object), "\n", sep = "")
+print.InfDiv <- function(x, ...) {
+    cat(class(x)[1]," object of length: ",
+        length(x), "\n", sep = "")
     cat("------- \n")
-    class(object) <- "GRangesList"
-    print(object[1])
+    class(x) <- "GRangesList"
+    print(x[1])
     cat("...\n")
     cat("<",
-        length(object) - 1,
-        " more ", class(object[[1]]), " elements>\n",
+        length(x) - 1,
+        " more ", class(x[[1]]), " elements>\n",
         sep = "")
     cat("------- \n")
-    invisible(object)
+    invisible(x)
 }
 
 
 #' @rdname selectDIMP
-#' @param object An object from 'pDMP' class
+#' @param x An object from 'pDMP' class
 #' @export
 #' @keywords internal
-print.pDMP <- function(object) {
-    cat(class(object)[1]," object of length: ",
-        length(object), "\n", sep = "")
+print.pDMP <- function(x, ...) {
+    cat(class(x)[1]," object of length: ",
+        length(x), "\n", sep = "")
     cat("------- \n")
-    class(object) <- "GRangesList"
-    print(object[1])
+    class(x) <- "GRangesList"
+    print(x[1])
     cat("...\n")
     cat("<",
-        length(object) - 1,
-        " more ", class(object[[1]]), " elements>\n",
+        length(x) - 1,
+        " more ", class(x[[1]]), " elements>\n",
         sep = "")
     cat("------- \n")
-    invisible(object)
+    invisible(x)
 }
 
 #' @rdname selectDIMP
-#' @param object An object from 'pDMP_OR_InfDiv' class
+#' @param x An object from 'pDMP_OR_InfDiv' class
 #' @export
 #' @keywords internal
-print.testDMP <- function(object) {
-    cat(class(object)[1]," object of length: ",
-        length(object), "\n", sep = "")
+print.testDMP <- function(x, ...) {
+    cat(class(x)[1]," object of length: ",
+        length(x), "\n", sep = "")
     cat("------- \n")
-    class(object) <- "GRangesList"
-    print(object[1])
+    class(x) <- "GRangesList"
+    print(x[1])
     cat("...\n")
     cat("<",
-        length(object) - 1,
-        " more ", class(object[[1]]), " elements>\n",
+        length(x) - 1,
+        " more ", class(x[[1]]), " elements>\n",
         sep = "")
     cat("------- \n")
-    invisible(object)
+    invisible(x)
 }

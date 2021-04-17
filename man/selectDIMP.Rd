@@ -17,11 +17,11 @@ selectDIMP(
   tv.cut = NULL
 )
 
-\method{print}{InfDiv}(object)
+\method{print}{InfDiv}(x, ...)
 
-\method{print}{pDMP}(object)
+\method{print}{pDMP}(x, ...)
 
-\method{print}{testDMP}(object)
+\method{print}{testDMP}(x, ...)
 }
 \arguments{
 \item{LR}{An object from 'pDMP' class.}
@@ -51,7 +51,7 @@ cytosine positions (if provided).}
 \item{tv.cut}{If tv.cut and tv.col are provided, then cytosine sites \eqn{k}
 with \eqn{|TV| < tv.cut} are removed.}
 
-\item{object}{An object from 'pDMP_OR_InfDiv' class}
+\item{x}{An object from 'pDMP_OR_InfDiv' class}
 }
 \value{
 An object from 'pDMP' class containing only differentially
