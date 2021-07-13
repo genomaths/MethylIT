@@ -14,6 +14,8 @@ getDIMPatGenes(
   GENES,
   type = "within",
   ignore.strand = TRUE,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
   output = c("list", "GRanges"),
   by.coord = FALSE,
   ...
@@ -24,6 +26,8 @@ getDIMPatGenes(
   GENES,
   type = "within",
   ignore.strand = TRUE,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
   output = NULL,
   by.coord = FALSE,
   ...
@@ -34,6 +38,8 @@ getDIMPatGenes(
   GENES,
   type = "within",
   ignore.strand = TRUE,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
   output = NULL,
   by.coord = FALSE,
   ...
@@ -44,6 +50,8 @@ getDIMPatGenes(
   GENES,
   type = "within",
   ignore.strand = TRUE,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
   output = c("list", "GRanges"),
   by.coord = FALSE,
   ...
@@ -54,6 +62,8 @@ getDIMPatGenes(
   GENES,
   type = "within",
   ignore.strand = TRUE,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
   output = c("list", "GRanges"),
   by.coord = FALSE,
   ...
@@ -64,6 +74,8 @@ getDIMPatGenes(
   GENES,
   type = "within",
   ignore.strand = TRUE,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
   output = c("list", "GRanges"),
   by.coord = FALSE,
   ...
@@ -80,6 +92,9 @@ gene (region) ids will be created using the gene (region) coordinates.}
 
 \item{ignore.strand, type}{Same as for
 \code{\link[GenomicRanges]{findOverlaps-methods}}.}
+
+\item{only.hypo, only.hyper}{logical(1). Whether to select only
+hypo-methylated or hyper-methylated cytosine sites.}
 
 \item{output}{Class of the object to be returned, a "list", or a "GRanges"
 object.}

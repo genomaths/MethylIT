@@ -16,7 +16,10 @@
 #' @keywords internal
 #' @export
 predict.ldaDMP <- function(object, ...) UseMethod("predict")
-predict.ldaDMP <- function(object, newdata,
+
+predict.ldaDMP <- function(
+                        object,
+                        newdata,
                         type = c("class", "posterior", "scores", "lda.pred"),
                         ...) {
     if (!inherits(object, "ldaDMP")) {
@@ -32,11 +35,11 @@ predict.ldaDMP <- function(object, newdata,
             position <- function(gr) {
                 chrs <- split(gr, seqnames(gr))
                 gr <- lapply(chrs, function(grc) {
-                    x <- start(grc)
-                    x.min <- min(x)
-                    x.max <- max(x)
-                    delta <-  max(c(x.max - x, 1))
-                    return((x - x.min) / (delta))})
+                                        x <- start(grc)
+                                        x.min <- min(x)
+                                        x.max <- max(x)
+                                        delta <-  max(c(x.max - x, 1))
+                                        return((x - x.min) / (delta))})
                 return(unlist(gr))
             }
             newdata$pos <- position(newdata)

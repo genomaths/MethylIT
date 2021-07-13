@@ -4,7 +4,13 @@
 \alias{estimateJDiv}
 \title{J Information Divergence of Methylation Levels}
 \usage{
-estimateJDiv(p, logbase = 2)
+estimateJDiv(
+  p,
+  logbase = 2,
+  stat = FALSE,
+  n = NULL,
+  output = c("single", "all")
+)
 }
 \arguments{
 \item{p}{A numerical vector of the methylation levels p = c(p1, p2) from
@@ -12,6 +18,12 @@ individuals 1 and 2.}
 
 \item{logbase}{Logarithm base used to compute the JD. Logarithm base 2 is
 used as default. Use logbase = exp(1) for natural logarithm.}
+
+\item{stat}{logical(1). Whether to compute the statistic with asymptotic
+Chi-squared distribution with one degree of freedom (details).}
+
+\item{output}{Optional. If 'stat = TRUE', whether to return \eqn{JD} and its
+asymptotic chi-squared statistic.}
 }
 \value{
 The J divergence value for the given methylation levels is
@@ -28,8 +40,7 @@ cytosine site, this function computes the J information divergence
 the divergence as: \eqn{D_{KL}(P || Q) + D_{KL}(Q || P)}, which
 is symmetric and nonnegative, where the probability distributions
 \emph{P} and \emph{Q} are defined on the same probability space
-(see
-\href{https://is.gd/oS8Bwv}{Wikipedia}).
+(see reference (1) and \href{https://is.gd/oS8Bwv}{Wikipedia}).
 \item In general, \emph{JD} is highly correlated with Hellinger
 divergence, which is the main divergence currently used in
 Methyl-IT (see examples for function
@@ -52,6 +63,16 @@ is computed as in reference (1-2):
                         (q_i - p_{ij}) * log((1 - p_{ij})/(1 - q_i)))/2}
 
 Missing methylation levels, reported as NA or NaN, are replaced with zero.
+
+The statistic with asymptotic Chi-squared distribution is based on the
+statistic suggested by Kupperman (1957) (2) for \eqn{D_{KL}} and commented in
+references (3-4). That is,
+
+\deqn{ 2*(n_{1} + 1)*(n_{2} + 1)*JD(p^{ij}, q^i)/(n_1 + n_2 + 2)}
+
+Where \eqn{n_{1}} and \eqn{n_{2}} are the total counts (coverage in the case
+of methylation) used to compute the probabilities \eqn{p_{ij}} and
+\eqn{q_i}. A basic Bayesian correction is added to prevent zero counts.
 }
 \examples{
 p <- c(0.5, 0.5)
@@ -67,6 +88,18 @@ estimateJDiv(p) == estimateJDiv(q)
 }
 \references{
 \enumerate{
+\item Kullback S, Leibler RA. On Information and Sufficiency.
+Ann Math Stat. 1951;22: 79–86. doi:10.1214/aoms/1177729694.
+\item Kupperman, M., 1957. Further application to information theory to
+multivariate analysis and statistical inference. Ph.D.
+Dissertation, George Washington University.
+\item Salicrú M, Morales D, Menéndez ML, Pardo L. On the applications of
+divergence type measures in testing statistical hypotheses.
+Journal of Multivariate Analysis. 1994. pp. 372–391.
+doi:10.1006/jmva.1994.1068.
+\item Basu A, Mandal A, Pardo L. Hypothesis testing for two discrete
+populations based on the Hellinger distance. Stat Probab Lett.
+Elsevier B.V.; 2010;80: 206–214. doi:10.1016/j.spl.2009.10.008.
 \item J. K. Chung, P. L. Kannappan, C. T. Ng, P. K. Sahoo, Measures of
 distance between probability distributions. J. Math. Anal. Appl.
 138, 280–292 (1989).

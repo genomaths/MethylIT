@@ -14,10 +14,12 @@
 #' column named \strong{'gene_id'} carrying the gene ids should be included in
 #' the metacolumns. If the meta-column named 'gene_id' is not provided, then
 #' gene (region) ids will be created using the gene (region) coordinates.
-#' @param output Class of the object to be returned, a "list", or a "GRanges"
-#'  object.
+#' @param only.hypo,only.hyper logical(1). Whether to select only
+#' hypo-methylated or hyper-methylated cytosine sites.
 #' @param ignore.strand,type Same as for
 #'  \code{\link[GenomicRanges]{findOverlaps-methods}}.
+#' @param output Class of the object to be returned, a "list", or a "GRanges"
+#' object.
 #' @param by.coord logical(1). If TRUE, then the DMP are count per coordinate
 #' and not per gene id.
 #' @param ... optional arguments for
@@ -56,6 +58,8 @@ getDIMPatGenes <- function( GR,
                             GENES,
                             type = "within",
                             ignore.strand = TRUE,
+                            only.hypo = FALSE,
+                            only.hyper = FALSE,
                             output = c("list", "GRanges"),
                             by.coord = FALSE,
                             ...)
@@ -68,9 +72,22 @@ getDIMPatGenes.default <- function( GR,
                                     GENES,
                                     type = "within",
                                     ignore.strand = TRUE,
+                                    only.hypo = FALSE,
+                                    only.hyper = FALSE,
                                     output = NULL,
                                     by.coord = FALSE,
                                     ...) {
+
+    if (!inherits(GR, "GRanges"))
+        stop("*** The 'GR' argument must inherit from 'GRanges-class'.")
+
+    if (!is.null(GR$TV) && is.numeric(GR$TV)) {
+        if (only.hypo)
+            GR <- GR[ GR$TV < 0]
+        if (only.hyper)
+            GR <- GR[ GR$TV > 0]
+    }
+
     coord_id <- NULL
     gene_id <- GENES$gene_id
     if (any(is.na(gene_id))) {
@@ -112,6 +129,7 @@ getDIMPatGenes.default <- function( GR,
             DIMP <- DIMP[, list(seqnames = unique(seqnames),
                                 start = min(start),
                                 end = max(end),
+                                gene_id = unique(gene_id),
                                 DIMPs = length(start)),
                          by = coord_id]
         }
@@ -126,15 +144,15 @@ getDIMPatGenes.default <- function( GR,
 
         DIMP <- data.frame(DIMP)
         DIMP <- makeGRangesFromDataFrame(DIMP, keep.extra.columns = TRUE)
-        Hits <- findOverlaps(DIMP, GENES, type = type,
-                            ignore.strand = ignore.strand, ...)
+        Hits <- findOverlaps(DIMP, GENES, type = "equal",
+                             ignore.strand = FALSE)
         GENES <- GENES[subjectHits(Hits), ]
-        DIMP <- as.data.frame(DIMP[queryHits(Hits), ])
-        mcols(GENES) <- data.frame(GeneID = GENES$gene_id, DIMPs = DIMP$DIMPs)
+        DIMP <- as.data.frame(DIMP[ queryHits(Hits) ])
+        mcols(GENES) <- data.frame(gene_id = GENES$gene_id, DIMPs = DIMP$DIMPs)
     } else {
         GENES <- GRanges()
-        mcols(GENES) <- data.frame(GeneID = factor(),
-            DIMPs = integer())
+        mcols(GENES) <- data.frame( gene_id = factor(),
+                                    DIMPs = integer())
     }
 
     return(unique(GENES))
@@ -147,6 +165,8 @@ getDIMPatGenes.GRanges <- function( GR,
                                     GENES,
                                     type = "within",
                                     ignore.strand = TRUE,
+                                    only.hypo = FALSE,
+                                    only.hyper = FALSE,
                                     output = NULL,
                                     by.coord = FALSE,
                                     ...) {
@@ -165,6 +185,8 @@ getDIMPatGenes.GRanges <- function( GR,
                                 GENES = GENES,
                                 type = type,
                                 ignore.strand = ignore.strand,
+                                only.hypo = only.hypo,
+                                only.hyper = only.hyper,
                                 by.coord = by.coord,
                                 ...)
     return(GR)
@@ -176,6 +198,8 @@ getDIMPatGenes.pDMP <- function(GR,
                                 GENES,
                                 type = "within",
                                 ignore.strand = TRUE,
+                                only.hypo = FALSE,
+                                only.hyper = FALSE,
                                 output = c("list", "GRanges"),
                                 by.coord = FALSE,
                                 ...) {
@@ -188,6 +212,8 @@ getDIMPatGenes.pDMP <- function(GR,
                     GENES = GENES,
                     type = type,
                     ignore.strand = ignore.strand,
+                    only.hypo = only.hypo,
+                    only.hyper = only.hyper,
                     by.coord = by.coord,
                     ...)
 
@@ -216,6 +242,8 @@ getDIMPatGenes.InfDiv <- function(
                                   GENES,
                                   type = "within",
                                   ignore.strand = TRUE,
+                                  only.hypo = FALSE,
+                                  only.hyper = FALSE,
                                   output = c("list", "GRanges"),
                                   by.coord = FALSE,
                                   ...) {
@@ -228,6 +256,8 @@ getDIMPatGenes.InfDiv <- function(
                     GENES = GENES,
                     type = type,
                     ignore.strand = ignore.strand,
+                    only.hypo = only.hypo,
+                    only.hyper = only.hyper,
                     by.coord = by.coord,
                     ...)
 
@@ -255,6 +285,8 @@ getDIMPatGenes.list <- function(
                                 GENES,
                                 type = "within",
                                 ignore.strand = TRUE,
+                                only.hypo = FALSE,
+                                only.hyper = FALSE,
                                 output = c("list", "GRanges"),
                                 by.coord = FALSE,
                                 ...) {
@@ -267,6 +299,8 @@ getDIMPatGenes.list <- function(
                     GENES = GENES,
                     type = type,
                     ignore.strand = ignore.strand,
+                    only.hypo = only.hypo,
+                    only.hyper = only.hyper,
                     by.coord = by.coord,
                     ...)
 

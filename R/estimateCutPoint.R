@@ -166,7 +166,8 @@ estimateCutPoint <- function(LR,
                             control.names,
                             treatment.names,
                             simple = TRUE,
-                            column = c(hdiv = TRUE, TV = TRUE,
+                            column = c(hdiv = TRUE, jdiv= TRUE,
+                                       jdiv.stat = FALSE, TV = TRUE,
                                        bay.TV = FALSE, wprob = TRUE,
                                        pos = TRUE),
                             classifier1 = c("logistic", "pca.logistic", "lda",
@@ -216,7 +217,7 @@ estimateCutPoint <- function(LR,
     # ----------------------- valid 'pDMP' bject-------------------------- #
     validateClass(LR)
     # -------------------------------------------------------------------------
-    vn <- c("hdiv", "TV")
+    vn <- c("hdiv", "jdiv", "jdiv.stat", "TV")
     vn <- vn[match(TRUE, column[vn])]
     if (is.null(div.col))
         div.col <- vn

@@ -45,6 +45,9 @@
 #' @param JD Logic (Default:FALSE). Option on whether to add a column with
 #'     values of J-information divergence (see \code{\link{estimateJDiv}}).
 #'     It is only compute if JD = TRUE and meth.level = FALSE.
+#' @param jd.stat logical(1). Whether to compute the \eqn{JD} statistic with
+#' asymptotic Chi-squared distribution with one degree of freedom (see
+#' \code{\link{estimateJDiv}}).
 #' @param num.cores The number of cores to use, i.e. at most how many child
 #'     processes will be run simultaneously (see 'bplapply' function from
 #'     BiocParallel package).
@@ -66,11 +69,6 @@
 #' @param logbase Logarithm base used to compute the JD (if JD = TRUE).
 #'     Logarithm base 2 is used as default (bit unit). Use logbase = exp(1) for
 #'     natural logarithm.
-#' @param init.pars  initial parameter values. Defaults is NULL and an initial
-#' guess is estimated using \code{\link[stats]{optim}} function. If the initial
-#' guessing fails initial parameter values are to alpha = 1 &
-#' beta = 1, which imply the parsimony pseudo-counts greater than zero.
-#'
 #' @param verbose if TRUE, prints the function log to stdout
 #' @param ... Optional parameter values for: maxiter, ftol, ptol, and gradtol
 #' from \code{\link[minpack.lm]{nlsLM}} and \code{\link[stats]{nlm}} functions.
@@ -142,11 +140,13 @@
 #' @importFrom GenomicRanges GRanges
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom S4Vectors mcols<-
+#' @importFrom data.table rbindlist
 #' @export
 estimateBayesianDivergence <- function(x,
                                     Bayesian = FALSE,
                                     init.pars = NULL,
                                     JD = FALSE,
+                                    jd.stat = FALSE,
                                     num.cores = 1,
                                     tasks = 0L,
                                     columns = c(mC1 = 1,uC1 = 2,
@@ -157,7 +157,9 @@ estimateBayesianDivergence <- function(x,
                                     verbose = TRUE,
                                     ...) {
 
-    if (verbose) progressbar <- TRUE else progressbar <- FALSE
+    progressbar <- FALSE
+    if (verbose)
+        progressbar <- TRUE
     if (Sys.info()["sysname"] == "Linux")
         bpparam <- MulticoreParam(workers = num.cores, tasks = tasks,
                                 progressbar = progressbar)
@@ -234,8 +236,7 @@ estimateBayesianDivergence <- function(x,
             estimateHellingerDiv(p = as.numeric(x[i, ]),
                                 n = as.numeric(n[i, ]))
         }, BPPARAM = bpparam)
-        if (verbose)
-            cat("* Coercing from list to vector...\n")
+
         hdiv <- unlist(hdiv)
         if (Bayesian) {
             x <- data.frame(x0, p1, p2, TV, p2 - p1,
@@ -247,12 +248,29 @@ estimateBayesianDivergence <- function(x,
             colnames(x) <- c("c1", "t1", "c2", "t2",
                 "p1", "p2", "TV", "hdiv")
         }
+
         if (JD) {
+            if (verbose)
+                cat("*** Estimating J-divergence...\n")
+
             jdiv <- bplapply(seq_len(nrow(x)), function(i) {
-                estimateJDiv(p = as.numeric(x[i, c("p1", "p2")]),
-                            logbase = logbase)
+                jd <- estimateJDiv(p = as.numeric(x[i, c("p1", "p2")]),
+                            logbase = logbase,
+                            stat = jd.stat,
+                            n = as.numeric(n[i, ]),
+                            output = "all")
+                if (jd.stat)
+                    return(data.frame(t(as.matrix(jd))))
+                else
+                    return(jd)
             }, BPPARAM = bpparam)
-            x$jdiv <- unlist(jdiv)
+            if (jd.stat) {
+                jdiv <- rbindlist(jdiv)
+                x$jdiv <- jdiv$X1
+                x$jdiv.stat <- jdiv$X2
+            }
+            else
+                x$jdiv <- unlist(jdiv)
         }
     } else {
         if (length(columns) > 2) columns <- c(1, 2)
@@ -263,11 +281,12 @@ estimateBayesianDivergence <- function(x,
         hdiv <- bplapply(seq_len(nrow(x)), function(i) {
                                 estimateHellingerDiv(p = as.numeric(x[i,]))},
                         BPPARAM = bpparam)
-        if (verbose)
-            cat("* Coercing from list to vector...\n")
         hdiv <- unlist(hdiv)
         x <- data.frame(x, TV = x[, 2] - x[, 1], hdiv)
         colnames(x) <- c("p1", "p2", "TV", "hdiv")
+
+        if (verbose)
+            cat("*** Estimating J-divergence...\n")
         if (JD) {
             jdiv <- bplapply(seq_len(nrow(x)), function(i) {
                             estimateJDiv(p = as.numeric(x[i, c("p1", "p2")]),
@@ -278,12 +297,21 @@ estimateBayesianDivergence <- function(x,
     }
     if (!ismatrix) {
         if (preserve.gr) {
-            if (JD)
-                mcols(HDiv) <- data.frame(mcols(HDiv),
-                                    x[, c("p1", "p2", "TV", "hdiv", "jdiv")])
+            if (JD) {
+                if (jd.stat) {
+                    x <- x[, c("p1", "p2", "TV", "hdiv", "jdiv", "jdiv.stat")]
+                    mcols(HDiv) <- data.frame(mcols(HDiv), x)
+                }
+                else {
+                    x <- x[, c("p1", "p2", "TV", "hdiv", "jdiv")]
+                    mcols(HDiv) <- data.frame(mcols(HDiv), x)
+                }
+            }
             else mcols(HDiv) <- data.frame(mcols(HDiv),
                                             x[, c("p1", "p2", "TV", "hdiv")])
-        } else mcols(HDiv) <- x
+        } else
+            mcols(HDiv) <- x
         return(HDiv)
-    } else return(x)
+    } else
+        return(x)
 }

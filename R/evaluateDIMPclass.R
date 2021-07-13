@@ -118,7 +118,8 @@
 #' @export
 evaluateDIMPclass <- function(LR,
                             control.names, treatment.names,
-                            column = c(hdiv = FALSE, TV = FALSE,
+                            column = c( hdiv = FALSE, jdiv = FALSE,
+                                        jdiv.stat = FALSE, TV = FALSE,
                                         bay.TV = FALSE, wprob = FALSE,
                                         pos = FALSE),
                             classifier = c("logistic", "pca.logistic",
@@ -145,40 +146,54 @@ evaluateDIMPclass <- function(LR,
     if (sum(column) == 0)
         stop(paste("*** At least one of columns with the predictor variables",
             " 'hdiv', 'TV', 'bay.TV', 'wprob', or pos' must be provided"))
-    if ((classifier[1] != "logistic") && sum(column) <
-        n.pc) {
+    if ((classifier[1] != "logistic") && sum(column) < n.pc) {
         stop(paste("* The number of predictor variables must be greater or ",
             "equal to n.pc"))
     }
     set.seed(seed)
 
     ## ================== To build the regression formula ================== ##
-    vn <- c("hdiv", "TV", "bay.TV", "logP", "pos")
-    cols <- c(hdiv = FALSE, TV = FALSE, bay.TV = FALSE,
-        wprob = FALSE, pos = FALSE)
+    vn <- c("hdiv", "jdiv", "jdiv.stat", "TV", "bay.TV", "logP", "pos")
+    cols <- c(hdiv = FALSE, jdiv = FALSE, jdiv.stat = FALSE, TV = FALSE,
+              bay.TV = FALSE, wprob = FALSE, pos = FALSE)
     idx <- !is.element(names(cols), names(column))
     column <- c(column, cols[idx])
-    column <- column[c("hdiv", "TV", "bay.TV", "wprob", "pos")]
+    column <- column[ c("hdiv", "jdiv", "jdiv.stat", "TV",
+                        "bay.TV", "wprob", "pos")]
 
     cn <- column
-    names(cn) <- c("hdiv", "TV", "bay.TV", "logP", "pos")
+    names(cn) <- c( "hdiv", "jdiv", "jdiv.stat",
+                    "TV", "bay.TV", "logP", "pos" )
     form <- as.character(outer(vn, vn, FUN = paste,  sep = ":"))
-    form <- form[c(2:6, 8:12, 14:18, 20:24)]
-    inter <- c(`hdiv:TV` = FALSE, `hdiv:logP` = FALSE, `hdiv:pos` = FALSE,
-                `hdiv:bay.TV` = FALSE, `TV:hdiv` = FALSE, `TV:logP` = FALSE,
-                `TV:pos` = FALSE, `TV:bay.TV` = FALSE,
-                `bay.TV:hdiv` = FALSE, `bay.TV:logP` = FALSE,
-                `bay.TV:pos` = FALSE, `bay.TV:TV` = FALSE,
-                `logP:hdiv` = FALSE, `logP:TV` = FALSE,
-                `logP:pos` = FALSE, `logP:bay.TV` = FALSE,
-                `pos:hdiv` = FALSE, `pos:TV` = FALSE,
-                `pos:logP` = FALSE, `pos:bay.TV` = FALSE)
+    form <- form[c(2:8, 10:16, 18:24, 26:32, 34:40, 42:48)]
+    inter <- c( "jdiv:hdiv" = FALSE, "jdiv.stat:hdiv" = FALSE,
+                "TV:hdiv" = FALSE, "bay.TV:hdiv" = FALSE,
+                "logP:hdiv" = FALSE, "pos:hdiv" = FALSE,
+                "hdiv:jdiv" = FALSE, "jdiv.stat:jdiv" = FALSE,
+                "TV:jdiv" = FALSE, "bay.TV:jdiv" = FALSE,
+                "logP:jdiv" = FALSE, "pos:jdiv" = FALSE,
+                "hdiv:jdiv.stat" = FALSE, "jdiv:jdiv.stat" = FALSE,
+                "TV:jdiv.stat" = FALSE, "bay.TV:jdiv.stat" = FALSE,
+                "logP:jdiv.stat" = FALSE, "pos:jdiv.stat" = FALSE,
+                "hdiv:TV" = FALSE, "jdiv:TV" = FALSE,
+                "jdiv.stat:TV" = FALSE, "bay.TV:TV" = FALSE,
+                "logP:TV" = FALSE, "pos:TV" = FALSE,
+                "hdiv:bay.TV" = FALSE, "jdiv:bay.TV" = FALSE,
+                "jdiv.stat:bay.TV" = FALSE, "TV:bay.TV" = FALSE,
+                "logP:bay.TV" = FALSE, "pos:bay.TV" = FALSE,
+                "hdiv:logP" = FALSE, "jdiv:logP" = FALSE,
+                "jdiv.stat:logP" = FALSE, "TV:logP" = FALSE,
+                "bay.TV:logP" = FALSE, "pos:logP" = FALSE,
+                "hdiv:pos" = FALSE, "jdiv:pos" = FALSE,
+                "jdiv.stat:pos" = FALSE, "TV:pos" = FALSE,
+                "bay.TV:pos" = FALSE, "logP:pos" = FALSE )
     if (!is.null(interactions) && (classifier[1] == "logistic" ||
                                     classifier[1] == "pca.logistic")) {
         if (sum(grepl("wprob", interactions)) > 0) {
             idx <- sub("wprob", "logP", interactions)
             inter[idx] <- TRUE
-        } else inter[interactions] <- TRUE
+        } else
+            inter[interactions] <- TRUE
     }
 
     if (sum(inter) > 0 && (classifier[1] == "logistic" ||
@@ -384,7 +399,7 @@ position <- function(gr) {
 
 DIV <- function(LR, classifier, interactions, column, pval.col) {
 
-    vn <- c("hdiv", "TV", "bay.TV", "wprob", "pos")
+    vn <- c("hdiv", "jdiv", "jdiv.stat","TV", "bay.TV", "wprob", "pos")
     if (classifier[1] == "logistic" || classifier[1] == "pca.logistic") {
         if (!is.null(interactions)) {
             idx <- unlist(lapply(vn, function(s)
@@ -400,17 +415,23 @@ DIV <- function(LR, classifier, interactions, column, pval.col) {
     for (k in seq_along(LR)) {
         dc <- c()
         x <- LR[[k]]
-        if (!is.null(pval.col)) x$wprob <- mcols(x[, pval.col])[, 1]
+        if (!is.null(pval.col))
+            x$wprob <- mcols(x[, pval.col])[, 1]
         x <- x[, vn]
-        if (column["hdiv"]) dc <- cbind(dc, hdiv = x$hdiv)
-
-        if (column["TV"]) dc <- cbind(dc, TV = x$TV)
-
-        if (column["bay.TV"]) dc <- cbind(dc, bay.TV = x$bay.TV)
-
-        if (column["wprob"]) dc <- cbind(dc, logP = log10(x$wprob + 2.2e-308))
-
-        if (column["pos"]) dc = cbind(dc, pos = position(x))
+        if (column["hdiv"])
+            dc <- cbind(dc, hdiv = x$hdiv)
+        if (column["jdiv"])
+            dc <- cbind(dc, jdiv = x$jdiv)
+        if (column["jdiv.stat"])
+            dc <- cbind(dc, jdiv.stat = x$jdiv.stat)
+        if (column["TV"])
+            dc <- cbind(dc, TV = x$TV)
+        if (column["bay.TV"])
+            dc <- cbind(dc, bay.TV = x$bay.TV)
+        if (column["wprob"])
+            dc <- cbind(dc, logP = log10(x$wprob + 2.2e-308))
+        if (column["pos"])
+            dc = cbind(dc, pos = position(x))
 
         if (!is.null(interactions) && (!column["pos"])) {
             if (sum(grepl("pos", interactions)) > 0)

@@ -35,15 +35,22 @@
 #'                  div.col = 9L)
 #' cutp
 
-mlCutpoint <- function(LR,
-                    control.names, treatment.names,
-                    column, div.col, tv.col = NULL,
-                    tv.cut, post.cut = 0.5,
-                    classifier1, classifier2 = NULL,
-                    interactions = NULL,
-                    n.pc, prop = 0.6,
-                    stat = 0L,  cut.values = NULL,
-                    num.cores = 1L, tasks = 0L, ...) {
+mlCutpoint <- function( LR,
+                        control.names,
+                        treatment.names,
+                        column,
+                        div.col,
+                        tv.col = NULL,
+                        tv.cut,
+                        post.cut = 0.5,
+                        classifier1,
+                        classifier2 = NULL,
+                        interactions = NULL,
+                        n.pc, prop = 0.6,
+                        stat = 0L,
+                        cut.values = NULL,
+                        num.cores = 1L,
+                        tasks = 0L, ...) {
 
     LR = list(unlist(LR[control.names]), unlist(LR[treatment.names]))
     names(LR) <- c("ctrl", "treat")
@@ -74,8 +81,10 @@ mlCutpoint <- function(LR,
     res$postCut <- cutp
     cuts <- cutp
     if (stat %in% seq_len(11)) st <- conf.mat$Performance$byClass[stat]
-    if (stat == 0) st <- conf.mat$Performance$overall[1]
-    if (stat == 12) st <- conf.mat$FDR
+    if (stat == 0)
+        st <- conf.mat$Performance$overall[1]
+    if (stat == 12)
+        st <- conf.mat$FDR
 
     if (!is.null(cut.values)) {
         if (is.numeric(cut.values)) {
@@ -87,36 +96,49 @@ mlCutpoint <- function(LR,
         } else warning("Parameter cut.values must be numeric. Ignored")
     }
     if (length(cuts) > 1) {
-        cut_search <- cutpoint_search(LR = LR, column = column,
-                                div.col = div.col, cuts = cuts,
-                                tv.col = tv.col, tv.cut = tv.cut,
+        cut_search <- cutpoint_search(
+                                LR = LR,
+                                column = column,
+                                div.col = div.col,
+                                cuts = cuts,
+                                tv.col = tv.col,
+                                tv.cut = tv.cut,
                                 classifier = classifier2[1],
                                 interactions = interactions,
                                 prop = prop,
-                                n.pc = n.pc, st = st,
+                                n.pc = n.pc,
+                                st = st,
                                 num.cores = num.cores,
-                                tasks = tasks, stat = stat, ...)
+                                tasks = tasks,
+                                stat = stat, ...)
 
         dmps <- cut_search$dmps
         cutp <- cut_search$cut
         conf.mat <- cut_search$cfm
         st <- cut_search$st
     } else {
-        dmps <- selectDIMP(LR, div.col = div.col,
-                            cutpoint = cutp, tv.col = tv.col,
+        dmps <- selectDIMP( LR,
+                            div.col = div.col,
+                            cutpoint = cutp,
+                            tv.col = tv.col,
                             tv.cut = tv.cut)
-        conf.mat <- evaluateDIMPclass(LR = dmps,
-                                    column = column, control.names = "ctrl",
+        conf.mat <- evaluateDIMPclass(
+                                    LR = dmps,
+                                    column = column,
+                                    control.names = "ctrl",
                                     treatment.names = "treat",
                                     classifier = classifier2[1],
                                     interactions = interactions,
-                                    prop = prop, output = "conf.mat",
-                                    n.pc = n.pc, num.cores = num.cores,
+                                    prop = prop,
+                                    output = "conf.mat",
+                                    n.pc = n.pc,
+                                    num.cores = num.cores,
                                     tasks = tasks, ...)
         if (stat == 0)  st <- conf.mat$Performance$overall[1]
         if (stat %in% seq_len(11)) st <- conf.mat$Performance$byClass[stat]
     }
-    predClasses <- predict(object = conf.mat$model, newdata = dmps,
+    predClasses <- predict( object = conf.mat$model,
+                            newdata = dmps,
                             type = "class")
     predClasses <- factor(predClasses, levels = c("CT", "TT"))
     classes <- c(rep("CT", length(dmps$ctrl)),
@@ -145,9 +167,20 @@ mlCutpoint <- function(LR,
 
 # ========================= Auxiliary function ======================== ###
 
-cutpoint_search <- function(LR, column, div.col, cuts, tv.col, tv.cut,
-                            classifier, prop, n.pc, st, num.cores, tasks,
-                            interactions, stat, ...) {
+cutpoint_search <- function(LR,
+                            column,
+                            div.col,
+                            cuts,
+                            tv.col,
+                            tv.cut,
+                            classifier,
+                            prop,
+                            n.pc,
+                            st,
+                            num.cores,
+                            tasks,
+                            interactions,
+                            stat, ...) {
     k = 1
     opt <- FALSE
     overcut <- FALSE

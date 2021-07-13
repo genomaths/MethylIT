@@ -12,6 +12,8 @@
 #'     meta-column named 'gene_id' carying the gene ids should be included. If
 #'     the meta-column named 'gene_id' is not provided, then gene (region) ids
 #'     will be created using the gene (region) coordinates.
+#' @param only.hypo,only.hyper logical(1). Whether to select only
+#' hypo-methylated or hyper-methylated cytosine sites.
 #' @param ignore.strand,type Same as for
 #'  \code{\link[GenomicRanges]{findOverlaps-methods}}
 #' @param ... optional arguments for
@@ -42,15 +44,38 @@
 #' @importFrom data.table data.table
 #' @importFrom rtracklayer import
 #' @export
-getDMPatRegions <- function(GR, regions, type = "within",
-                            ignore.strand = TRUE, ...)
+getDMPatRegions <- function(
+                            GR,
+                            regions,
+                            only.hypo = FALSE,
+                            only.hyper = FALSE,
+                            type = "within",
+                            ignore.strand = TRUE,
+                            ...)
                         UseMethod("getDMPatRegions")
 
 #' @rdname getDMPatRegions
 #' @importFrom S4Vectors mcols
 #' @export
-getDMPatRegions.default <- function(GR, regions, type = "within",
-                                    ignore.strand = TRUE, ...) {
+getDMPatRegions.default <- function(
+                                    GR,
+                                    regions,
+                                    only.hypo = FALSE,
+                                    only.hyper = FALSE,
+                                    type = "within",
+                                    ignore.strand = TRUE,
+                                    ...) {
+
+    if (!inherits(GR, "GRanges"))
+        stop("*** The 'GR' argument must inherit from 'GRanges-class'.")
+
+    if (!is.null(GR$TV) && is.numeric(GR$TV)) {
+        if (only.hypo)
+            GR <- GR[ GR$TV < 0]
+        if (only.hyper)
+            GR <- GR[ GR$TV > 0]
+    }
+
     gene_id <- regions$gene_id
     if (any(is.na(gene_id))) {
         warnings("At least one gene ID is NA. Using gene coordinates as IDs")
@@ -90,36 +115,86 @@ getDMPatRegions.default <- function(GR, regions, type = "within",
 #' @rdname getDMPatRegions
 #' @importFrom S4Vectors mcols
 #' @export
-getDMPatRegions.GRanges <- function(GR, regions, type = "within",
-                                    ignore.strand = TRUE, ...) {
-    GR <- getDMPatRegions.default(GR, regions = regions, type = type,
-                                ignore.strand = ignore.strand, ...)
+getDMPatRegions.GRanges <- function(
+                                    GR,
+                                    regions,
+                                    only.hypo = FALSE,
+                                    only.hyper = FALSE,
+                                    type = "within",
+                                    ignore.strand = TRUE,
+                                    ...) {
+    GR <- getDMPatRegions.default(
+                                    GR,
+                                    regions = regions,
+                                    only.hypo = only.hypo,
+                                    only.hyper = only.hyper,
+                                    type = type,
+                                    ignore.strand = ignore.strand,
+                                    ...)
     return(GR)
 }
 
 #' @rdname getDMPatRegions
 #' @export
-getDMPatRegions.pDMP <- function(GR, regions, type = "within",
-                                ignore.strand = TRUE, ...) {
-    return(lapply(GR, getDMPatRegions.default, regions = regions,
-                type = type, ignore.strand = ignore.strand,
-                keep.attr = TRUE, ...))
+getDMPatRegions.pDMP <- function(
+                                GR,
+                                regions,
+                                only.hypo = FALSE,
+                                only.hyper = FALSE,
+                                type = "within",
+                                ignore.strand = TRUE,
+                                ...) {
+    return(lapply( GR,
+                   getDMPatRegions.default,
+                   regions = regions,
+                   only.hypo = only.hypo,
+                   only.hyper = only.hyper,
+                   type = type,
+                   ignore.strand = ignore.strand,
+                   keep.attr = TRUE,
+                   ...))
 }
 
 #' @rdname getDMPatRegions
 #' @export
-getDMPatRegions.InfDiv <- function(GR, regions, type = "within",
-                                    ignore.strand = TRUE, ...) {
-    return(lapply(GR, getDMPatRegions.default, regions = regions, type = type,
-                ignore.strand = ignore.strand, keep.attr = TRUE, ...))
+getDMPatRegions.InfDiv <- function(
+                                    GR,
+                                    regions,
+                                    only.hypo = FALSE,
+                                    only.hyper = FALSE,
+                                    type = "within",
+                                    ignore.strand = TRUE,
+                                    ...) {
+    return(lapply(  GR,
+                    getDMPatRegions.default,
+                    regions = regions,
+                    only.hypo = only.hypo,
+                    only.hyper = only.hyper,
+                    type = type,
+                    ignore.strand = ignore.strand,
+                    keep.attr = TRUE,
+                    ...))
 }
 
 #' @rdname getDMPatRegions
 #' @export
-getDMPatRegions.list <- function(GR, regions, type = "within",
-                                ignore.strand = TRUE, ...) {
-    return(lapply(GR, getDMPatRegions.default, regions = regions, type = type,
-                ignore.strand = ignore.strand, keep.attr = TRUE, ...))
+getDMPatRegions.list <- function(
+                                GR,
+                                regions,
+                                only.hypo = FALSE,
+                                only.hyper = FALSE,
+                                type = "within",
+                                ignore.strand = TRUE,
+                                ...) {
+    return(lapply(  GR,
+                    getDMPatRegions.default,
+                    regions = regions,
+                    only.hypo = only.hypo,
+                    only.hyper = only.hyper,
+                    type = type,
+                    ignore.strand = ignore.strand,
+                    keep.attr = TRUE,
+                    ...))
 }
 
 

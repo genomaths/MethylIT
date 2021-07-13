@@ -35,9 +35,13 @@
 #' @importFrom BiocParallel MulticoreParam bplapply SnowParam
 #' @importFrom stats na.omit
 #' @export
-predict.LogisticR <- function(object, newdata = NULL,
-    type = c("all", "class", "posterior"), num.cores = 1L,
-    tasks = 0L, ...) {
+predict.LogisticR <- function(
+                            object,
+                            newdata = NULL,
+                            type = c("all", "class", "posterior"),
+                            num.cores = 1L,
+                            tasks = 0L,
+                            ...) {
     type <- type[1]
     if (!is.element(type, c("class", "all", "posterior")))
         stop("The type setting '", type, "' does not exist")
@@ -66,7 +70,7 @@ predict.LogisticR <- function(object, newdata = NULL,
             })
             return(unlist(gr))
         }
-        v <- c("hdiv", "TV", "bay.TV", "logP", "pos")
+        v <- c("hdiv", "jdiv", "jdiv.stat","TV", "bay.TV", "logP", "pos")
         vn <- setdiff(names(coef(object$modeling)),
             "(Intercept)")
         v <- v[na.omit(match(vn, v))]
@@ -76,16 +80,32 @@ predict.LogisticR <- function(object, newdata = NULL,
 
         if (is.list(newdata)) {
             dt <- lapply(newdata, function(x) {
-                df <- data.frame(hdiv = x$hdiv, TV = x$TV, bay.TV = x$bay.TV,
+                if (!is.null(x$jdiv))
+                df <- data.frame(
+                                hdiv = x$hdiv,
+                                TV = x$TV,
+                                bay.TV = x$bay.TV,
                                 logP = log10(x$wprob + 2.2e-308))
-                if (is.element("pos", vn)) df$pos = position(x)
+
+                if (!is.null(x$jdiv))
+                    df$jdiv <- x$jdiv
+                if (!is.null(x$jdiv.stat))
+                    df$jdiv.stat <- x$jdiv.stat
+                if (is.element("pos", vn))
+                    df$pos = position(x)
                 df <- as.matrix(df[, vn])
                 df <- scale(df, center = object$center, scale = object$scale)
                 return(data.frame(df))
             })
         } else {
-            dt <- cbind(hdiv = newdata$hdiv, TV = newdata$TV,
-                logP = log10(newdata$wprob + 2.2e-308))
+            dt <- cbind(hdiv = newdata$hdiv,
+                        TV = newdata$TV,
+                        logP = log10(newdata$wprob + 2.2e-308))
+
+            if (!is.null(newdata$jdiv))
+                df$jdiv <- newdata$jdiv
+            if (!is.null(newdata$jdiv.stat))
+                df$jdiv.stat <- newdata$jdiv.stat
             if (is.element("pos", vn))
                 dt$pos = position(newdata)
             dt <- as.matrix(dt[, vn])

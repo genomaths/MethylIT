@@ -37,7 +37,8 @@
 simpleCutPoint <- function( LR,
                             control.names,
                             treatment.names,
-                            column, div.col,
+                            column,
+                            div.col,
                             tv.col = NULL,
                             tv.cut,
                             clas.perf,
@@ -127,7 +128,7 @@ simpleCutPoint <- function( LR,
     ## LR to be used for ROC analysis LR: list of sample
     ## GRanges
     if (is.null(div.col))
-    stop(paste("* Provide a divergence column"))
+        stop(paste("* Provide a divergence column"))
 
     dt <- list(ctrl = data.frame(), treat = data.frame())
     dt$ctrl <- data.frame(idiv = abs(mcols(LR$ctrl[, div.col])[, 1]),

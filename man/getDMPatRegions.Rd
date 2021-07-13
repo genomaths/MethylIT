@@ -9,17 +9,65 @@
 \alias{getDMPatRegions.list}
 \title{Count DMPs at Genomic Regions}
 \usage{
-getDMPatRegions(GR, regions, type = "within", ignore.strand = TRUE, ...)
+getDMPatRegions(
+  GR,
+  regions,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
+  type = "within",
+  ignore.strand = TRUE,
+  ...
+)
 
-\method{getDMPatRegions}{default}(GR, regions, type = "within", ignore.strand = TRUE, ...)
+\method{getDMPatRegions}{default}(
+  GR,
+  regions,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
+  type = "within",
+  ignore.strand = TRUE,
+  ...
+)
 
-\method{getDMPatRegions}{GRanges}(GR, regions, type = "within", ignore.strand = TRUE, ...)
+\method{getDMPatRegions}{GRanges}(
+  GR,
+  regions,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
+  type = "within",
+  ignore.strand = TRUE,
+  ...
+)
 
-\method{getDMPatRegions}{pDMP}(GR, regions, type = "within", ignore.strand = TRUE, ...)
+\method{getDMPatRegions}{pDMP}(
+  GR,
+  regions,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
+  type = "within",
+  ignore.strand = TRUE,
+  ...
+)
 
-\method{getDMPatRegions}{InfDiv}(GR, regions, type = "within", ignore.strand = TRUE, ...)
+\method{getDMPatRegions}{InfDiv}(
+  GR,
+  regions,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
+  type = "within",
+  ignore.strand = TRUE,
+  ...
+)
 
-\method{getDMPatRegions}{list}(GR, regions, type = "within", ignore.strand = TRUE, ...)
+\method{getDMPatRegions}{list}(
+  GR,
+  regions,
+  only.hypo = FALSE,
+  only.hyper = FALSE,
+  type = "within",
+  ignore.strand = TRUE,
+  ...
+)
 }
 \arguments{
 \item{GR}{An objects object from the any of the classes: 'pDMP', 'InfDiv',
@@ -29,6 +77,9 @@ GRangesList, GRanges or a list of GRanges.}
 meta-column named 'gene_id' carying the gene ids should be included. If
 the meta-column named 'gene_id' is not provided, then gene (region) ids
 will be created using the gene (region) coordinates.}
+
+\item{only.hypo, only.hyper}{logical(1). Whether to select only
+hypo-methylated or hyper-methylated cytosine sites.}
 
 \item{ignore.strand, type}{Same as for
 \code{\link[GenomicRanges]{findOverlaps-methods}}}

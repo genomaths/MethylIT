@@ -122,6 +122,9 @@
 #' @param JD Logic (Default:FALSE). Option on whether to add a column with
 #'     values of J-information divergence (see \code{\link{estimateJDiv}}).
 #'     It is only compute if JD = TRUE and meth.level = FALSE.
+#' @param jd.stat logical(1). Whether to compute the \eqn{JD} statistic with
+#' asymptotic Chi-squared distribution with one degree of freedom (see
+#' \code{\link{estimateJDiv}}).
 #' @param num.cores The number of cores to use, i.e. at most how many child
 #'     processes will be run simultaneously (see 'bplapply' function from
 #'     BiocParallel package).
@@ -213,7 +216,9 @@ estimateDivergence <- function(
                         min.sitecov = 4,
                         high.coverage = NULL,
                         percentile = 0.999,
-                        JD = FALSE, num.cores = 1L,
+                        JD = FALSE,
+                        jd.stat = FALSE,
+                        num.cores = 1L,
                         tasks = 0L,
                         meth.level = FALSE,
                         logbase = 2,
@@ -281,8 +286,9 @@ estimateDivergence <- function(
             x = estimateBayesianDivergence(
                                         x,
                                         Bayesian = Bayesian,
-                                        JD = JD,
                                         init.pars = init.pars,
+                                        JD = JD,
+                                        jd.stat = jd.stat,
                                         num.cores = num.cores,
                                         tasks = tasks,
                                         meth.level = meth.level,

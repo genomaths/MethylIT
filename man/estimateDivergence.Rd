@@ -17,6 +17,7 @@ estimateDivergence(
   high.coverage = NULL,
   percentile = 0.999,
   JD = FALSE,
+  jd.stat = FALSE,
   num.cores = 1L,
   tasks = 0L,
   meth.level = FALSE,
@@ -81,6 +82,10 @@ files stacked.}
 \item{JD}{Logic (Default:FALSE). Option on whether to add a column with
 values of J-information divergence (see \code{\link{estimateJDiv}}).
 It is only compute if JD = TRUE and meth.level = FALSE.}
+
+\item{jd.stat}{logical(1). Whether to compute the \eqn{JD} statistic with
+asymptotic Chi-squared distribution with one degree of freedom (see
+\code{\link{estimateJDiv}}).}
 
 \item{num.cores}{The number of cores to use, i.e. at most how many child
 processes will be run simultaneously (see 'bplapply' function from
