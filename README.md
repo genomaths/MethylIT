@@ -83,7 +83,7 @@ Ubuntu
 
 Install R dependencies:
     
-    install.packages(c("ArgumentCheck", "caret", "Epi", "e1071", "minpack.lm", "nls2", "caTools", "rmarkdown",   "RCurl"),dependencies=TRUE)
+    install.packages(c("caret", "Epi", "e1071", "minpack.lm", "nls2", "caTools", "rmarkdown",   "RCurl"),dependencies=TRUE)
     
     BiocManager::install(c('BiocParallel', 'biovizBase', 'genefilter', 'GenomeInfoDb', 'GenomicRanges'))
 

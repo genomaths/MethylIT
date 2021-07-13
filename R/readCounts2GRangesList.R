@@ -67,54 +67,52 @@
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #'
 #' @export
-readCounts2GRangesList <- function(filenames = NULL,
-    sample.id = NULL, pattern = NULL, remove = FALSE,
-    columns = c(seqnames = NULL, start = NULL, end = NULL,
-        strand = NULL, fraction = NULL, percent = NULL,
-        mC = NULL, uC = NULL, coverage = NULL, context = NULL,
-        signal = NULL),
-    chromosome.names = NULL, chromosomes = NULL, verbose = TRUE,
-    ...) {
+readCounts2GRangesList <- function(
+                                filenames = NULL,
+                                sample.id = NULL,
+                                pattern = NULL,
+                                remove = FALSE,
+                                columns = c(seqnames = NULL, start = NULL,
+                                            end = NULL, strand = NULL,
+                                            fraction = NULL, percent = NULL,
+                                            mC = NULL, uC = NULL,
+                                            coverage = NULL, context = NULL,
+                                            signal = NULL),
+                                chromosome.names = NULL,
+                                chromosomes = NULL,
+                                verbose = TRUE,
+                                ...) {
 
     colns <- c("seqnames", "start", "end", "strand",
         "fraction", "percent", "mC", "uC", "coverage",
         "context", "signal")
-    Check <- ArgumentCheck::newArgCheck()
     if (is.null(filenames)) {
-        ArgumentCheck::addError(msg = "No file names provided",
-            argcheck = Check)
+        stop("*** No file names provided")
     }
     for (file in filenames) {
         if (!file.exists(file)) {
-            ArgumentCheck::addError(msg = paste0("Unable to find: ",
-                file), argcheck = Check)
+            stop(paste0("*** Unable to find: ", file))
         }
     }
     cn <- names(columns)
     if (!is.element("seqnames", cn) || !is.element("start", cn)) {
-        text <- paste0("You must provide the numbers for ",
-                        "'seqnames' (chromosomes names), ", "  'start' columns")
-        ArgumentCheck::addError(msg = text, argcheck = Check)
+        stop(paste0("*** You must provide the numbers for ",
+                "'seqnames' (chromosomes names), ", "  'start' columns"))
     }
 
     gz.ext = "[.]gz$"
     if (grepl(gz.ext, "", filenames) && sum(is.element(filenames,
         sub(gz.ext, "", filenames))) > 0) {
-        text <- paste0("File duplication. File: \n",
-                    filenames[is.element(filenames, sub(gz.ext,"", filenames))],
-                    "\n is also provided in compressed format '.gz' \n")
-        ArgumentCheck::addError(msg = text, argcheck = Check)
+        stop(paste0("*** File duplication. File: \n",
+                filenames[is.element(filenames, sub(gz.ext,"", filenames))],
+                "\n is also provided in compressed format '.gz' \n"))
     }
 
     idx <- is.element(names(columns), colns)
     if (sum(idx) != length(columns)) {
-        text <- paste0("Probably you have a typing mistake ",
-                        "in the column names: ", "'", names(columns)[!idx],
-                        "'")
-        ArgumentCheck::addError(msg = text, argcheck = Check)
+        stop(paste0("Probably you have a typing mistake ",
+            "in the column names: ", "'", names(columns)[!idx], "'"))
     }
-
-    ArgumentCheck::finishArgCheck(Check)
 
     columns <- as.integer(columns)
 

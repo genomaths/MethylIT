@@ -28,7 +28,6 @@ biocViews:
   DifferentialExpression, Biophysics
 LazyData: yes
 Imports:
-  ArgumentCheck,
   BiocGenerics,
   BiocParallel,
   caret,

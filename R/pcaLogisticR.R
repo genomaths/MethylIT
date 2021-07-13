@@ -60,11 +60,9 @@ pcaLogisticR <- function(formula = NULL,
                         tol = 1e-04,
                         max.pc = NULL) {
 
-    Check <- ArgumentCheck::newArgCheck()
     if (!is.null(formula) && !is(formula, "formula")) {
-        ans <- paste("A formula of the form groups ~ x1 + x2 + ... (see",
-            "?pcaLogisticR or ?glm).", sep = "")
-        ArgumentCheck::addError(msg = ans, argcheck = Check)
+        stop(paste("*** A formula of the form groups ~ x1 + x2 + ... ",
+            "must be provided (see ?pcaLogisticR or ?glm)."))
     }
 
     if (!is.null(formula) && is(formula, "formula")) {
@@ -77,19 +75,15 @@ pcaLogisticR <- function(formula = NULL,
         if (inherits(vn, "try-error"))
             stop("* Error in the formula")
         if (length(vn) < n.pc) {
-            ans <- "The number of number predictor variables greater than "
-            ans1 <- "the number of principal components: "
-            ArgumentCheck::addError(msg = paste0(ans,
-                ans1, n.pc), argcheck = Check)
+            stop(paste0("The number of number predictor variables is",
+                "greater than the number of principal components"))
+
         }
     }
 
     if (is.null(formula)) {
-        ans <- "A formula or grouping variable must be provided."
-        ArgumentCheck::addError(msg = ans, argcheck = Check)
+        stop("*** A formula or grouping variable must be provided.")
     }
-
-    ArgumentCheck::finishArgCheck(Check)
 
     m = nrow(data)
     if (floor(m/3) < n.pc) {

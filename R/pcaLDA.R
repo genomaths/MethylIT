@@ -71,54 +71,45 @@ pcaLDA <- function(
                     columns = 9L,
                     ...) {
 
-    Check <- ArgumentCheck::newArgCheck()
     if (!is.null(formula) && !is(formula, "formula")) {
-        ans <- paste("A formula of the form groups ~ x1 + x2 + ...",
-            "(see ?pcaLDA or ?lda).")
-        ArgumentCheck::addError(msg = ans, argcheck = Check)
-    }
-
-    if (!is.null(data) && inherits(data, c("pDMP", "InfDiv"))) {
-        nams <- names(data)
-        data <- uniqueGRanges(data, columns = columns, verbose = FALSE, ...)
-        data <- t(as.matrix(mcols(data)))
-        rownames(data) <- nams
-        data <- data.frame(data)
+        stop(paste("*** A formula of the form groups ~ x1 + x2 + ...",
+                   "must be provided (see ?pcaQDA or ?qda)."))
     }
 
     if (!is.null(formula) && is(formula, "formula")) {
         vn <- try(attr(terms(formula), "term.labels"),
-            silent = TRUE)
+                  silent = TRUE)
         if (inherits(vn, "try-error")) {
             vn <- try(setdiff(colnames(data), as.character(formula)[2]),
-                silent = TRUE)
+                      silent = TRUE)
         }
         if (inherits(vn, "try-error"))
             stop("* Error in the formula")
         if (length(vn) < n.pc) {
-            ans <- "The number of number predictor variables greater than "
-            ans1 <- "the number of principal components: "
-            ArgumentCheck::addError(msg = paste0(ans,
-                ans1, n.pc), argcheck = Check)
+            stop(paste0("*** The number of number predictor variables ",
+                "greater than or equal the number of principal components"))
         }
     }
-
     if (is.null(formula) && is.null(grouping)) {
-        ans <- "A formula or grouping varible must be provided."
-        ArgumentCheck::addError(msg = ans, argcheck = Check)
+        stop("*** A formula or grouping variable must be provided.")
     }
-
     if (is.null(formula) && !is.null(grouping)) {
         vn <- setdiff(colnames(data), as.character(grouping))
         if (length(vn) < n.pc) {
-            ans <- "The number of number predictor variables must be greater "
-            ans1 <- "than or equal the number of principal components: "
-            ArgumentCheck::addError(msg = paste0(ans,
-                ans1, n.pc), argcheck = Check)
+            stop(paste0("*** The number of number predictor variables ",
+                "greater than or equal the number of principal components"))
         }
     }
 
-    ArgumentCheck::finishArgCheck(Check)
+    if (is.null(formula) && !is.null(grouping)) {
+        m <- dim(data)
+        if (floor(m[1]/3) < n.pc) {
+            ans <- "*** The number principal components: "
+            ans1 <- " must be lower than the number of individuals N/3 \n"
+            stop(paste0(ans, n.pc, ans1))
+        }
+    }
+
     if (is.null(formula) && !is.null(grouping)) {
         m <- dim(data)
         if (floor(m[1]/3) < n.pc) {
