@@ -1,3 +1,13 @@
+# MethylIT 0.3.2.2
+* Current version 
+* Actively used in methylome analysis
+* In development     
+   * 07-14-21:    
+         1) Upgrading corresponding to R version 4.1.0.     
+              - Prevent potential crash originated by changes in some 
+                R packages internally used by Methyl-IT.   
+              - *J-Divergence* is now available in *estimateCutPoint* function
+
 # MethylIT 0.3.2.1
 * Current version 
 * Actively used in methylome analysis
