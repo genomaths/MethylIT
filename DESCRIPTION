@@ -1,0 +1,57 @@
+Package: MethylIT
+Title: Methylation Analysis Based on Signal Detection
+Version: 0.3.2.7
+Encoding: UTF-8
+Authors@R: c(person("Robersy", "Sanchez", email = "rus547@psu.edu",
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "0000-0002-5246-1453")))
+URL: https://github.com/genomaths/MethylIT
+Description: Methyl-IT implements methylation analysis based on signal detection
+             theory and machine-learning. Methylation process is a stochastic
+             process, particularly, a biochemical-biophysical process which must
+             not be reduced to statistic. Methyl-IT includes the information on
+             the statistical biophysics of the methylation process with the 
+             estimation of the probability distribution of the noise 
+             (plus signal), which is expressed in terms of information 
+             divergences. 
+Depends: 
+  R (>= 3.6.0),
+  rtracklayer,
+  GenomicRanges
+License: file LICENSE
+biocViews: 
+  Software, Epigenetics, MathematicalBiology, DNAMethylation, 
+  DifferentialMethylation, Sequencing, Alignment, Bayesian, 
+  DifferentialExpression, Biophysics
+LazyData: yes
+Imports:
+  BiocGenerics,
+  BiocParallel,
+  caret,
+  data.table,
+  genefilter,
+  GenomeInfoDb,
+  GenomicRanges,
+  graphics,
+  IRanges,
+  matrixStats,
+  MASS,
+  methods,
+  minpack.lm,
+  nls2,
+  RCurl,
+  S4Vectors,
+  stats,
+  utils,
+  XML
+RoxygenNote: 7.2.3
+Suggests:
+  spelling, 
+  testthat, 
+  markdown,
+  knitr,
+  BiocStyle
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+Language: en-US
+BugReports: https://github.com/genomaths/MethylIT/issues

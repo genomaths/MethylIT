@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Sanchez"
+  given-names: "Robersy"
+  orcid: "https://orcid.org/0000-0002-5246-1453"
+title: "Methyl-IT: R package based on signal detection and machine learning"
+version: 0.3.2.7
+doi: 10.5281/zenodo.4041756
+date-released: 2020-09-21
+url: "https://github.com/genomaths/MethylIT"
