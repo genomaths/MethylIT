@@ -94,7 +94,7 @@ evaluation of the Software, other than in a live operating environment, to deter
 whether to enter into a commercial license. THE PACKAGE IS PROVIDED "AS IS", WITHOUT 
 WARRANTY OF ANY KIND, EXPRESS OR IMPLIED (see LICENSE file).
 
-[Methyl-IT](https://methylit.com) can be dowloaded at:
+[Methyl-IT](https://methylit.com) can be downloaded at:
 https://methylit.com
 
 Get Started
