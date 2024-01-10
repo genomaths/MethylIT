@@ -77,12 +77,25 @@ number between 0 and 1, also known as methylation level.
 
 Status
 ------
-In maintenance.   
+Currently, the package is actively used in methylation analyses. 
 
 Flow diagram
 ------------
 
 <img src="man/figures/workflow.png" align="center" />
+
+Download
+--------
+
+The available open source version is only for non-commercial use. The software 
+shall be used for non-commercial purposes including teaching, academic and 
+government research, public demonstrations, personal experimentation, and/or the 
+evaluation of the Software, other than in a live operating environment, to determine
+whether to enter into a commercial license. THE PACKAGE IS PROVIDED "AS IS", WITHOUT 
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED (see LICENSE file).
+
+[Methyl-IT](https://methylit.com) can be dowloaded at:
+https://methylit.com
 
 Get Started
 -----------
@@ -144,7 +157,7 @@ You are free to copy, distribute and transmit MethylIT for non-commercial purpos
 Contact
 -------
 
-For questions about the MethylIT project, contact <rus547@psu.edu>
+For questions about the MethylIT project, see [contact](https://methylit.com) at: https://methylit.com
 
 Contributor Code of Conduct
 ---------------------------
